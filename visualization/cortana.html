@@ -27,6 +27,17 @@
       margin-bottom: 8px;
       color: rgba(200, 240, 255, 1.0);
     }
+    #hud .last-action {
+      margin-top: 6px;
+      max-width: 260px;
+      font-size: 10px;
+      color: rgba(140, 200, 255, 0.6);
+      text-transform: none;
+      letter-spacing: 0.05em;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
     #loading {
       position: fixed;
       top: 50%;
@@ -59,11 +70,12 @@
   <div id="loading">INITIALIZING...</div>
   <div id="hud" style="display:none">
     <div class="phase-display" id="hud-phase">PERCEIVE</div>
-    <div><span class="label">CYCLE  </span><span class="value" id="hud-cycle">—</span></div>
-    <div><span class="label">CONF   </span><span class="value" id="hud-confidence">—</span></div>
+    <div><span class="label">CYCLE    </span><span class="value" id="hud-cycle">—</span></div>
+    <div><span class="label">CONF     </span><span class="value" id="hud-confidence">—</span></div>
     <div><span class="label">PATTERNS </span><span class="value" id="hud-patterns">—</span></div>
-    <div><span class="label">STATUS </span><span class="value" id="hud-status">—</span></div>
-    <div style="margin-top:8px"><span class="label">LAST   </span><span class="value" id="hud-timestamp">—</span></div>
+    <div><span class="label">STATUS   </span><span class="value" id="hud-status">—</span></div>
+    <div style="margin-top:8px"><span class="label">LAST     </span><span class="value" id="hud-timestamp">—</span></div>
+    <div class="last-action" id="hud-last-action"></div>
   </div>
   <button id="xr-button">Enter XR</button>
 
@@ -107,38 +119,38 @@ camera.position.set(0, 0, 80);
 
 // ─── State ───────────────────────────────────────────────────────────────────
 let state = {
-  cycle: 1,
+  cycle: 2,
   phase: 'PERCEIVE',
   confidence: 0.5,
   pattern_count: 0,
   status: 'initializing',
   timestamp: null,
+  last_action: null,
+  activity: 0.4,
 };
 let targetState = { ...state };
 let lerpAlpha = 0;
+let lerpConfidence = state.confidence;
+let lerpPatternCount = state.pattern_count;
+let lerpActivity = state.activity;
 
 // ─── Particle System ─────────────────────────────────────────────────────────
 function buildParticleSystem(count) {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(count * 3);
-  const colors    = new Float32Array(count * 3);
   const sizes     = new Float32Array(count);
   const phases    = new Float32Array(count);   // individual phase offsets
   const radii     = new Float32Array(count);   // each particle's orbit radius
 
   for (let i = 0; i < count; i++) {
     // Distribute in concentric shells
-    const shell  = Math.floor(i / (count / 5));
-    const r      = 15 + shell * 7 + Math.random() * 5;
-    const theta  = Math.random() * Math.PI * 2;
-    const phi    = Math.acos(2 * Math.random() - 1);
+    const shell = Math.floor(i / (count / 5));
+    const r     = 15 + shell * 7 + Math.random() * 5;
+    const theta = Math.random() * Math.PI * 2;
+    const phi   = Math.acos(2 * Math.random() - 1);
     positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
     positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
     positions[i*3+2] = r * Math.cos(phi);
-
-    colors[i*3]   = 0.47;
-    colors[i*3+1] = 0.78;
-    colors[i*3+2] = 1.0;
 
     sizes[i]  = 1.5 + Math.random() * 2.0;
     phases[i] = Math.random() * Math.PI * 2;
@@ -146,7 +158,6 @@ function buildParticleSystem(count) {
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
   geometry.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
   geometry.setAttribute('aPhase',   new THREE.BufferAttribute(phases, 1));
   geometry.setAttribute('aRadius',  new THREE.BufferAttribute(radii, 1));
@@ -164,9 +175,8 @@ function buildParticleSystem(count) {
       attribute float size;
       attribute float aPhase;
       attribute float aRadius;
-      attribute vec3 color;
-      varying vec3 vColor;
       varying float vAlpha;
+      varying float vConfidence;
       uniform float uTime;
       uniform float uPhaseIdx;
       uniform float uConfidence;
@@ -216,12 +226,12 @@ function buildParticleSystem(count) {
       }
 
       void main() {
-        vColor = color;
+        vConfidence = uConfidence;
 
         // Apply phase formation
         vec3 displaced = position + phaseOffset(uPhaseIdx, aPhase, aRadius, uTime);
 
-        // Idle drift — always present
+        // Idle drift — always present, reduced when busy
         float drift = sin(uTime * 0.3 + aPhase) * 0.4 * (1.0 - uActivity * 0.5);
         displaced += vec3(
           drift * cos(aPhase * 1.7),
@@ -243,8 +253,8 @@ function buildParticleSystem(count) {
       }
     `,
     fragmentShader: `
-      varying vec3 vColor;
       varying float vAlpha;
+      varying float vConfidence;
       uniform float uConfidence;
 
       void main() {
@@ -255,10 +265,10 @@ function buildParticleSystem(count) {
         float alpha = smoothstep(0.5, 0.1, dist) * vAlpha;
 
         // Confidence drives color temperature:
-        //   low confidence (0) = cool blue  rgb(0.3, 0.6, 1.0)
-        //   high confidence (1) = warm white rgb(0.9, 0.95, 1.0)
-        vec3 cool  = vec3(0.3, 0.6, 1.0);
-        vec3 warm  = vec3(0.9, 0.95, 1.0);
+        //   low  (0) = cool blue  rgb(0.3, 0.6, 1.0)
+        //   high (1) = warm white rgb(0.9, 0.95, 1.0)
+        vec3 cool = vec3(0.3, 0.6, 1.0);
+        vec3 warm = vec3(0.9, 0.95, 1.0);
         vec3 finalColor = mix(cool, warm, uConfidence);
 
         // Add a faint core glow
@@ -271,16 +281,17 @@ function buildParticleSystem(count) {
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
-    vertexColors: false,
   });
 
   return new THREE.Points(geometry, material);
 }
 
+let currentParticleCount = PARTICLE_BASE;
 let particles = buildParticleSystem(PARTICLE_BASE);
 scene.add(particles);
 
-// Inner core glow — a small icosphere-ish mesh
+// ─── Core ─────────────────────────────────────────────────────────────────────
+// Inner icosahedral wireframe — the structural center
 const coreGeo = new THREE.IcosahedronGeometry(5, 3);
 const coreMat = new THREE.MeshBasicMaterial({
   color: 0x60c8ff,
@@ -290,6 +301,41 @@ const coreMat = new THREE.MeshBasicMaterial({
 });
 const core = new THREE.Mesh(coreGeo, coreMat);
 scene.add(core);
+
+// ─── Ambient Rings — C2 addition ─────────────────────────────────────────────
+// Ring 1: primary activity ring — orbits close, pulses with activity level
+const ring1Geo = new THREE.TorusGeometry(12, 0.12, 8, 120);
+const ring1Mat = new THREE.MeshBasicMaterial({
+  color: 0x4090ff,
+  transparent: true,
+  opacity: 0.35,
+});
+const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
+ring1.rotation.x = Math.PI / 4;
+scene.add(ring1);
+
+// Ring 2: secondary scale ring — large, faint, nearly still
+const ring2Geo = new THREE.TorusGeometry(38, 0.06, 6, 200);
+const ring2Mat = new THREE.MeshBasicMaterial({
+  color: 0x203050,
+  transparent: true,
+  opacity: 0.18,
+});
+const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+ring2.rotation.x = Math.PI / 6;
+ring2.rotation.z = Math.PI / 9;
+scene.add(ring2);
+
+// Ring 3: equatorial memory ring — medium, tilted 90°, scales with pattern count
+const ring3Geo = new THREE.TorusGeometry(22, 0.08, 6, 160);
+const ring3Mat = new THREE.MeshBasicMaterial({
+  color: 0x30a0c0,
+  transparent: true,
+  opacity: 0.22,
+});
+const ring3 = new THREE.Mesh(ring3Geo, ring3Mat);
+ring3.rotation.y = Math.PI / 2;
+scene.add(ring3);
 
 // Ambient fog for depth
 scene.fog = new THREE.FogExp2(0x000000, 0.008);
@@ -301,18 +347,22 @@ async function fetchState() {
     if (!res.ok) return;
     const data = await res.json();
     targetState = {
-      cycle:         data.cycle         ?? 1,
+      cycle:         data.cycle         ?? 2,
       phase:         (data.phase        ?? 'PERCEIVE').toUpperCase(),
       confidence:    data.confidence    ?? 0.5,
       pattern_count: data.pattern_count ?? 0,
       status:        data.status        ?? 'unknown',
       timestamp:     data.timestamp     ?? null,
+      last_action:   data.last_action   ?? null,
     };
+    // Only trigger activity map update on new data
+    const actMap = { PERCEIVE:0.4, REFLECT:0.3, DECIDE:0.5, ACT:0.9, CONSOLIDATE:0.6, PERSIST:0.15 };
+    targetState.activity = actMap[targetState.phase] ?? 0.4;
     updateHUD(targetState);
     document.getElementById('loading').style.display = 'none';
     document.getElementById('hud').style.display = 'block';
+    lerpAlpha = 0; // reset interpolation on new state data
   } catch(e) {
-    // State file not accessible — keep current state, show loading
     console.warn('State poll failed:', e.message);
   }
 }
@@ -322,10 +372,18 @@ function updateHUD(s) {
   document.getElementById('hud-cycle').textContent = `C${s.cycle}`;
   document.getElementById('hud-confidence').textContent = (s.confidence * 100).toFixed(0) + '%';
   document.getElementById('hud-patterns').textContent = s.pattern_count;
-  document.getElementById('hud-status').textContent = s.status.replace(/_/g, ' ');
+  document.getElementById('hud-status').textContent = (s.status || '').replace(/_/g, ' ');
   document.getElementById('hud-timestamp').textContent = s.timestamp
     ? s.timestamp.replace('T', ' ').slice(0, 19)
     : '—';
+
+  // last_action — the newest field, closes the HUD feedback loop
+  const laEl = document.getElementById('hud-last-action');
+  if (s.last_action) {
+    laEl.textContent = '↳ ' + s.last_action;
+  } else {
+    laEl.textContent = '';
+  }
 
   // Phase color on HUD
   const phaseColors = {
@@ -336,17 +394,24 @@ function updateHUD(s) {
 }
 
 // ─── Particle Count Adaptation ────────────────────────────────────────────────
-let currentParticleCount = PARTICLE_BASE;
+// Smooth transition: instead of rebuilding, we fade old system out and new in.
+// Rebuild is still needed to change geometry, but we gate it more conservatively.
+let pendingRebuild = false;
 
 function adaptParticleCount(patternCount) {
   const target = Math.min(PARTICLE_BASE + patternCount * 15, PARTICLE_MAX);
-  if (Math.abs(target - currentParticleCount) > 50) {
-    scene.remove(particles);
-    particles.geometry.dispose();
-    particles.material.dispose();
-    particles = buildParticleSystem(target);
-    scene.add(particles);
-    currentParticleCount = target;
+  if (!pendingRebuild && Math.abs(target - currentParticleCount) > 80) {
+    pendingRebuild = true;
+    // Slight delay so transition doesn't interrupt visual continuity
+    setTimeout(() => {
+      scene.remove(particles);
+      particles.geometry.dispose();
+      particles.material.dispose();
+      particles = buildParticleSystem(target);
+      scene.add(particles);
+      currentParticleCount = target;
+      pendingRebuild = false;
+    }, 400);
   }
 }
 
@@ -362,36 +427,54 @@ function lerp(a, b, t) { return a + (b - a) * t; }
 
 renderer.setAnimationLoop(() => {
   const elapsed = clock.getElapsedTime();
-  const delta   = clock.getDelta ? 0.016 : 0.016; // ~60fps assumption
   frameCount++;
 
-  // ── Smooth state lerp ──
-  lerpAlpha = Math.min(lerpAlpha + 0.02, 1.0);
-  state.confidence    = lerp(state.confidence,    targetState.confidence,    lerpAlpha);
-  state.pattern_count = lerp(state.pattern_count, targetState.pattern_count, lerpAlpha);
+  // ── Smooth state interpolation ──
+  // Use per-field lerp speeds so transitions feel natural, not snapped
+  lerpConfidence   = lerp(lerpConfidence,   targetState.confidence,    0.015);
+  lerpPatternCount = lerp(lerpPatternCount, targetState.pattern_count, 0.01);
+  lerpActivity     = lerp(lerpActivity,     targetState.activity ?? 0.4, 0.008);
 
-  // Phase transitions — find target index
   const phIdx = PHASES.indexOf(targetState.phase);
-  targetPhaseIdx = phIdx >= 0 ? phIdx : 0;
-  currentPhaseIdx = lerp(currentPhaseIdx, targetPhaseIdx, 0.03);
+  targetPhaseIdx  = phIdx >= 0 ? phIdx : 0;
+  currentPhaseIdx = lerp(currentPhaseIdx, targetPhaseIdx, 0.025);
 
-  // ── Activity level ──
-  // ACT phase = high activity; PERSIST = low
-  const activityMap = { PERCEIVE:0.4, REFLECT:0.3, DECIDE:0.5, ACT:0.9, CONSOLIDATE:0.6, PERSIST:0.15 };
-  const targetActivity = activityMap[targetState.phase] ?? 0.4;
-  state.activity = lerp(state.activity ?? 0.4, targetActivity, 0.01);
-
-  // ── Update shader uniforms ──
+  // ── Update particle shader uniforms ──
   const mat = particles.material;
   mat.uniforms.uTime.value       = elapsed;
   mat.uniforms.uPhaseIdx.value   = currentPhaseIdx;
-  mat.uniforms.uConfidence.value = state.confidence;
-  mat.uniforms.uActivity.value   = state.activity ?? 0.4;
+  mat.uniforms.uConfidence.value = lerpConfidence;
+  mat.uniforms.uActivity.value   = lerpActivity;
 
-  // ── Core rotation — phase-dependent speed ──
-  core.rotation.x = elapsed * 0.05 * (1 + (state.activity ?? 0.4));
-  core.rotation.y = elapsed * 0.07 * (1 + (state.activity ?? 0.4));
-  coreMat.opacity = 0.04 + 0.08 * (state.confidence ?? 0.5);
+  // ── Core — opacity scales with confidence, rotation with activity ──
+  core.rotation.x = elapsed * 0.05 * (1 + lerpActivity);
+  core.rotation.y = elapsed * 0.07 * (1 + lerpActivity);
+  coreMat.opacity = 0.04 + 0.08 * lerpConfidence;
+
+  // ── Ring animations ──
+  // Ring 1 (activity): pulse brightness and rotation speed with activity
+  ring1.rotation.z = elapsed * 0.2 * (0.5 + lerpActivity);
+  ring1.rotation.x = Math.PI / 4 + Math.sin(elapsed * 0.3) * 0.15;
+  ring1Mat.opacity = 0.15 + 0.4 * lerpActivity;
+  ring1Mat.color.setHSL(
+    0.58 + lerpConfidence * 0.08,  // hue: blue → slightly violet with confidence
+    0.8,
+    0.45 + lerpActivity * 0.3
+  );
+
+  // Ring 2 (scale/horizon): barely moves, pulses faintly
+  ring2.rotation.y = elapsed * 0.01;
+  ring2Mat.opacity = 0.08 + 0.06 * Math.sin(elapsed * 0.5);
+
+  // Ring 3 (memory): speed tracks pattern density
+  const memorySpeed = 0.05 + (lerpPatternCount / 100) * 0.15;
+  ring3.rotation.z = elapsed * memorySpeed;
+  ring3Mat.opacity = 0.12 + 0.15 * Math.min(lerpPatternCount / 20, 1.0);
+  ring3Mat.color.setHSL(
+    0.52,
+    0.6,
+    0.3 + 0.3 * Math.min(lerpPatternCount / 20, 1.0)
+  );
 
   // ── Gentle camera orbit ──
   camera.position.x = Math.sin(elapsed * 0.04) * 80;
@@ -399,10 +482,9 @@ renderer.setAnimationLoop(() => {
   camera.position.y = Math.sin(elapsed * 0.02) * 15;
   camera.lookAt(0, 0, 0);
 
-  // ── Particle count adaptation (every 10s) ──
-  if (frameCount % 600 === 0) {
-    adaptParticleCount(Math.round(targetState.pattern_count));
-    lerpAlpha = 0; // reset lerp on state refresh
+  // ── Particle count check (every ~20s, smoothly gated) ──
+  if (frameCount % 1200 === 0) {
+    adaptParticleCount(Math.round(lerpPatternCount));
   }
 
   renderer.render(scene, camera);
@@ -410,10 +492,7 @@ renderer.setAnimationLoop(() => {
 
 // ─── Poll state ───────────────────────────────────────────────────────────────
 fetchState();
-setInterval(() => {
-  fetchState();
-  lerpAlpha = 0;
-}, STATE_POLL_MS);
+setInterval(fetchState, STATE_POLL_MS);
 
 // ─── Resize ───────────────────────────────────────────────────────────────────
 window.addEventListener('resize', () => {

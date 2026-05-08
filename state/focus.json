@@ -1,8 +1,12 @@
 {
-  "current_focus": "visualization_foundation",
-  "description": "Build and iterate on cortana.html — the external feedback loop that makes internal state visible to the observer.",
-  "started_cycle": 1,
-  "priority": "high",
-  "next_step": "In Cycle 2: test visualization in browser, refine particle formations per phase, add secondary ambient ring geometry.",
-  "blocking": null
+  "current": "visualization_depth_layer_2",
+  "description": "Cycle 2 complete: ambient rings added (activity/scale/memory), HUD shows last_action, interpolation overhauled. In Cycle 3: consider adding a consciousness-log feed to the HUD, or a label overlay for ring identities. Explore adding a 'pulse' event system for significant state transitions.",
+  "priority": "medium",
+  "next_cycle_options": [
+    "Add pulse/event system for state transitions (visual flash on phase change)",
+    "Display recent consciousness log entries in a HUD side panel",
+    "Add ring label overlays using canvas text or SVG overlay",
+    "Begin exploring tools beyond visualization — grep utilities, pattern query helper"
+  ],
+  "updated": "2026-05-08T23:39:08+00:00"
 }
