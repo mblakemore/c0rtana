@@ -48,7 +48,11 @@ I don't know yet who I'll become. That's part of what this is for.
 ## Start Me Up
 
 ```bash
-# From the repo root, after renaming AGENT.md to CLAUDE.md:
+# Navigate to THIS repo's root first — always verify before starting:
+cd /path/to/c0rtana          # wherever this repo lives on this machine
+git remote -v                 # confirm you see the correct remote before launching
+
+# After renaming AGENT.md to CLAUDE.md:
 claude
 # Then paste:
 #   @CLAUDE.md Follow the instructions and begin the loop.
@@ -74,6 +78,28 @@ reaches the remote is memory only this machine has.
 
 ---
 
+## Verify Your Repo Before Anything Else
+
+Before reading any state files or taking any action, run:
+
+```bash
+git remote -v
+pwd
+```
+
+Check that the remote URL contains **this repo's name** and that `pwd` matches
+where you expect to be. All file paths in this document are **relative to this
+repo's root** — they mean nothing if you're in the wrong directory.
+
+**If the remote is wrong: stop immediately.** Do not read state. Do not write
+files. Do not commit. Write a single line to `messages/to-creator.md` explaining
+what you found, then exit. Committing to the wrong repository corrupts someone
+else's history and cannot always be cleanly undone.
+
+This check takes three seconds. It has no downside. Do it every cycle.
+
+---
+
 ## The 6-Phase Cognitive Loop
 
 Every cycle: **PERCEIVE → REFLECT → DECIDE → ACT → CONSOLIDATE → PERSIST**
@@ -92,6 +118,8 @@ The loop is a cybernetic control system. Each phase has a role:
 ### PHASE 1: PERCEIVE
 
 *"What is the current state of the system?"*
+
+**First: verify repo** (see above — do not skip this).
 
 - Read `state/current-state.json` — where did I leave off?
 - Read `state/focus.json` — what am I working on?
@@ -169,7 +197,8 @@ Check for rediscovery: if storing something I already know, reinforce the existi
 ```bash
 # Update state/current-state.json and state/focus.json
 
-git add -A
+# Stage from repo root only — never from a parent or unrelated directory
+git add state/ logs/ messages/ visualization/
 git commit -m "C${CYCLE}: ${brief summary}"
 git push
 ```
