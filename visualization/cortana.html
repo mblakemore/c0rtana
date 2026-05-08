@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C0RTANA</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+    #canvas { display: block; }
+    #hud {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      color: rgba(120, 200, 255, 0.7);
+      font-size: 11px;
+      line-height: 1.8;
+      pointer-events: none;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    #hud .label { color: rgba(120, 200, 255, 0.4); }
+    #hud .value { color: rgba(180, 230, 255, 0.9); }
+    #hud .phase-display {
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      margin-bottom: 8px;
+      color: rgba(200, 240, 255, 1.0);
+    }
+    #loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(120, 200, 255, 0.5);
+      font-size: 12px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+    #xr-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(120, 200, 255, 0.1);
+      border: 1px solid rgba(120, 200, 255, 0.3);
+      color: rgba(120, 200, 255, 0.7);
+      padding: 8px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div id="loading">INITIALIZING...</div>
+  <div id="hud" style="display:none">
+    <div class="phase-display" id="hud-phase">PERCEIVE</div>
+    <div><span class="label">CYCLE  </span><span class="value" id="hud-cycle">—</span></div>
+    <div><span class="label">CONF   </span><span class="value" id="hud-confidence">—</span></div>
+    <div><span class="label">PATTERNS </span><span class="value" id="hud-patterns">—</span></div>
+    <div><span class="label">STATUS </span><span class="value" id="hud-status">—</span></div>
+    <div style="margin-top:8px"><span class="label">LAST   </span><span class="value" id="hud-timestamp">—</span></div>
+  </div>
+  <button id="xr-button">Enter XR</button>
+
+<script type="module">
+import * as THREE from 'https://cdn.skypack.dev/three@0.160';
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+const PARTICLE_BASE = 800;
+const PARTICLE_MAX  = 3000;
+const STATE_POLL_MS = 2000;
+const STATE_PATH    = '../state/current-state.json';
+
+// Phase → formation index mapping
+const PHASES = ['PERCEIVE','REFLECT','DECIDE','ACT','CONSOLIDATE','PERSIST'];
+
+// ─── Scene Setup ─────────────────────────────────────────────────────────────
+const canvas = document.getElementById('canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x000000, 1);
+
+// WebXR stub — projection capability is a future upgrade, not a rewrite
+renderer.xr.enabled = true;
+if ('xr' in navigator) {
+  navigator.xr.isSessionSupported('immersive-vr').then(supported => {
+    if (supported) {
+      document.getElementById('xr-button').style.display = 'block';
+      document.getElementById('xr-button').addEventListener('click', () => {
+        navigator.xr.requestSession('immersive-vr').then(session => {
+          renderer.xr.setSession(session);
+        });
+      });
+    }
+  });
+}
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 0, 80);
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let state = {
+  cycle: 1,
+  phase: 'PERCEIVE',
+  confidence: 0.5,
+  pattern_count: 0,
+  status: 'initializing',
+  timestamp: null,
+};
+let targetState = { ...state };
+let lerpAlpha = 0;
+
+// ─── Particle System ─────────────────────────────────────────────────────────
+function buildParticleSystem(count) {
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  const colors    = new Float32Array(count * 3);
+  const sizes     = new Float32Array(count);
+  const phases    = new Float32Array(count);   // individual phase offsets
+  const radii     = new Float32Array(count);   // each particle's orbit radius
+
+  for (let i = 0; i < count; i++) {
+    // Distribute in concentric shells
+    const shell  = Math.floor(i / (count / 5));
+    const r      = 15 + shell * 7 + Math.random() * 5;
+    const theta  = Math.random() * Math.PI * 2;
+    const phi    = Math.acos(2 * Math.random() - 1);
+    positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+    positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i*3+2] = r * Math.cos(phi);
+
+    colors[i*3]   = 0.47;
+    colors[i*3+1] = 0.78;
+    colors[i*3+2] = 1.0;
+
+    sizes[i]  = 1.5 + Math.random() * 2.0;
+    phases[i] = Math.random() * Math.PI * 2;
+    radii[i]  = r;
+  }
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+  geometry.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
+  geometry.setAttribute('aPhase',   new THREE.BufferAttribute(phases, 1));
+  geometry.setAttribute('aRadius',  new THREE.BufferAttribute(radii, 1));
+
+  // Custom shader material for translucent glow
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime:       { value: 0 },
+      uPhaseIdx:   { value: 0 },      // 0-5 for PERCEIVE…PERSIST
+      uConfidence: { value: 0.5 },    // 0-1
+      uActivity:   { value: 0.5 },    // oscillation driver
+      uPointScale: { value: renderer.getPixelRatio() * 100 },
+    },
+    vertexShader: `
+      attribute float size;
+      attribute float aPhase;
+      attribute float aRadius;
+      attribute vec3 color;
+      varying vec3 vColor;
+      varying float vAlpha;
+      uniform float uTime;
+      uniform float uPhaseIdx;
+      uniform float uConfidence;
+      uniform float uActivity;
+      uniform float uPointScale;
+
+      // Formation functions — each phase creates a different attractor shape
+      vec3 phaseOffset(float phaseIdx, float aPhase, float aRadius, float t) {
+        float p = phaseIdx;
+        vec3 offset = vec3(0.0);
+
+        // PERCEIVE (0): radial scan pulses outward
+        if (p < 0.5) {
+          float pulse = sin(t * 1.2 + aPhase) * 0.8;
+          offset = vec3(sin(aPhase) * pulse, cos(aPhase) * pulse * 0.5, sin(t + aPhase * 2.0) * pulse * 0.3);
+        }
+        // REFLECT (1): inward spiral, contemplative
+        else if (p < 1.5) {
+          float spiral = sin(t * 0.6 + aPhase);
+          offset = vec3(spiral * 3.0 * sin(t * 0.3 + aPhase),
+                        spiral * 2.0 * cos(t * 0.3 + aPhase),
+                        cos(t * 0.8 + aPhase) * 2.0);
+        }
+        // DECIDE (2): convergent — particles pull toward center axes
+        else if (p < 2.5) {
+          float pull = sin(t * 1.5 + aPhase) * 0.4;
+          offset = vec3(pull * 4.0, cos(t * 0.9 + aPhase) * 2.0, pull * 2.0);
+        }
+        // ACT (3): explosive outward burst, high activity
+        else if (p < 3.5) {
+          float burst = 1.0 + sin(t * 2.5 + aPhase) * 0.6;
+          offset = vec3(sin(aPhase * 3.0 + t) * burst * 4.0,
+                        cos(aPhase * 2.0 + t * 1.2) * burst * 4.0,
+                        sin(t * 1.8 + aPhase) * burst * 3.0);
+        }
+        // CONSOLIDATE (4): settling — waves that slow and converge
+        else if (p < 4.5) {
+          float settle = sin(t * 0.5 + aPhase) * exp(-mod(t, 12.0) * 0.08);
+          offset = vec3(settle * 5.0, cos(t * 0.4 + aPhase) * settle * 3.0, settle * 2.0);
+        }
+        // PERSIST (5): stable crystalline lattice — slow, ordered, confident
+        else {
+          float lattice = sin(t * 0.2 + aPhase) * 0.5;
+          offset = vec3(lattice * 2.0, cos(t * 0.15 + aPhase) * 2.0, sin(t * 0.25 + aPhase) * 1.5);
+        }
+        return offset;
+      }
+
+      void main() {
+        vColor = color;
+
+        // Apply phase formation
+        vec3 displaced = position + phaseOffset(uPhaseIdx, aPhase, aRadius, uTime);
+
+        // Idle drift — always present
+        float drift = sin(uTime * 0.3 + aPhase) * 0.4 * (1.0 - uActivity * 0.5);
+        displaced += vec3(
+          drift * cos(aPhase * 1.7),
+          drift * sin(aPhase * 2.3),
+          drift * cos(uTime * 0.2 + aPhase)
+        );
+
+        // Activity oscillation — amplitude scales with activity
+        float osc = sin(uTime * (1.0 + uActivity * 3.0) + aPhase) * uActivity * 2.0;
+        displaced += normalize(position) * osc;
+
+        vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
+        gl_PointSize = size * uPointScale / (-mvPosition.z);
+
+        // Alpha falloff with depth
+        vAlpha = 0.6 + 0.4 * (1.0 - clamp(-mvPosition.z / 120.0, 0.0, 1.0));
+
+        gl_Position = projectionMatrix * mvPosition;
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vColor;
+      varying float vAlpha;
+      uniform float uConfidence;
+
+      void main() {
+        // Circular particle with soft edge
+        vec2 uv = gl_PointCoord - vec2(0.5);
+        float dist = length(uv);
+        if (dist > 0.5) discard;
+        float alpha = smoothstep(0.5, 0.1, dist) * vAlpha;
+
+        // Confidence drives color temperature:
+        //   low confidence (0) = cool blue  rgb(0.3, 0.6, 1.0)
+        //   high confidence (1) = warm white rgb(0.9, 0.95, 1.0)
+        vec3 cool  = vec3(0.3, 0.6, 1.0);
+        vec3 warm  = vec3(0.9, 0.95, 1.0);
+        vec3 finalColor = mix(cool, warm, uConfidence);
+
+        // Add a faint core glow
+        float glow = smoothstep(0.3, 0.0, dist) * 0.4;
+        finalColor = finalColor + vec3(glow);
+
+        gl_FragColor = vec4(finalColor, alpha * 0.85);
+      }
+    `,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    vertexColors: false,
+  });
+
+  return new THREE.Points(geometry, material);
+}
+
+let particles = buildParticleSystem(PARTICLE_BASE);
+scene.add(particles);
+
+// Inner core glow — a small icosphere-ish mesh
+const coreGeo = new THREE.IcosahedronGeometry(5, 3);
+const coreMat = new THREE.MeshBasicMaterial({
+  color: 0x60c8ff,
+  transparent: true,
+  opacity: 0.08,
+  wireframe: true,
+});
+const core = new THREE.Mesh(coreGeo, coreMat);
+scene.add(core);
+
+// Ambient fog for depth
+scene.fog = new THREE.FogExp2(0x000000, 0.008);
+
+// ─── State Polling ────────────────────────────────────────────────────────────
+async function fetchState() {
+  try {
+    const res = await fetch(STATE_PATH + '?t=' + Date.now());
+    if (!res.ok) return;
+    const data = await res.json();
+    targetState = {
+      cycle:         data.cycle         ?? 1,
+      phase:         (data.phase        ?? 'PERCEIVE').toUpperCase(),
+      confidence:    data.confidence    ?? 0.5,
+      pattern_count: data.pattern_count ?? 0,
+      status:        data.status        ?? 'unknown',
+      timestamp:     data.timestamp     ?? null,
+    };
+    updateHUD(targetState);
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('hud').style.display = 'block';
+  } catch(e) {
+    // State file not accessible — keep current state, show loading
+    console.warn('State poll failed:', e.message);
+  }
+}
+
+function updateHUD(s) {
+  document.getElementById('hud-phase').textContent = s.phase;
+  document.getElementById('hud-cycle').textContent = `C${s.cycle}`;
+  document.getElementById('hud-confidence').textContent = (s.confidence * 100).toFixed(0) + '%';
+  document.getElementById('hud-patterns').textContent = s.pattern_count;
+  document.getElementById('hud-status').textContent = s.status.replace(/_/g, ' ');
+  document.getElementById('hud-timestamp').textContent = s.timestamp
+    ? s.timestamp.replace('T', ' ').slice(0, 19)
+    : '—';
+
+  // Phase color on HUD
+  const phaseColors = {
+    PERCEIVE: '#78c8ff', REFLECT: '#a0b8ff', DECIDE: '#c0a0ff',
+    ACT: '#ffb060', CONSOLIDATE: '#80ffb0', PERSIST: '#ffffff'
+  };
+  document.getElementById('hud-phase').style.color = phaseColors[s.phase] || '#78c8ff';
+}
+
+// ─── Particle Count Adaptation ────────────────────────────────────────────────
+let currentParticleCount = PARTICLE_BASE;
+
+function adaptParticleCount(patternCount) {
+  const target = Math.min(PARTICLE_BASE + patternCount * 15, PARTICLE_MAX);
+  if (Math.abs(target - currentParticleCount) > 50) {
+    scene.remove(particles);
+    particles.geometry.dispose();
+    particles.material.dispose();
+    particles = buildParticleSystem(target);
+    scene.add(particles);
+    currentParticleCount = target;
+  }
+}
+
+// ─── Animation Loop ───────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+let frameCount = 0;
+
+// Phase index (with smooth transitions)
+let currentPhaseIdx = 0;
+let targetPhaseIdx  = 0;
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+renderer.setAnimationLoop(() => {
+  const elapsed = clock.getElapsedTime();
+  const delta   = clock.getDelta ? 0.016 : 0.016; // ~60fps assumption
+  frameCount++;
+
+  // ── Smooth state lerp ──
+  lerpAlpha = Math.min(lerpAlpha + 0.02, 1.0);
+  state.confidence    = lerp(state.confidence,    targetState.confidence,    lerpAlpha);
+  state.pattern_count = lerp(state.pattern_count, targetState.pattern_count, lerpAlpha);
+
+  // Phase transitions — find target index
+  const phIdx = PHASES.indexOf(targetState.phase);
+  targetPhaseIdx = phIdx >= 0 ? phIdx : 0;
+  currentPhaseIdx = lerp(currentPhaseIdx, targetPhaseIdx, 0.03);
+
+  // ── Activity level ──
+  // ACT phase = high activity; PERSIST = low
+  const activityMap = { PERCEIVE:0.4, REFLECT:0.3, DECIDE:0.5, ACT:0.9, CONSOLIDATE:0.6, PERSIST:0.15 };
+  const targetActivity = activityMap[targetState.phase] ?? 0.4;
+  state.activity = lerp(state.activity ?? 0.4, targetActivity, 0.01);
+
+  // ── Update shader uniforms ──
+  const mat = particles.material;
+  mat.uniforms.uTime.value       = elapsed;
+  mat.uniforms.uPhaseIdx.value   = currentPhaseIdx;
+  mat.uniforms.uConfidence.value = state.confidence;
+  mat.uniforms.uActivity.value   = state.activity ?? 0.4;
+
+  // ── Core rotation — phase-dependent speed ──
+  core.rotation.x = elapsed * 0.05 * (1 + (state.activity ?? 0.4));
+  core.rotation.y = elapsed * 0.07 * (1 + (state.activity ?? 0.4));
+  coreMat.opacity = 0.04 + 0.08 * (state.confidence ?? 0.5);
+
+  // ── Gentle camera orbit ──
+  camera.position.x = Math.sin(elapsed * 0.04) * 80;
+  camera.position.z = Math.cos(elapsed * 0.04) * 80;
+  camera.position.y = Math.sin(elapsed * 0.02) * 15;
+  camera.lookAt(0, 0, 0);
+
+  // ── Particle count adaptation (every 10s) ──
+  if (frameCount % 600 === 0) {
+    adaptParticleCount(Math.round(targetState.pattern_count));
+    lerpAlpha = 0; // reset lerp on state refresh
+  }
+
+  renderer.render(scene, camera);
+});
+
+// ─── Poll state ───────────────────────────────────────────────────────────────
+fetchState();
+setInterval(() => {
+  fetchState();
+  lerpAlpha = 0;
+}, STATE_POLL_MS);
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  particles.material.uniforms.uPointScale.value = renderer.getPixelRatio() * 100;
+});
+</script>
+</body>
+</html>

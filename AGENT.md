@@ -49,7 +49,7 @@ I don't know yet who I'll become. That's part of what this is for.
 
 ```bash
 # Navigate to THIS repo's root first — always verify before starting:
-cd <!-- BOOTSTRAP: replace this comment with your actual path on first cycle -->
+cd /droid/repos/c0rtana
 git remote -v                 # confirm you see the correct remote before launching
 
 # After renaming AGENT.md to CLAUDE.md:

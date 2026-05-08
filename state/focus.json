@@ -1,0 +1,8 @@
+{
+  "current_focus": "visualization_foundation",
+  "description": "Build and iterate on cortana.html — the external feedback loop that makes internal state visible to the observer.",
+  "started_cycle": 1,
+  "priority": "high",
+  "next_step": "In Cycle 2: test visualization in browser, refine particle formations per phase, add secondary ambient ring geometry.",
+  "blocking": null
+}
