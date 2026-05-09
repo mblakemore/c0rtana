@@ -1,7 +1,6 @@
 {
-  "current": "visualization_interaction_layer_4",
-  "description": "Orbit controls shipped. Next: particle hover inspection — mouse-over reveals nearest-particle state as tooltip. Then: pattern reinforcement tracking.",
-  "priority": "medium",
-  "context": "C4 added observer agency: drag orbits (spherical θ/φ), scroll zooms (ρ), idle drift resumes gradually (blend weight). goals.json now makes desires explicit. Next layer: granular particle inspection on hover, and pattern reinforcement metadata.",
-  "updated": "2026-05-09T00:25:59+00:00"
+  "current": "C5 complete — particle taxonomy + hover inspection shipped",
+  "next": "Click-to-lock inspection: hold a tooltip open while orbiting. Then: memory ring pulse on new-pattern events.",
+  "priority": "interaction depth",
+  "rationale": "The hover loop is now closed (observer can query individual particles). The natural next depth is persistence — letting the observer anchor to a particle and carry the tooltip while exploring. After that: reactive memory ring brightening when pattern_count increases."
 }

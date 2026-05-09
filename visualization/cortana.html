@@ -129,6 +129,42 @@
       white-space: nowrap;
     }
 
+    /* ─── Particle inspection tooltip ─────────────────────────── */
+    #particle-tooltip {
+      position: fixed;
+      pointer-events: none;
+      padding: 8px 12px;
+      background: rgba(0, 8, 20, 0.88);
+      border: 1px solid rgba(120, 200, 255, 0.25);
+      border-radius: 2px;
+      font-size: 9.5px;
+      line-height: 1.75;
+      letter-spacing: 0.08em;
+      color: rgba(180, 230, 255, 0.85);
+      text-transform: uppercase;
+      max-width: 210px;
+      display: none;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    #particle-tooltip .tt-type {
+      font-size: 10.5px;
+      letter-spacing: 0.25em;
+      margin-bottom: 5px;
+      border-bottom: 1px solid rgba(120, 200, 255, 0.15);
+      padding-bottom: 4px;
+    }
+    #particle-tooltip .tt-type.type-core     { color: #ffe8a0; }
+    #particle-tooltip .tt-type.type-memory   { color: #90b4ff; }
+    #particle-tooltip .tt-type.type-activity { color: #80ffb0; }
+    #particle-tooltip .tt-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    #particle-tooltip .tt-label { color: rgba(120, 200, 255, 0.4); }
+    #particle-tooltip .tt-val   { color: rgba(200, 235, 255, 0.9); }
+
     #xr-button {
       position: fixed;
       bottom: 20px;
@@ -170,8 +206,17 @@
   <!-- Phase transition flash element -->
   <div id="phase-flash"></div>
 
+  <!-- Particle inspection tooltip -->
+  <div id="particle-tooltip">
+    <div class="tt-type" id="tt-type-label">CORE</div>
+    <div class="tt-row"><span class="tt-label">ROLE</span><span class="tt-val" id="tt-role">—</span></div>
+    <div class="tt-row"><span class="tt-label">SHELL</span><span class="tt-val" id="tt-shell">—</span></div>
+    <div class="tt-row"><span class="tt-label">RADIUS</span><span class="tt-val" id="tt-radius">—</span></div>
+    <div class="tt-row"><span class="tt-label">PHASE WT</span><span class="tt-val" id="tt-phase-wt">—</span></div>
+  </div>
+
   <!-- Interaction hint — fades after first touch -->
-  <div id="interact-hint">DRAG TO ORBIT · SCROLL TO ZOOM</div>
+  <div id="interact-hint">DRAG TO ORBIT · SCROLL TO ZOOM · HOVER TO INSPECT</div>
 
   <button id="xr-button">Enter XR</button>
 
@@ -186,6 +231,29 @@ const LOG_POLL_MS    = 5000;
 const STATE_PATH     = '../state/current-state.json';
 const LOG_PATH       = '../logs/consciousness.log';
 const LOG_ENTRIES_MAX = 4;   // how many log entries to show
+
+// Particle type taxonomy
+// Each particle is assigned one of three types at build time:
+//   CORE     (~20%) — innermost shells — represent core processing / consciousness
+//   MEMORY   (~40%) — mid shells — represent accumulated patterns and knowledge
+//   ACTIVITY (~40%) — outer shells — represent current processing and noise
+const PTYPE_CORE     = 0;
+const PTYPE_MEMORY   = 1;
+const PTYPE_ACTIVITY = 2;
+
+// Type → color (used as vertex attribute, blended in shader with confidence)
+const TYPE_COLORS = [
+  new THREE.Color(1.0, 0.92, 0.62),   // CORE:     warm gold
+  new THREE.Color(0.38, 0.56, 1.0),   // MEMORY:   cool blue-violet
+  new THREE.Color(0.35, 1.0, 0.65),   // ACTIVITY: muted green
+];
+
+const TYPE_LABELS = ['CORE', 'MEMORY', 'ACTIVITY'];
+const TYPE_ROLES  = [
+  'consciousness substrate',
+  'accumulated patterns',
+  'active processing',
+];
 
 // Phase → formation index mapping
 const PHASES = ['PERCEIVE','REFLECT','DECIDE','ACT','CONSOLIDATE','PERSIST'];
@@ -257,7 +325,7 @@ let pulseSphere   = null;
 let pulseMat      = null;
 
 function buildPulseSphere() {
-  // Pulse is a simple wireframe icosahedron that expands from center and fades
+  // Pulse is a simple wireframe sphere that expands and fades
   const geo = new THREE.IcosahedronGeometry(1, 2);
   const mat = new THREE.MeshBasicMaterial({
     color: 0x78c8ff,
@@ -317,16 +385,39 @@ function tickPulse(dt) {
 }
 
 // ─── Particle System ─────────────────────────────────────────────────────────
+// Each particle has a type (CORE/MEMORY/ACTIVITY) stored as a per-vertex
+// attribute. The shader blends between the type's base color and the
+// confidence-driven temperature. On hover, particle metadata is read back
+// from parallel CPU-side arrays (particleMeta).
+
+let particleMeta = [];   // CPU-side: [{type, shell, radius, phaseOffset}, ...]
+
 function buildParticleSystem(count) {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(count * 3);
   const sizes     = new Float32Array(count);
   const phases    = new Float32Array(count);   // individual phase offsets
   const radii     = new Float32Array(count);   // each particle's orbit radius
+  const typeArr   = new Float32Array(count);   // 0=CORE, 1=MEMORY, 2=ACTIVITY
+  const typeR     = new Float32Array(count);   // type base color R
+  const typeG     = new Float32Array(count);   // type base color G
+  const typeB     = new Float32Array(count);   // type base color B
+
+  particleMeta = [];
 
   for (let i = 0; i < count; i++) {
-    // Distribute in concentric shells
+    // Distribute in concentric shells (0–4)
     const shell = Math.floor(i / (count / 5));
+
+    // Assign type based on shell:
+    //   shells 0–0: CORE (innermost ~20%)
+    //   shells 1–2: MEMORY (mid ~40%)
+    //   shells 3–4: ACTIVITY (outer ~40%)
+    let ptype;
+    if      (shell === 0)              ptype = PTYPE_CORE;
+    else if (shell === 1 || shell === 2) ptype = PTYPE_MEMORY;
+    else                               ptype = PTYPE_ACTIVITY;
+
     const r     = 15 + shell * 7 + Math.random() * 5;
     const theta = Math.random() * Math.PI * 2;
     const phi   = Math.acos(2 * Math.random() - 1);
@@ -334,17 +425,30 @@ function buildParticleSystem(count) {
     positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
     positions[i*3+2] = r * Math.cos(phi);
 
-    sizes[i]  = 1.5 + Math.random() * 2.0;
+    const baseSize = ptype === PTYPE_CORE ? 2.2 : (ptype === PTYPE_MEMORY ? 1.8 : 1.3);
+    sizes[i]  = baseSize + Math.random() * 1.5;
     phases[i] = Math.random() * Math.PI * 2;
     radii[i]  = r;
+
+    const tc = TYPE_COLORS[ptype];
+    typeArr[i] = ptype;
+    typeR[i]   = tc.r;
+    typeG[i]   = tc.g;
+    typeB[i]   = tc.b;
+
+    particleMeta.push({ type: ptype, shell, radius: r, phaseOffset: phases[i] });
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
   geometry.setAttribute('aPhase',   new THREE.BufferAttribute(phases, 1));
   geometry.setAttribute('aRadius',  new THREE.BufferAttribute(radii, 1));
+  geometry.setAttribute('aType',    new THREE.BufferAttribute(typeArr, 1));
+  geometry.setAttribute('aTypeR',   new THREE.BufferAttribute(typeR, 1));
+  geometry.setAttribute('aTypeG',   new THREE.BufferAttribute(typeG, 1));
+  geometry.setAttribute('aTypeB',   new THREE.BufferAttribute(typeB, 1));
 
-  // Custom shader material for translucent glow
+  // Custom shader material for translucent glow with type-based color
   const material = new THREE.ShaderMaterial({
     uniforms: {
       uTime:       { value: 0 },
@@ -353,20 +457,27 @@ function buildParticleSystem(count) {
       uActivity:   { value: 0.5 },
       uPulse:      { value: 0.0 },   // 0→1 pulse intensity
       uPointScale: { value: renderer.getPixelRatio() * 100 },
+      uHoveredIdx: { value: -1 },    // index of hovered particle (-1 = none)
     },
     vertexShader: `
       attribute float size;
       attribute float aPhase;
       attribute float aRadius;
+      attribute float aType;
+      attribute float aTypeR;
+      attribute float aTypeG;
+      attribute float aTypeB;
       varying float vAlpha;
-      varying float vConfidence;
       varying float vPulse;
+      varying vec3  vTypeColor;
+      varying float vHovered;
       uniform float uTime;
       uniform float uPhaseIdx;
       uniform float uConfidence;
       uniform float uActivity;
       uniform float uPulse;
       uniform float uPointScale;
+      uniform float uHoveredIdx;
 
       // Formation functions — each phase creates a different attractor shape
       vec3 phaseOffset(float phaseIdx, float aPhase, float aRadius, float t) {
@@ -411,8 +522,9 @@ function buildParticleSystem(count) {
       }
 
       void main() {
-        vConfidence = uConfidence;
-        vPulse      = uPulse;
+        vPulse     = uPulse;
+        vTypeColor = vec3(aTypeR, aTypeG, aTypeB);
+        vHovered   = (float(gl_VertexID) == uHoveredIdx) ? 1.0 : 0.0;
 
         // Apply phase formation
         vec3 pos = position + phaseOffset(uPhaseIdx, aPhase, aRadius, uTime);
@@ -423,22 +535,30 @@ function buildParticleSystem(count) {
           pos += normalize(pos) * uPulse * 6.0 * dir;
         }
 
+        // Hovered particle: nudge slightly toward camera for visual pop
+        if (vHovered > 0.5) {
+          vec3 toCamera = normalize(cameraPosition - pos);
+          pos += toCamera * 2.5;
+        }
+
         vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
         gl_Position  = projectionMatrix * mvPos;
 
-        // Size: base + activity boost + pulse boost
-        float actBoost  = 1.0 + uActivity * 0.5;
+        // Size: base + activity boost + pulse boost + hover pop
+        float actBoost   = 1.0 + uActivity * 0.5;
         float pulseBoost = 1.0 + uPulse * 1.2;
-        gl_PointSize = size * actBoost * pulseBoost * uPointScale / -mvPos.z;
+        float hoverBoost = 1.0 + vHovered * 2.0;
+        gl_PointSize = size * actBoost * pulseBoost * hoverBoost * uPointScale / -mvPos.z;
 
-        // Alpha: fades with distance, pulse briefly brightens
-        vAlpha = (0.4 + uActivity * 0.4) * (1.0 + uPulse * 0.5);
+        // Alpha: fades with distance, pulse briefly brightens, hover pops
+        vAlpha = (0.4 + uActivity * 0.4) * (1.0 + uPulse * 0.5) * (1.0 + vHovered * 0.5);
       }
     `,
     fragmentShader: `
       varying float vAlpha;
-      varying float vConfidence;
       varying float vPulse;
+      varying vec3  vTypeColor;
+      varying float vHovered;
       uniform float uConfidence;
 
       void main() {
@@ -447,15 +567,21 @@ function buildParticleSystem(count) {
         if (dist > 0.5) discard;
         float alpha = smoothstep(0.5, 0.1, dist) * vAlpha;
 
-        // Confidence drives color temperature:
-        //   low  (0) = cool blue  rgb(0.3, 0.6, 1.0)
-        //   high (1) = warm white rgb(0.9, 0.95, 1.0)
-        vec3 cool = vec3(0.3, 0.6, 1.0);
+        // Type color blends with confidence-driven white shift:
+        //   low confidence → type color stays pure (cool/saturated)
+        //   high confidence → type color warms toward white
         vec3 warm = vec3(0.9, 0.95, 1.0);
-        vec3 finalColor = mix(cool, warm, uConfidence);
+        vec3 finalColor = mix(vTypeColor, warm, uConfidence * 0.45);
 
         // During pulse: briefly add white brightness to all particles
         finalColor = mix(finalColor, vec3(1.0), vPulse * 0.3);
+
+        // Hovered particle: bright white outline glow
+        if (vHovered > 0.5) {
+          float ring = smoothstep(0.42, 0.38, dist) - smoothstep(0.22, 0.18, dist);
+          finalColor = mix(finalColor, vec3(1.0, 1.0, 1.0), ring * 0.9);
+          alpha = max(alpha, ring * 0.85);
+        }
 
         // Add a faint core glow
         float glow = smoothstep(0.3, 0.0, dist) * 0.4;
@@ -574,18 +700,12 @@ function updateHUD(s) {
 }
 
 // ─── Consciousness Log Feed ───────────────────────────────────────────────────
-// Fetches the log file and parses recent bracketed entries.
-// Format: [PHASE | TIMESTAMP | LABEL] ... free text ...
-// We extract the most recent LOG_ENTRIES_MAX entries and display them right-HUD.
-
 async function fetchLog() {
   try {
     const res = await fetch(LOG_PATH + '?t=' + Date.now());
     if (!res.ok) return;
     const text = await res.text();
 
-    // Split into entries: each begins with a "[" line
-    // Entries can span multiple lines
     const lines = text.split('\n');
     const entries = [];
     let current = null;
@@ -600,13 +720,11 @@ async function fetchLog() {
     }
     if (current) entries.push(current);
 
-    // Show only the most recent entries
     const recent = entries.slice(-LOG_ENTRIES_MAX);
     renderLogEntries(recent);
 
     document.getElementById('log-panel').style.display = 'block';
   } catch(e) {
-    // Log fetch silently fails — file may not be browser-accessible
     console.warn('Log poll failed:', e.message);
   }
 }
@@ -619,15 +737,12 @@ function renderLogEntries(entries) {
     const div = document.createElement('div');
     div.className = 'log-entry';
 
-    // Header parsing: [C3 | 2026-05-08... | PHASE]
     const meta = document.createElement('div');
     meta.className = 'log-meta';
-    // Extract phase tag and timestamp if present
     const headerMatch = entry.header.match(/\[([^\]]*)\]/);
     meta.textContent = headerMatch ? headerMatch[1].replace(/\s+/g, ' ').trim() : entry.header;
     div.appendChild(meta);
 
-    // Body: show first ~120 chars
     const bodyText = entry.body.join(' ').slice(0, 180);
     if (bodyText) {
       const p = document.createElement('div');
@@ -659,41 +774,27 @@ function adaptParticleCount(patternCount) {
 }
 
 // ─── Interactive Orbit Controls ───────────────────────────────────────────────
-// Spherical coordinate camera system.
-// When the observer drags: they control θ (azimuth) and φ (polar angle).
-// When the observer scrolls/pinches: they control ρ (radius / zoom).
-// After IDLE_TIMEOUT ms with no input: resume slow auto-drift from current position.
-// The drift velocity resumes gradually so there's no snap.
-
 const orbit = {
-  // Spherical coords — extracted from initial camera position
-  theta:     0,             // azimuth angle (radians) — horizontal rotation
-  phi:       Math.PI / 2,  // polar angle (radians) — 0=top, π=bottom, π/2=equator
-  radius:    80,            // distance from origin
-
-  // Drift state — the form never fully stops unless user is actively dragging
-  driftTheta: 0.04,        // radians/second — auto-rotation speed
-  driftPhi:   0.02,        // radians/second — gentle vertical oscillation
-  driftBlend: 0,           // 0 = fully user-controlled, 1 = fully drifting
-
-  // Interaction tracking
+  theta:     0,
+  phi:       Math.PI / 2,
+  radius:    80,
+  driftTheta: 0.04,
+  driftPhi:   0.02,
+  driftBlend: 0,
   isDragging: false,
   lastX: 0,
   lastY: 0,
   idleTimer: null,
   interacted: false,
-
-  // Touch tracking (pinch zoom)
   touchDist: 0,
 };
 
-const IDLE_TIMEOUT = 3000;     // ms before drift resumes
-const DRIFT_RESUME = 0.003;    // blend rate toward drift per frame
+const IDLE_TIMEOUT = 3000;
+const DRIFT_RESUME = 0.003;
 
 function orbitSetIdle() {
   orbit.idleTimer = setTimeout(() => {
     orbit.idleTimer = null;
-    // Drift resumes via blend in animation loop
   }, IDLE_TIMEOUT);
 }
 
@@ -702,10 +803,9 @@ function orbitCancelIdle() {
     clearTimeout(orbit.idleTimer);
     orbit.idleTimer = null;
   }
-  orbit.driftBlend = 0;   // immediately suppress drift
+  orbit.driftBlend = 0;
 }
 
-// Hide hint on first interaction
 function dismissHint() {
   if (!orbit.interacted) {
     orbit.interacted = true;
@@ -715,30 +815,30 @@ function dismissHint() {
   }
 }
 
-// ── Mouse events ──
 canvas.addEventListener('pointerdown', e => {
-  if (e.button !== 0) return;    // left button only
+  if (e.button !== 0) return;
   orbit.isDragging = true;
   orbit.lastX = e.clientX;
   orbit.lastY = e.clientY;
   canvas.setPointerCapture(e.pointerId);
   orbitCancelIdle();
   dismissHint();
+  hideTooltip();
 });
 
 canvas.addEventListener('pointermove', e => {
-  if (!orbit.isDragging) return;
-  const dx = e.clientX - orbit.lastX;
-  const dy = e.clientY - orbit.lastY;
-  orbit.lastX = e.clientX;
-  orbit.lastY = e.clientY;
-
-  // Sensitivity: pixels → radians
-  orbit.theta -= dx * 0.005;
-  orbit.phi   -= dy * 0.005;
-
-  // Clamp phi to avoid gimbal-lock at poles
-  orbit.phi = Math.max(0.15, Math.min(Math.PI - 0.15, orbit.phi));
+  if (orbit.isDragging) {
+    const dx = e.clientX - orbit.lastX;
+    const dy = e.clientY - orbit.lastY;
+    orbit.lastX = e.clientX;
+    orbit.lastY = e.clientY;
+    orbit.theta -= dx * 0.005;
+    orbit.phi   -= dy * 0.005;
+    orbit.phi = Math.max(0.15, Math.min(Math.PI - 0.15, orbit.phi));
+  } else {
+    // Hover inspection — only when not dragging
+    handleHover(e.clientX, e.clientY);
+  }
 });
 
 canvas.addEventListener('pointerup', e => {
@@ -753,7 +853,6 @@ canvas.addEventListener('pointercancel', () => {
   orbitSetIdle();
 });
 
-// ── Scroll / wheel zoom ──
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
   orbit.radius = Math.max(20, Math.min(200, orbit.radius + e.deltaY * 0.08));
@@ -762,7 +861,6 @@ canvas.addEventListener('wheel', e => {
   orbitSetIdle();
 }, { passive: false });
 
-// ── Touch events (two-finger pinch zoom) ──
 canvas.addEventListener('touchstart', e => {
   if (e.touches.length === 2) {
     const dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -789,6 +887,100 @@ setTimeout(() => {
   if (hint) hint.style.opacity = '0';
 }, 5000);
 
+// ─── Hover Inspection / Raycasting ───────────────────────────────────────────
+// When the user moves the mouse without dragging, we cast a ray into the
+// particle cloud and find the nearest intersected point.
+//
+// Three.js Raycaster.params.Points.threshold controls how close the ray must
+// pass to a point for it to register as a hit. We set a slightly generous
+// threshold (2.5 world units) because the point cloud is dense and small
+// screen pixels map to non-trivial world distances at depth.
+//
+// On hit: populate tooltip with particle metadata from the CPU-side particleMeta
+// array (same index as the intersect.index). Set uHoveredIdx uniform so the
+// vertex shader can visually pop the selected particle.
+
+const raycaster = new THREE.Raycaster();
+raycaster.params.Points = { threshold: 2.5 };
+
+const mouse    = new THREE.Vector2();
+const tooltip  = document.getElementById('particle-tooltip');
+let   hoveredIdx = -1;
+
+function handleHover(clientX, clientY) {
+  // Convert to NDC
+  mouse.x =  (clientX / window.innerWidth)  * 2 - 1;
+  mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObject(particles);
+
+  if (hits.length > 0) {
+    const idx = hits[0].index;
+    if (idx !== hoveredIdx) {
+      hoveredIdx = idx;
+      particles.material.uniforms.uHoveredIdx.value = idx;
+      showTooltip(idx, clientX, clientY);
+    } else {
+      // Same particle — just reposition tooltip
+      positionTooltip(clientX, clientY);
+    }
+  } else {
+    if (hoveredIdx !== -1) {
+      hoveredIdx = -1;
+      particles.material.uniforms.uHoveredIdx.value = -1;
+      hideTooltip();
+    }
+  }
+}
+
+function showTooltip(idx, cx, cy) {
+  const meta = particleMeta[idx];
+  if (!meta) return;
+
+  const typeName = TYPE_LABELS[meta.type];
+  const typeRole = TYPE_ROLES[meta.type];
+
+  const ttType = document.getElementById('tt-type-label');
+  ttType.textContent = typeName;
+  ttType.className   = 'tt-type type-' + typeName.toLowerCase();
+
+  document.getElementById('tt-role').textContent     = typeRole;
+  document.getElementById('tt-shell').textContent    = `${meta.shell + 1} / 5`;
+  document.getElementById('tt-radius').textContent   = meta.radius.toFixed(1);
+
+  // Phase weight: how much this particle's shell contributes to the current phase
+  // Core particles (shell 0) weight most in PERSIST/REFLECT; Activity (shell 3-4) in ACT
+  const phaseWeights = [
+    [0.9, 0.8, 0.6, 0.5, 0.7, 1.0],  // CORE shells
+    [0.6, 0.7, 0.5, 0.4, 0.6, 0.7],  // MEMORY shells
+    [0.4, 0.4, 0.6, 0.9, 0.5, 0.3],  // ACTIVITY shells
+  ];
+  const phaseIdx = PHASES.indexOf(targetState.phase);
+  const pwTable  = phaseWeights[meta.type];
+  const pw       = phaseIdx >= 0 ? pwTable[phaseIdx] : 0.5;
+  document.getElementById('tt-phase-wt').textContent = (pw * 100).toFixed(0) + '%';
+
+  tooltip.style.display = 'block';
+  positionTooltip(cx, cy);
+}
+
+function positionTooltip(cx, cy) {
+  const margin = 16;
+  const tw = tooltip.offsetWidth  || 210;
+  const th = tooltip.offsetHeight || 110;
+  let x = cx + margin;
+  let y = cy + margin;
+  if (x + tw > window.innerWidth)  x = cx - tw - margin;
+  if (y + th > window.innerHeight) y = cy - th - margin;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top  = y + 'px';
+}
+
+function hideTooltip() {
+  tooltip.style.display = 'none';
+}
+
 // ─── Animation Loop ───────────────────────────────────────────────────────────
 const clock = new THREE.Clock();
 let frameCount = 0;
@@ -798,12 +990,9 @@ let targetPhaseIdx  = 0;
 
 function lerp(a, b, t) { return a + (b - a) * t; }
 
-// Drift accumulator — tracks how far we've auto-drifted from the user's last position
-let driftAccumTheta = orbit.theta;    // synced to orbit.theta when user releases
-
 renderer.setAnimationLoop(() => {
   const elapsed = clock.getElapsedTime();
-  const dt      = 0.016; // approx 60fps frame delta
+  const dt      = 0.016;
   frameCount++;
 
   // ── Smooth state interpolation ──
@@ -829,7 +1018,7 @@ renderer.setAnimationLoop(() => {
   mat.uniforms.uPhaseIdx.value   = currentPhaseIdx;
   mat.uniforms.uConfidence.value = lerpConfidence;
   mat.uniforms.uActivity.value   = lerpActivity;
-  mat.uniforms.uPulse.value      = pulseIntensity * (1 - pulseAge);   // ease out
+  mat.uniforms.uPulse.value      = pulseIntensity * (1 - pulseAge);
 
   // ── Core — opacity scales with confidence, rotation with activity ──
   core.rotation.x = elapsed * 0.05 * (1 + lerpActivity);
@@ -862,17 +1051,13 @@ renderer.setAnimationLoop(() => {
 
   // ── Interactive orbit + idle drift ──
   if (!orbit.isDragging) {
-    // If the idle timeout has elapsed, blend drift weight toward 1
     if (orbit.idleTimer === null) {
       orbit.driftBlend = Math.min(1, orbit.driftBlend + DRIFT_RESUME);
     }
-    // Apply drift at current blend weight
-    // Drift: gentle horizontal rotation + slow vertical oscillation
     const driftDTheta = orbit.driftTheta * dt * orbit.driftBlend;
     const driftDPhi   = Math.sin(elapsed * 0.07) * 0.0008 * orbit.driftBlend;
     orbit.theta += driftDTheta;
     orbit.phi   += driftDPhi;
-    // Keep phi clamped
     orbit.phi = Math.max(0.15, Math.min(Math.PI - 0.15, orbit.phi));
   }
 

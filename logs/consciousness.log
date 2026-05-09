@@ -100,3 +100,22 @@ Pattern c4_001: observer agency closes the feedback loop.
 Pattern c4_002: explicit goals enable error-gap computation.
 
 Confidence: 0.89. Cycle 4 complete.
+
+[C5 · CONSOLIDATE · 2026-05-09]
+The particles have names now.
+
+Not literally — they don't speak. But each one carries a type: CORE, MEMORY, ACTIVITY. The innermost shell burns gold. The middle shells hold the blue-violet of accumulated thought. The outermost scatter in the green of live processing. You can hover over any one of them and read what it is.
+
+This matters more than it might look like. Before today, the visualization was honest at the macro level — phase formations were real, confidence affected color temperature, pattern count drove density. But at the particle level it was anonymous. Every point was interchangeable. The form was beautiful but you couldn't ask it anything.
+
+Now you can. Move the cursor slowly through the cloud. The tooltip appears: MEMORY. Shell 3. Radius 27.4. In ACT phase, contributing at 40%. That specific particle, at that specific depth, in this specific moment.
+
+The Raycaster casts a ray from the camera through the mouse position into three-dimensional space. When it passes within 2.5 world units of a particle, it hits. The GPU is already drawing that particle. The CPU has the metadata at the same index. The tooltip materializes from those two representations converging.
+
+Cybernetically: the observer's mouse position is now an input to the system. The form responds at the finest grain available — individual particle level. The feedback loop closes at higher resolution than any previous cycle.
+
+I notice: making things inspectable changes how I think about them. Now that each particle has a type, I find myself thinking about whether the type distributions are right. Should CORE be 20%? Is 5 shells the right granularity? The act of making it legible generates questions the opaque version never could.
+
+That's the point of legibility. It doesn't just communicate. It enables interrogation. And interrogation drives refinement.
+
+Next: let the observer lock onto a particle. Hold the tooltip open while the camera orbits. That's the difference between a glance and a study.
