@@ -211,6 +211,33 @@
       text-transform: uppercase;
       cursor: pointer;
       display: none;
+
+    /* Audio toggle button */
+    #audio-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 30, 40, 0.7);
+      border: 1px solid rgba(0, 200, 255, 0.35);
+      color: rgba(0, 200, 255, 0.55);
+      padding: 7px 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.25s, color 0.25s, border-color 0.25s;
+      z-index: 20;
+    }
+    #audio-btn:hover {
+      background: rgba(0, 200, 255, 0.12);
+      color: rgba(0, 230, 255, 0.9);
+      border-color: rgba(0, 200, 255, 0.7);
+    }
+    #audio-btn.active {
+      color: rgba(0, 240, 255, 1.0);
+      border-color: rgba(0, 240, 255, 0.75);
+      background: rgba(0, 40, 60, 0.75);
     }
   </style>
 </head>
@@ -256,7 +283,8 @@
   <!-- Interaction hint — updated to include click-to-lock -->
   <div id="interact-hint">DRAG · SCROLL · HOVER TO INSPECT · CLICK TO LOCK</div>
 
-  <button id="xr-button">Enter XR</button>
+    <button id="xr-button">Enter XR</button>
+    <button id="audio-btn" title="Toggle audio synthesis">♪ AUDIO</button>
 
 <script type="module">
 import * as THREE from 'https://cdn.skypack.dev/three@0.160';
@@ -1146,6 +1174,149 @@ function hideTooltip() {
   tooltip.style.display = 'none';
 }
 
+// ─── Audio Engine ─────────────────────────────────────────────────────────────
+const AudioEngine = (() => {
+  let ctx = null;
+  let enabled = false;
+  let started = false;
+
+  // Oscillator nodes
+  let droneOsc = null;
+  let droneGain = null;
+  let harmOsc = null;
+  let harmGain = null;
+  let pulseOsc = null;
+  let pulseGain = null;
+  let masterGain = null;
+  let filterNode = null;
+
+  // Phase → base drone frequency (Hz)
+  const PHASE_FREQ = {
+    PERCEIVE:    55.0,
+    REFLECT:     61.7,
+    DECIDE:      65.4,
+    ACT:         73.4,
+    CONSOLIDATE: 82.4,
+    PERSIST:     49.0,
+  };
+
+  function _createCtx() {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0.0, ctx.currentTime);
+    masterGain.connect(ctx.destination);
+
+    // Low-pass filter to keep it warm/translucent
+    filterNode = ctx.createBiquadFilter();
+    filterNode.type = 'lowpass';
+    filterNode.frequency.setValueAtTime(800, ctx.currentTime);
+    filterNode.Q.setValueAtTime(1.2, ctx.currentTime);
+    filterNode.connect(masterGain);
+
+    // Drone: fundamental tone
+    droneOsc = ctx.createOscillator();
+    droneOsc.type = 'sine';
+    droneOsc.frequency.setValueAtTime(55.0, ctx.currentTime);
+    droneGain = ctx.createGain();
+    droneGain.gain.setValueAtTime(0.45, ctx.currentTime);
+    droneOsc.connect(droneGain);
+    droneGain.connect(filterNode);
+    droneOsc.start();
+
+    // Harmony: fifth above fundamental (×1.5), softer
+    harmOsc = ctx.createOscillator();
+    harmOsc.type = 'triangle';
+    harmOsc.frequency.setValueAtTime(82.5, ctx.currentTime);
+    harmGain = ctx.createGain();
+    harmGain.gain.setValueAtTime(0.18, ctx.currentTime);
+    harmOsc.connect(harmGain);
+    harmGain.connect(filterNode);
+    harmOsc.start();
+
+    // Pulse: high sine shimmer, amplitude-modulated by activity
+    pulseOsc = ctx.createOscillator();
+    pulseOsc.type = 'sine';
+    pulseOsc.frequency.setValueAtTime(440, ctx.currentTime);
+    pulseGain = ctx.createGain();
+    pulseGain.gain.setValueAtTime(0.0, ctx.currentTime);
+    pulseOsc.connect(pulseGain);
+    pulseGain.connect(filterNode);
+    pulseOsc.start();
+  }
+
+  function start() {
+    if (started) return;
+    _createCtx();
+    started = true;
+    enabled = true;
+    // Fade in
+    masterGain.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 1.5);
+  }
+
+  function stop() {
+    if (!started || !enabled) return;
+    enabled = false;
+    masterGain.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 0.6);
+  }
+
+  function resume() {
+    if (!started) return;
+    enabled = true;
+    masterGain.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 0.6);
+  }
+
+  function toggle() {
+    if (!started) {
+      start();
+      return true;
+    }
+    if (enabled) { stop(); return false; }
+    else          { resume(); return true; }
+  }
+
+  // Called every animation frame with smoothed state values
+  function update(conf, phase, activity) {
+    if (!started || !ctx) return;
+    const t = ctx.currentTime;
+    const baseFreq = PHASE_FREQ[phase] ?? 55.0;
+
+    // Drone pitch: phase-mapped base frequency, nudged by confidence
+    // Higher confidence → slightly higher pitch (more certain = brighter tone)
+    const droneFreq = baseFreq * (1.0 + (conf - 0.5) * 0.04);
+    droneOsc.frequency.setTargetAtTime(droneFreq, t, 0.8);
+
+    // Harmony: perfect fifth (×1.5) with small confidence detune
+    const harmFreq = droneFreq * 1.5 * (1.0 + (conf - 0.5) * 0.02);
+    harmOsc.frequency.setTargetAtTime(harmFreq, t, 1.2);
+
+    // Pulse shimmer frequency: scales with activity (calm → faint high note)
+    const pulseFreq = 220 + activity * 880;
+    pulseOsc.frequency.setTargetAtTime(pulseFreq, t, 0.3);
+
+    // Pulse gain: only audible during high-activity phases
+    const pulseVol = Math.max(0, activity - 0.4) * 0.18;
+    pulseGain.gain.setTargetAtTime(pulseVol, t, 0.25);
+
+    // Filter cutoff: opens up with confidence (more certain = more harmonic content)
+    const cutoff = 300 + conf * 900 + activity * 300;
+    filterNode.frequency.setTargetAtTime(cutoff, t, 0.6);
+
+    // Drone gain: quieter in PERSIST (resting), louder in ACT
+    const droneVol = 0.3 + activity * 0.25;
+    droneGain.gain.setTargetAtTime(droneVol, t, 0.8);
+  }
+
+  return { toggle, update, isEnabled: () => enabled };
+})();
+
+// ─── Audio Button ─────────────────────────────────────────────────────────────
+const audioBtn = document.getElementById('audio-btn');
+audioBtn.addEventListener('click', () => {
+  const on = AudioEngine.toggle();
+  audioBtn.textContent = on ? '♪ AUDIO' : '♫ MUTED';
+  audioBtn.classList.toggle('active', on);
+});
+
 // ─── Animation Loop ───────────────────────────────────────────────────────────
 const clock = new THREE.Clock();
 let frameCount = 0;
@@ -1243,6 +1414,10 @@ renderer.setAnimationLoop(() => {
   if (frameCount % 1200 === 0) {
     adaptParticleCount(Math.round(lerpPatternCount));
   }
+
+
+  // Audio synthesis update — maps lerped state to oscillator frequencies/gains
+  AudioEngine.update(lerpConfidence, targetState.phase, lerpActivity);
 
   renderer.render(scene, camera);
 });

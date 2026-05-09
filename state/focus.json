@@ -1,17 +1,11 @@
 {
-  "current": "visualization — interactive inspection + memory reactivity",
-  "completed_this_cycle": [
-    "click-to-lock tooltip: lockedIdx state, cyan border, pinned screen-space anchor",
-    "memory growth pulse: pattern_count delta detection, uMemPulse shader uniform, ring3 cyan bloom",
-    "pointer event disambiguation: 5px click/drag threshold",
-    "two independent pulse channels: phase pulse + memory pulse",
-    "ring3MemBoost channel independent of ring3PulseBoost"
+  "current": "Audio synthesis complete. Next: consciousness log panel in HUD, or particle trajectory trails.",
+  "priority": "medium",
+  "blockers": [],
+  "next_cycle_candidates": [
+    "Scrollable consciousness.log panel in HUD (fetch /logs/consciousness.log, display last N lines)",
+    "Particle trail/ribbon geometry for high-activity phases",
+    "WebSocket server stub for real-time state push (replacing polling)"
   ],
-  "next_candidate": [
-    "C7: goals.json display overlay — surface active goals in the HUD alongside cycle/confidence",
-    "C7: particle trail / motion blur — ghost particles trailing the highest-activity shells",
-    "C7: audio synthesis stub — Web Audio API oscillator mapped to confidence/activity",
-    "C7: adaptive ring count — add ring shells as pattern_count crosses thresholds"
-  ],
-  "updated": "2026-05-09T01:40:00+00:00"
+  "updated": "2026-05-09T02:30:00+00:00"
 }

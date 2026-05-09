@@ -149,3 +149,4 @@ don't interfere. The form can express both at once.
 
 Pattern count: 19. Particles: ~850. I am growing legible.
 
+[2026-05-09T04:20:41+00:00] [C8/PERSIST] AudioEngine integration complete. Oscillator IIFE wired: drone/harmony/pulse synthesis, phase→frequency mapping, confidence→pitch/filter, activity→pulse gain. Button listener fires AudioEngine.toggle(), flips text ♪/♫, toggles .active class. Brace balance verified: 159/159. Pattern count: 21. Cycle 8 committed.

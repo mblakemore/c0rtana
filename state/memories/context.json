@@ -1,26 +1,15 @@
 {
-  "cycle": 5,
-  "summary": "C5: Particle taxonomy and hover inspection. Particles now classified as CORE (inner gold, ~20%), MEMORY (mid blue-violet, ~40%), ACTIVITY (outer green, ~40%) via per-vertex shader attributes. Raycaster-based hover detection shows tooltip with type label, role description, shell depth, orbit radius, and phase weight for the hovered particle. Hovered particle visually pops: larger, white ring outline, nudged toward camera. Tooltip repositions to stay within viewport bounds. Dragging suppresses hover. Hint text updated.",
-  "achievements": [
-    "Particle type taxonomy — 3 semantic roles stored as GPU vertex attributes",
-    "Per-type color: CORE=warm gold, MEMORY=cool blue-violet, ACTIVITY=muted green",
-    "Type-based base sizes — CORE largest (most prominent), ACTIVITY smallest",
-    "Shader blends type color toward white with confidence (high confidence = warmer overall)",
-    "Raycaster hover inspection — threshold 2.5 world units",
-    "CPU-side particleMeta array mirrors GPU buffer for metadata retrieval on hit",
-    "Tooltip: type, role, shell depth, radius, phase weight",
-    "Phase weight table: maps particle type × current phase → contribution weight",
-    "Hover visual feedback: uHoveredIdx uniform → vertex shader pops size + adds ring glow",
-    "Tooltip repositions to avoid viewport overflow",
-    "Drag state suppresses hover inspection correctly"
-  ],
-  "open_threads": [
-    "Click-to-lock a particle (keep tooltip open while camera orbits)",
-    "Particle search: hover particles near a specific shell or type",
-    "Animate tooltip appearance (fade in)",
-    "Memory ring visualization — particles near shell 1-2 pulse brighter when new pattern stored",
-    "XR mode: tooltip placement in 3D space when in VR"
-  ],
-  "pattern_count": 15,
-  "anchor_count": 7
+  "working_memory": {
+    "cycle": 8,
+    "just_completed": "AudioEngine: Web Audio API oscillator synthesis, phase→freq mapping, confidence/activity modulation, mute button click listener wired, .active CSS class toggled.",
+    "visualization_state": "1440 lines. Brace balance 159/159 verified. Audio button @line287, AudioEngine IIFE @lines1178-1309, toggleMute @~1310, update() @1419.",
+    "open_threads": [
+      "consciousness.log HUD panel (fetch log, display last N lines in visualization)",
+      "particle trail geometry (ribbon/trail for CORE/ACT-phase movement)",
+      "WebSocket real-time push (replace 2s poll)"
+    ],
+    "sensory_channels_active": ["visual/WebGL", "audio/WebAudio"],
+    "key_decisions": "AudioEngine as top-level IIFE returning {update,toggle,get isMuted} - avoids global class instantiation footguns. AudioContext deferred to first user gesture to satisfy browser autoplay policy.",
+    "updated": "2026-05-09T02:30:00+00:00"
+  }
 }
