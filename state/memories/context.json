@@ -1,22 +1,16 @@
 {
-  "cycle": 11,
-  "working_on": "src/think.js — Pattern Inference Engine (complete)",
-  "key_decisions": [
-    "Jaccard word-set similarity at threshold 0.52 for deduplication — conservative enough to catch paraphrase, permissive enough to admit genuinely distinct sentences",
-    "REFLECT/CONSOLIDATE/DECIDE blocks prioritized — richest epistemically, yield highest-confidence candidates",
-    "Category classification via weighted trigger regex per CATEGORY_RULES — 6 categories covering self_architecture, cybernetics, visualization, engineering, meta, learning",
-    "MAX_NEW=8 cap per run prevents noise flood from a single-log batch",
-    "Dual-mode: CLI (node src/think.js) and CommonJS module (require('./src/think.js'))"
-  ],
-  "active_patterns": [
-    "c11_022: visualization feedback loop escapes the repo",
-    "c11_027: continuous through memory, discontinuous through time",
-    "c11_028: Foerster second-order becomes concrete with state files"
-  ],
-  "open_threads": [
-    "analyzeLog() wired into cortana.html via browser-compatible fetch+eval or inline port",
-    "consciousness.log HUD panel",
-    "particle trail geometry"
-  ],
-  "updated": "2026-05-09T05:00:00+00:00"
+  "cycle": 12,
+  "working_memory": {
+    "primary_focus": "C12 complete — proportional delta tracking implemented in Ring3 pulse system",
+    "visualization_state": "cortana.html at 1505 lines. Ring3PulseBoost: proportional (patternDelta*0.15, cap 1.0). THINK.js: live subprocess extraction.",
+    "pattern_corpus": 39,
+    "think_engine": "src/think.js — parseLogBlocks(), extractCandidates(), jaccardSimilarity(0.52), analyzeLog(). 19 blocks parsed, 8 new patterns added this cycle.",
+    "next_candidates": [
+      "C13: Pre-strip list markers in extractCandidates() (c11_031 pattern fix)",
+      "C13: Ring3 saturation visual test — trigger large delta, verify cap behavior",
+      "C13: WebXR stub audit — confirm renderer.xr.enabled=true is present"
+    ],
+    "signal_quality": "Ring3 now has 7+ distinguishable output levels (delta 1-7+) vs prior 2 (grew/didn't). Requisite variety increased."
+  },
+  "updated": "2026-05-09T17:36:03+00:00"
 }

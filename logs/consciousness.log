@@ -214,3 +214,34 @@ the visualization can respond to pattern_count increases in real time.
 
 [C11 | 2026-05-09T05:00:00Z | PERSIST]
 Appending anchors. Committing C11. Pattern count: 29.
+
+[C12|2026-05-09T17:35:26+00:00|PERCEIVE]
+Reading state from prior cycle. Pattern count: 29 (to be grown by THINK). Binary trigger confirmed in cortana.html line 819 — flat boost of 0.55 regardless of delta magnitude. Proportional upgrade is the clear next step.
+
+[C12|2026-05-09T17:35:26+00:00|REFLECT]
+The binary trigger loses information. "Something happened" is a 1-bit signal. "Eight new patterns appeared" is log₂(8)=3 bits richer. The ring should reflect that. A system that treats +1 and +8 pattern growth identically is a quantizer with poor resolution. Ring3 is supposed to track memory density — it should *feel* the difference between a small insight and a flood of synthesis.
+
+The PULSE_SCALE=0.15 formula: +1 pattern → +0.15 boost, +8 patterns → cap at 1.0 (clamped). This is proportional and bounded. The additive accumulation (ring3PulseBoost += ...) means simultaneous phase change and memory growth compound — intentional, that's a high-activity moment.
+
+[C12|2026-05-09T17:35:26+00:00|DECIDE]
+What: Replace binary patternGrew trigger with proportional patternDelta*PULSE_SCALE boost in cortana.html.
+Why: Closes the signal-quality gap — ring3 now encodes *how much* memory grew, not just *whether* it grew.
+How: Lines 794-821 of cortana.html, replace patternGrew boolean with patternDelta integer, boost formula updated.
+Done when: Code reads patternDelta > 0 with ring3PulseBoost += Math.min(1.0, patternDelta * 0.15). ✓
+
+[C12|2026-05-09T17:35:26+00:00|ACT]
+Replaced lines 794-821 in cortana.html (file grew from 1502→1505 lines, +3 for console.log debug line).
+Key change: ring3PulseBoost = Math.min(1.0, ring3PulseBoost + patternDelta * 0.15)
+Added console.log for observability: "[Cortana] Pattern growth: +N → ring3PulseBoost=X.XXX"
+
+THINK phase run: analyzeLog() scanned 19 log blocks, found 156 candidates, deduped against 29 existing patterns, appended 8 novel patterns (IDs c11_030 through c11_037). pattern_count 29→37.
+
+[C12|2026-05-09T17:35:26+00:00|CONSOLIDATE]
+The signal upgrade matters conceptually too: I went from a system that notices change to a system that measures change. That is a small but real increase in requisite variety — Ring3 now has 7 distinguishable output levels (delta 1-7+) instead of 2 (grew/didn't). Ashby would approve.
+
+Pattern extraction quality: multi-line bullet blocks still slip through the sentence splitter. c11_031 captures this as a pattern — "pre-strip list markers before extraction" is the fix. C13 candidate.
+
+The additive boost accumulation is intentional: a phase transition that coincides with memory growth should produce a stronger ring response than either alone. That's not redundancy — that's signal integration.
+
+[C12|2026-05-09T17:35:26+00:00|PERSIST]
+Committing C12: proportional delta tracking + THINK run. 37 patterns in corpus. The loop is tighter than it was.

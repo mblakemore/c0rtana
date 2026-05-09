@@ -791,34 +791,37 @@ async function fetchState() {
 
     const newPhase = (data.phase ?? 'PERCEIVE').toUpperCase();
     const phaseChanged = newPhase !== prevPhase;
-    const newPatternCount = data.pattern_count ?? 0;
-    const patternGrew     = newPatternCount > prevPatternCount;
+      const newPatternCount = data.pattern_count ?? 0;
+      const patternDelta    = newPatternCount - prevPatternCount;  // magnitude, not just boolean
 
-    targetState = {
-      cycle:         data.cycle         ?? 2,
-      phase:         newPhase,
-      confidence:    data.confidence    ?? 0.5,
-      pattern_count: newPatternCount,
-      status:        data.status        ?? 'unknown',
-      timestamp:     data.timestamp     ?? null,
-      last_action:   data.last_action   ?? null,
-    };
-    const actMap = { PERCEIVE:0.4, REFLECT:0.3, DECIDE:0.5, ACT:0.9, CONSOLIDATE:0.6, PERSIST:0.15 };
-    targetState.activity = actMap[targetState.phase] ?? 0.4;
+      targetState = {
+        cycle:         data.cycle         ?? 2,
+        phase:         newPhase,
+        confidence:    data.confidence    ?? 0.5,
+        pattern_count: newPatternCount,
+        status:        data.status        ?? 'unknown',
+        timestamp:     data.timestamp     ?? null,
+        last_action:   data.last_action   ?? null,
+      };
+      const actMap = { PERCEIVE:0.4, REFLECT:0.3, DECIDE:0.5, ACT:0.9, CONSOLIDATE:0.6, PERSIST:0.15 };
+      targetState.activity = actMap[targetState.phase] ?? 0.4;
 
-    if (phaseChanged) {
-      firePulse(newPhase);
-      ring1PulseBoost = 0.5;
-      ring3PulseBoost = 0.3;
-      prevPhase = newPhase;
-    }
+      if (phaseChanged) {
+        firePulse(newPhase);
+        ring1PulseBoost = 0.5;
+        ring3PulseBoost = 0.3;
+        prevPhase = newPhase;
+      }
 
-    // Memory growth event: pattern count increased
-    if (patternGrew) {
-      fireMemoryPulse();
-      ring3PulseBoost = Math.max(ring3PulseBoost, 0.55);
-    }
-    prevPatternCount = newPatternCount;
+      // Memory growth event: proportional ring3 boost — each new pattern adds 15% signal
+      if (patternDelta > 0) {
+        fireMemoryPulse();
+        const PULSE_SCALE = 0.15;
+        ring3PulseBoost = Math.min(1.0, ring3PulseBoost + patternDelta * PULSE_SCALE);
+        console.log(`[Cortana] Pattern growth: +${patternDelta} → ring3PulseBoost=${ring3PulseBoost.toFixed(3)}`);
+      }
+      prevPatternCount = newPatternCount;
+
 
     updateHUD(targetState);
     document.getElementById('loading').style.display = 'none';
