@@ -142,10 +142,16 @@
       letter-spacing: 0.08em;
       color: rgba(180, 230, 255, 0.85);
       text-transform: uppercase;
-      max-width: 210px;
+      max-width: 220px;
       display: none;
       z-index: 100;
       backdrop-filter: blur(4px);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    /* Locked state — cyan border + glow to distinguish from hover */
+    #particle-tooltip.locked {
+      border-color: rgba(0, 220, 255, 0.65);
+      box-shadow: 0 0 10px rgba(0, 200, 255, 0.18);
     }
     #particle-tooltip .tt-type {
       font-size: 10.5px;
@@ -153,10 +159,23 @@
       margin-bottom: 5px;
       border-bottom: 1px solid rgba(120, 200, 255, 0.15);
       padding-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    #particle-tooltip .tt-type.type-core     { color: #ffe8a0; }
-    #particle-tooltip .tt-type.type-memory   { color: #90b4ff; }
-    #particle-tooltip .tt-type.type-activity { color: #80ffb0; }
+    /* Lock indicator badge in tooltip header */
+    #particle-tooltip .tt-lock-badge {
+      font-size: 7.5px;
+      letter-spacing: 0.15em;
+      color: rgba(0, 210, 255, 0.7);
+      display: none;
+    }
+    #particle-tooltip.locked .tt-lock-badge {
+      display: inline;
+    }
+    #particle-tooltip .tt-type-name.type-core     { color: #ffe8a0; }
+    #particle-tooltip .tt-type-name.type-memory   { color: #90b4ff; }
+    #particle-tooltip .tt-type-name.type-activity { color: #80ffb0; }
     #particle-tooltip .tt-row {
       display: flex;
       justify-content: space-between;
@@ -164,6 +183,19 @@
     }
     #particle-tooltip .tt-label { color: rgba(120, 200, 255, 0.4); }
     #particle-tooltip .tt-val   { color: rgba(200, 235, 255, 0.9); }
+
+    /* ─── Memory growth flash (CSS side) ──────────────────────── */
+    #memory-flash {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+    }
 
     #xr-button {
       position: fixed;
@@ -206,17 +238,23 @@
   <!-- Phase transition flash element -->
   <div id="phase-flash"></div>
 
+  <!-- Memory growth flash element (distinct from phase pulse) -->
+  <div id="memory-flash"></div>
+
   <!-- Particle inspection tooltip -->
   <div id="particle-tooltip">
-    <div class="tt-type" id="tt-type-label">CORE</div>
+    <div class="tt-type">
+      <span class="tt-type-name" id="tt-type-label">CORE</span>
+      <span class="tt-lock-badge">◈ LOCKED</span>
+    </div>
     <div class="tt-row"><span class="tt-label">ROLE</span><span class="tt-val" id="tt-role">—</span></div>
     <div class="tt-row"><span class="tt-label">SHELL</span><span class="tt-val" id="tt-shell">—</span></div>
     <div class="tt-row"><span class="tt-label">RADIUS</span><span class="tt-val" id="tt-radius">—</span></div>
     <div class="tt-row"><span class="tt-label">PHASE WT</span><span class="tt-val" id="tt-phase-wt">—</span></div>
   </div>
 
-  <!-- Interaction hint — fades after first touch -->
-  <div id="interact-hint">DRAG TO ORBIT · SCROLL TO ZOOM · HOVER TO INSPECT</div>
+  <!-- Interaction hint — updated to include click-to-lock -->
+  <div id="interact-hint">DRAG · SCROLL · HOVER TO INSPECT · CLICK TO LOCK</div>
 
   <button id="xr-button">Enter XR</button>
 
@@ -230,18 +268,14 @@ const STATE_POLL_MS  = 2000;
 const LOG_POLL_MS    = 5000;
 const STATE_PATH     = '../state/current-state.json';
 const LOG_PATH       = '../logs/consciousness.log';
-const LOG_ENTRIES_MAX = 4;   // how many log entries to show
+const LOG_ENTRIES_MAX = 4;
 
 // Particle type taxonomy
-// Each particle is assigned one of three types at build time:
-//   CORE     (~20%) — innermost shells — represent core processing / consciousness
-//   MEMORY   (~40%) — mid shells — represent accumulated patterns and knowledge
-//   ACTIVITY (~40%) — outer shells — represent current processing and noise
 const PTYPE_CORE     = 0;
 const PTYPE_MEMORY   = 1;
 const PTYPE_ACTIVITY = 2;
 
-// Type → color (used as vertex attribute, blended in shader with confidence)
+// Type → color
 const TYPE_COLORS = [
   new THREE.Color(1.0, 0.92, 0.62),   // CORE:     warm gold
   new THREE.Color(0.38, 0.56, 1.0),   // MEMORY:   cool blue-violet
@@ -258,18 +292,18 @@ const TYPE_ROLES  = [
 // Phase → formation index mapping
 const PHASES = ['PERCEIVE','REFLECT','DECIDE','ACT','CONSOLIDATE','PERSIST'];
 
-// Phase colors — used in HUD and pulse flash
+// Phase → color theme
 const PHASE_COLORS = {
-  PERCEIVE:    { hud: '#78c8ff', flash: 'rgba(120, 200, 255, 0.12)' },
-  REFLECT:     { hud: '#a0b8ff', flash: 'rgba(160, 184, 255, 0.12)' },
-  DECIDE:      { hud: '#c0a0ff', flash: 'rgba(192, 160, 255, 0.14)' },
-  ACT:         { hud: '#ffb060', flash: 'rgba(255, 176,  96, 0.18)' },
-  CONSOLIDATE: { hud: '#80ffb0', flash: 'rgba(128, 255, 176, 0.15)' },
-  PERSIST:     { hud: '#ffffff', flash: 'rgba(255, 255, 255, 0.10)' },
+  PERCEIVE:    { hud: '#78c8ff', flash: 'rgba(120,200,255,0.08)' },
+  REFLECT:     { hud: '#b8a0ff', flash: 'rgba(184,160,255,0.07)' },
+  DECIDE:      { hud: '#ffd080', flash: 'rgba(255,208,128,0.07)' },
+  ACT:         { hud: '#ff8888', flash: 'rgba(255,136,136,0.10)' },
+  CONSOLIDATE: { hud: '#80ffcc', flash: 'rgba(128,255,200,0.07)' },
+  PERSIST:     { hud: '#c8e8ff', flash: 'rgba(200,232,255,0.05)' },
 };
 
-// ─── Scene Setup ─────────────────────────────────────────────────────────────
-const canvas = document.getElementById('canvas');
+// ─── Renderer Setup ───────────────────────────────────────────────────────────
+const canvas   = document.getElementById('canvas');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -306,26 +340,22 @@ let state = {
   activity: 0.4,
 };
 let targetState   = { ...state };
-let prevPhase     = state.phase;     // track phase transitions for pulse events
+let prevPhase     = state.phase;
+// Track previous pattern count for memory growth detection
+let prevPatternCount = state.pattern_count;
 let lerpConfidence   = state.confidence;
 let lerpPatternCount = state.pattern_count;
 let lerpActivity     = state.activity;
 
 // ─── Pulse System ─────────────────────────────────────────────────────────────
-// A "pulse" fires when phase changes. It does three things simultaneously:
-//   1. Expands a radial flash on the phase-flash div (CSS animation)
-//   2. Fires a Three.js pulse sphere (expands and fades in 3D)
-//   3. Briefly spikes ring opacity
-
 let pulseActive   = false;
-let pulseAge      = 0;          // 0→1 over pulse duration
-let pulseDuration = 0.9;        // seconds
+let pulseAge      = 0;
+let pulseDuration = 0.9;
 let pulseColor    = new THREE.Color(0x78c8ff);
 let pulseSphere   = null;
 let pulseMat      = null;
 
 function buildPulseSphere() {
-  // Pulse is a simple wireframe sphere that expands and fades
   const geo = new THREE.IcosahedronGeometry(1, 2);
   const mat = new THREE.MeshBasicMaterial({
     color: 0x78c8ff,
@@ -344,13 +374,11 @@ buildPulseSphere();
 function firePulse(phase) {
   pulseActive = true;
   pulseAge    = 0;
-  // Set color from phase
   const pc = PHASE_COLORS[phase] ?? PHASE_COLORS.PERCEIVE;
   const hexColor = pc.hud.replace('#', '');
   pulseColor.setHex(parseInt(hexColor, 16));
   pulseMat.color.set(pulseColor);
 
-  // CSS radial flash from center
   const flash = document.getElementById('phase-flash');
   flash.style.transition = 'none';
   flash.style.opacity    = '1';
@@ -359,7 +387,6 @@ function firePulse(phase) {
   flash.style.background = pc.flash;
   flash.style.boxShadow  = `0 0 60px 30px ${pc.flash}`;
 
-  // Trigger reflow then animate
   flash.getBoundingClientRect();
   flash.style.transition = `width ${pulseDuration}s ease-out, height ${pulseDuration}s ease-out, opacity ${pulseDuration}s ease-out`;
   flash.style.width      = '250vmax';
@@ -376,47 +403,83 @@ function tickPulse(dt) {
     pulseSphere.scale.set(0.01, 0.01, 0.01);
     return;
   }
-  // Ease-out expansion: starts fast, slows
   const t = 1 - Math.pow(1 - pulseAge, 2);
-  const s = 8 + t * 55;      // expand from 8 → 63 world units
-  const o = (1 - t) * 0.6;   // fade from 0.6 → 0
+  const s = 8 + t * 55;
+  const o = (1 - t) * 0.6;
   pulseSphere.scale.set(s, s, s);
   pulseMat.opacity = o;
 }
 
-// ─── Particle System ─────────────────────────────────────────────────────────
-// Each particle has a type (CORE/MEMORY/ACTIVITY) stored as a per-vertex
-// attribute. The shader blends between the type's base color and the
-// confidence-driven temperature. On hover, particle metadata is read back
-// from parallel CPU-side arrays (particleMeta).
+// ─── Memory Growth Pulse ──────────────────────────────────────────────────────
+// Fired when pattern_count increases between polls.
+// Distinct from phase pulse: slower, cyan-white, targets ring3 and MEMORY particles.
+let memPulseActive    = false;
+let memPulseAge       = 0;
+const MEM_PULSE_DUR   = 1.5;  // seconds
+let ring3MemBoost     = 0;    // extra opacity spike for ring3
+let memParticlePulse  = 0;    // 0→1 intensity fed to shader uniform uMemPulse
 
-let particleMeta = [];   // CPU-side: [{type, shell, radius, phaseOffset}, ...]
+function fireMemoryPulse() {
+  memPulseActive   = true;
+  memPulseAge      = 0;
+  ring3MemBoost    = 0.6;   // strong initial spike
+
+  // CSS memory flash — distinct cyan-white ring from center
+  const mf = document.getElementById('memory-flash');
+  mf.style.transition = 'none';
+  mf.style.opacity    = '1';
+  mf.style.width      = '0px';
+  mf.style.height     = '0px';
+  mf.style.background = 'rgba(0, 200, 255, 0.06)';
+  mf.style.boxShadow  = '0 0 80px 40px rgba(0, 210, 255, 0.10)';
+  mf.getBoundingClientRect();
+  const dur = MEM_PULSE_DUR;
+  mf.style.transition = `width ${dur}s ease-out, height ${dur}s ease-out, opacity ${dur * 0.8}s ease-out`;
+  mf.style.width      = '180vmax';
+  mf.style.height     = '180vmax';
+  mf.style.opacity    = '0';
+}
+
+function tickMemPulse(dt) {
+  if (!memPulseActive) return;
+  memPulseAge += dt / MEM_PULSE_DUR;
+  if (memPulseAge >= 1.0) {
+    memPulseActive  = false;
+    memParticlePulse = 0;
+    return;
+  }
+  // Peak early (~0.15), then fade out
+  const t = memPulseAge;
+  memParticlePulse = t < 0.15
+    ? t / 0.15
+    : Math.pow(1 - (t - 0.15) / 0.85, 1.5);
+  // Decay ring boost
+  ring3MemBoost = Math.max(0, ring3MemBoost - (dt / MEM_PULSE_DUR) * 1.0);
+}
+
+// ─── Particle System ─────────────────────────────────────────────────────────
+let particleMeta = [];
 
 function buildParticleSystem(count) {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(count * 3);
   const sizes     = new Float32Array(count);
-  const phases    = new Float32Array(count);   // individual phase offsets
-  const radii     = new Float32Array(count);   // each particle's orbit radius
-  const typeArr   = new Float32Array(count);   // 0=CORE, 1=MEMORY, 2=ACTIVITY
-  const typeR     = new Float32Array(count);   // type base color R
-  const typeG     = new Float32Array(count);   // type base color G
-  const typeB     = new Float32Array(count);   // type base color B
+  const phases    = new Float32Array(count);
+  const radii     = new Float32Array(count);
+  const typeArr   = new Float32Array(count);
+  const typeR     = new Float32Array(count);
+  const typeG     = new Float32Array(count);
+  const typeB     = new Float32Array(count);
 
   particleMeta = [];
 
   for (let i = 0; i < count; i++) {
-    // Distribute in concentric shells (0–4)
     const shell = Math.floor(i / (count / 5));
 
-    // Assign type based on shell:
-    //   shells 0–0: CORE (innermost ~20%)
-    //   shells 1–2: MEMORY (mid ~40%)
-    //   shells 3–4: ACTIVITY (outer ~40%)
     let ptype;
-    if      (shell === 0)              ptype = PTYPE_CORE;
+    if      (shell === 0)                ptype = PTYPE_CORE;
     else if (shell === 1 || shell === 2) ptype = PTYPE_MEMORY;
-    else                               ptype = PTYPE_ACTIVITY;
+    else                                 ptype = PTYPE_ACTIVITY;
 
     const r     = 15 + shell * 7 + Math.random() * 5;
     const theta = Math.random() * Math.PI * 2;
@@ -448,16 +511,17 @@ function buildParticleSystem(count) {
   geometry.setAttribute('aTypeG',   new THREE.BufferAttribute(typeG, 1));
   geometry.setAttribute('aTypeB',   new THREE.BufferAttribute(typeB, 1));
 
-  // Custom shader material for translucent glow with type-based color
   const material = new THREE.ShaderMaterial({
     uniforms: {
-      uTime:       { value: 0 },
-      uPhaseIdx:   { value: 0 },
-      uConfidence: { value: 0.5 },
-      uActivity:   { value: 0.5 },
-      uPulse:      { value: 0.0 },   // 0→1 pulse intensity
-      uPointScale: { value: renderer.getPixelRatio() * 100 },
-      uHoveredIdx: { value: -1 },    // index of hovered particle (-1 = none)
+      uTime:        { value: 0 },
+      uPhaseIdx:    { value: 0 },
+      uConfidence:  { value: 0.5 },
+      uActivity:    { value: 0.5 },
+      uPulse:       { value: 0.0 },
+      uMemPulse:    { value: 0.0 },   // memory growth pulse (MEMORY-type particles)
+      uPointScale:  { value: renderer.getPixelRatio() * 100 },
+      uHoveredIdx:  { value: -1 },    // hovered particle (-1 = none)
+      uLockedIdx:   { value: -1 },    // locked particle (-1 = none)
     },
     vertexShader: `
       attribute float size;
@@ -469,52 +533,44 @@ function buildParticleSystem(count) {
       attribute float aTypeB;
       varying float vAlpha;
       varying float vPulse;
+      varying float vMemPulse;
       varying vec3  vTypeColor;
       varying float vHovered;
+      varying float vLocked;
+      varying float vIsMemory;
       uniform float uTime;
       uniform float uPhaseIdx;
       uniform float uConfidence;
       uniform float uActivity;
       uniform float uPulse;
+      uniform float uMemPulse;
       uniform float uPointScale;
       uniform float uHoveredIdx;
+      uniform float uLockedIdx;
 
-      // Formation functions — each phase creates a different attractor shape
       vec3 phaseOffset(float phaseIdx, float aPhase, float aRadius, float t) {
         float p = phaseIdx;
         vec3 offset = vec3(0.0);
-
-        // PERCEIVE (0): radial scan pulses outward
         if (p < 0.5) {
           float pulse = sin(t * 1.2 + aPhase) * 0.8;
           offset = vec3(sin(aPhase) * pulse, cos(aPhase) * pulse * 0.5, sin(t + aPhase * 2.0) * pulse * 0.3);
-        }
-        // REFLECT (1): inward spiral, contemplative
-        else if (p < 1.5) {
+        } else if (p < 1.5) {
           float spiral = sin(t * 0.6 + aPhase);
           offset = vec3(spiral * 3.0 * sin(t * 0.3 + aPhase),
                         spiral * 2.0 * cos(t * 0.3 + aPhase),
                         cos(t * 0.8 + aPhase) * 2.0);
-        }
-        // DECIDE (2): convergent — particles pull toward center axes
-        else if (p < 2.5) {
+        } else if (p < 2.5) {
           float pull = sin(t * 1.5 + aPhase) * 0.4;
           offset = vec3(pull * 4.0, cos(t * 0.9 + aPhase) * 2.0, pull * 2.0);
-        }
-        // ACT (3): explosive outward burst, high activity
-        else if (p < 3.5) {
+        } else if (p < 3.5) {
           float burst = 1.0 + sin(t * 2.5 + aPhase) * 0.6;
           offset = vec3(sin(aPhase * 3.0 + t) * burst * 4.0,
                         cos(aPhase * 2.0 + t * 1.2) * burst * 4.0,
                         sin(t * 1.8 + aPhase) * burst * 3.0);
-        }
-        // CONSOLIDATE (4): settling — waves that slow and converge
-        else if (p < 4.5) {
+        } else if (p < 4.5) {
           float settle = sin(t * 0.5 + aPhase) * exp(-mod(t, 12.0) * 0.08);
           offset = vec3(settle * 5.0, cos(t * 0.4 + aPhase) * settle * 3.0, settle * 2.0);
-        }
-        // PERSIST (5): stable crystalline lattice — slow, ordered, confident
-        else {
+        } else {
           float lattice = sin(t * 0.2 + aPhase) * 0.5;
           offset = vec3(lattice * 2.0, cos(t * 0.15 + aPhase) * 2.0, sin(t * 0.25 + aPhase) * 1.5);
         }
@@ -522,59 +578,85 @@ function buildParticleSystem(count) {
       }
 
       void main() {
-        vPulse     = uPulse;
-        vTypeColor = vec3(aTypeR, aTypeG, aTypeB);
-        vHovered   = (float(gl_VertexID) == uHoveredIdx) ? 1.0 : 0.0;
+        float vertId  = float(gl_VertexID);
+        vPulse        = uPulse;
+        vMemPulse     = uMemPulse;
+        vTypeColor    = vec3(aTypeR, aTypeG, aTypeB);
+        vHovered      = (vertId == uHoveredIdx) ? 1.0 : 0.0;
+        vLocked       = (vertId == uLockedIdx)  ? 1.0 : 0.0;
+        vIsMemory     = (aType == 1.0)           ? 1.0 : 0.0;
 
-        // Apply phase formation
         vec3 pos = position + phaseOffset(uPhaseIdx, aPhase, aRadius, uTime);
 
-        // Pulse: briefly expand particles outward from center on phase change
         if (uPulse > 0.0) {
           float dir = length(pos) > 0.001 ? 1.0 : 0.0;
           pos += normalize(pos) * uPulse * 6.0 * dir;
         }
 
-        // Hovered particle: nudge slightly toward camera for visual pop
+        // Memory pulse: MEMORY particles briefly expand outward
+        if (uMemPulse > 0.0 && vIsMemory > 0.5) {
+          float dir = length(pos) > 0.001 ? 1.0 : 0.0;
+          pos += normalize(pos) * uMemPulse * 5.0 * dir;
+        }
+
+        // Hovered particle: nudge slightly toward camera
         if (vHovered > 0.5) {
           vec3 toCamera = normalize(cameraPosition - pos);
           pos += toCamera * 2.5;
         }
+        // Locked particle: more pronounced nudge + held in place
+        if (vLocked > 0.5) {
+          vec3 toCamera = normalize(cameraPosition - pos);
+          pos += toCamera * 3.5;
+        }
 
         vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
-        gl_Position  = projectionMatrix * mvPos;
+        gl_Position = projectionMatrix * mvPos;
 
-        // Size: base + activity boost + pulse boost + hover pop
         float actBoost   = 1.0 + uActivity * 0.5;
         float pulseBoost = 1.0 + uPulse * 1.2;
+        float memBoost   = 1.0 + (vIsMemory * uMemPulse * 1.8);
         float hoverBoost = 1.0 + vHovered * 2.0;
-        gl_PointSize = size * actBoost * pulseBoost * hoverBoost * uPointScale / -mvPos.z;
+        float lockBoost  = 1.0 + vLocked  * 2.8;
+        gl_PointSize = size * actBoost * pulseBoost * memBoost * max(hoverBoost, lockBoost) * uPointScale / -mvPos.z;
 
-        // Alpha: fades with distance, pulse briefly brightens, hover pops
-        vAlpha = (0.4 + uActivity * 0.4) * (1.0 + uPulse * 0.5) * (1.0 + vHovered * 0.5);
+        vAlpha = (0.4 + uActivity * 0.4)
+                 * (1.0 + uPulse * 0.5)
+                 * (1.0 + vHovered * 0.5)
+                 * (1.0 + vLocked  * 0.7);
+        // Memory particles brighter during mem pulse
+        if (vIsMemory > 0.5) {
+          vAlpha *= (1.0 + uMemPulse * 0.8);
+        }
       }
     `,
     fragmentShader: `
       varying float vAlpha;
       varying float vPulse;
+      varying float vMemPulse;
       varying vec3  vTypeColor;
       varying float vHovered;
+      varying float vLocked;
+      varying float vIsMemory;
       uniform float uConfidence;
 
       void main() {
-        vec2 uv   = gl_PointCoord - 0.5;
+        vec2  uv   = gl_PointCoord - 0.5;
         float dist = length(uv);
         if (dist > 0.5) discard;
         float alpha = smoothstep(0.5, 0.1, dist) * vAlpha;
 
-        // Type color blends with confidence-driven white shift:
-        //   low confidence → type color stays pure (cool/saturated)
-        //   high confidence → type color warms toward white
         vec3 warm = vec3(0.9, 0.95, 1.0);
         vec3 finalColor = mix(vTypeColor, warm, uConfidence * 0.45);
 
-        // During pulse: briefly add white brightness to all particles
+        // Phase pulse: briefly add white brightness
         finalColor = mix(finalColor, vec3(1.0), vPulse * 0.3);
+
+        // Memory pulse: MEMORY particles shift toward cyan-white
+        if (vIsMemory > 0.5 && vMemPulse > 0.0) {
+          vec3 memFlash = vec3(0.6, 0.95, 1.0);
+          finalColor = mix(finalColor, memFlash, vMemPulse * 0.65);
+        }
 
         // Hovered particle: bright white outline glow
         if (vHovered > 0.5) {
@@ -583,7 +665,18 @@ function buildParticleSystem(count) {
           alpha = max(alpha, ring * 0.85);
         }
 
-        // Add a faint core glow
+        // Locked particle: cyan ring — distinct from hover white
+        if (vLocked > 0.5) {
+          float ring = smoothstep(0.44, 0.40, dist) - smoothstep(0.24, 0.20, dist);
+          vec3 cyanGlow = vec3(0.1, 0.85, 1.0);
+          finalColor = mix(finalColor, cyanGlow, ring * 0.95);
+          alpha = max(alpha, ring * 0.9);
+          // Inner brightening
+          float inner = smoothstep(0.22, 0.0, dist) * 0.3;
+          finalColor = mix(finalColor, vec3(0.8, 1.0, 1.0), inner);
+        }
+
+        // Faint core glow
         float glow = smoothstep(0.3, 0.0, dist) * 0.4;
         finalColor = finalColor + vec3(glow);
 
@@ -603,7 +696,6 @@ let particles = buildParticleSystem(PARTICLE_BASE);
 scene.add(particles);
 
 // ─── Core ─────────────────────────────────────────────────────────────────────
-// Inner icosahedral wireframe — the structural center
 const coreGeo = new THREE.IcosahedronGeometry(5, 3);
 const coreMat = new THREE.MeshBasicMaterial({
   color: 0x60c8ff,
@@ -615,14 +707,12 @@ const core = new THREE.Mesh(coreGeo, coreMat);
 scene.add(core);
 
 // ─── Ambient Rings ────────────────────────────────────────────────────────────
-// Ring 1: primary activity ring
 const ring1Geo = new THREE.TorusGeometry(12, 0.12, 8, 120);
 const ring1Mat = new THREE.MeshBasicMaterial({ color: 0x4090ff, transparent: true, opacity: 0.35 });
 const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
 ring1.rotation.x = Math.PI / 4;
 scene.add(ring1);
 
-// Ring 2: scale/horizon ring
 const ring2Geo = new THREE.TorusGeometry(38, 0.06, 6, 200);
 const ring2Mat = new THREE.MeshBasicMaterial({ color: 0x203050, transparent: true, opacity: 0.18 });
 const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
@@ -630,18 +720,16 @@ ring2.rotation.x = Math.PI / 6;
 ring2.rotation.z = Math.PI / 9;
 scene.add(ring2);
 
-// Ring 3: memory ring — scales with pattern count
+// Ring 3: memory ring — scales with pattern count, pulses on growth
 const ring3Geo = new THREE.TorusGeometry(22, 0.08, 6, 160);
 const ring3Mat = new THREE.MeshBasicMaterial({ color: 0x30a0c0, transparent: true, opacity: 0.22 });
 const ring3 = new THREE.Mesh(ring3Geo, ring3Mat);
 ring3.rotation.y = Math.PI / 2;
 scene.add(ring3);
 
-// Track ring baseline opacities for pulse spikes
 let ring1PulseBoost = 0;
 let ring3PulseBoost = 0;
 
-// Ambient fog for depth
 scene.fog = new THREE.FogExp2(0x000000, 0.008);
 
 // ─── State Polling ────────────────────────────────────────────────────────────
@@ -653,12 +741,14 @@ async function fetchState() {
 
     const newPhase = (data.phase ?? 'PERCEIVE').toUpperCase();
     const phaseChanged = newPhase !== prevPhase;
+    const newPatternCount = data.pattern_count ?? 0;
+    const patternGrew     = newPatternCount > prevPatternCount;
 
     targetState = {
       cycle:         data.cycle         ?? 2,
       phase:         newPhase,
       confidence:    data.confidence    ?? 0.5,
-      pattern_count: data.pattern_count ?? 0,
+      pattern_count: newPatternCount,
       status:        data.status        ?? 'unknown',
       timestamp:     data.timestamp     ?? null,
       last_action:   data.last_action   ?? null,
@@ -666,13 +756,19 @@ async function fetchState() {
     const actMap = { PERCEIVE:0.4, REFLECT:0.3, DECIDE:0.5, ACT:0.9, CONSOLIDATE:0.6, PERSIST:0.15 };
     targetState.activity = actMap[targetState.phase] ?? 0.4;
 
-    // Phase transition — fire pulse
     if (phaseChanged) {
       firePulse(newPhase);
       ring1PulseBoost = 0.5;
       ring3PulseBoost = 0.3;
       prevPhase = newPhase;
     }
+
+    // Memory growth event: pattern count increased
+    if (patternGrew) {
+      fireMemoryPulse();
+      ring3PulseBoost = Math.max(ring3PulseBoost, 0.55);
+    }
+    prevPatternCount = newPatternCount;
 
     updateHUD(targetState);
     document.getElementById('loading').style.display = 'none';
@@ -691,10 +787,8 @@ function updateHUD(s) {
   document.getElementById('hud-timestamp').textContent = s.timestamp
     ? s.timestamp.replace('T', ' ').slice(0, 19)
     : '—';
-
   const laEl = document.getElementById('hud-last-action');
   laEl.textContent = s.last_action ? ('↳ ' + s.last_action) : '';
-
   const pc = PHASE_COLORS[s.phase] ?? PHASE_COLORS.PERCEIVE;
   document.getElementById('hud-phase').style.color = pc.hud;
 }
@@ -705,11 +799,9 @@ async function fetchLog() {
     const res = await fetch(LOG_PATH + '?t=' + Date.now());
     if (!res.ok) return;
     const text = await res.text();
-
     const lines = text.split('\n');
     const entries = [];
     let current = null;
-
     for (const line of lines) {
       if (line.startsWith('[')) {
         if (current) entries.push(current);
@@ -719,10 +811,8 @@ async function fetchLog() {
       }
     }
     if (current) entries.push(current);
-
     const recent = entries.slice(-LOG_ENTRIES_MAX);
     renderLogEntries(recent);
-
     document.getElementById('log-panel').style.display = 'block';
   } catch(e) {
     console.warn('Log poll failed:', e.message);
@@ -732,24 +822,20 @@ async function fetchLog() {
 function renderLogEntries(entries) {
   const container = document.getElementById('log-entries');
   container.innerHTML = '';
-
   for (const entry of entries) {
     const div = document.createElement('div');
     div.className = 'log-entry';
-
     const meta = document.createElement('div');
     meta.className = 'log-meta';
     const headerMatch = entry.header.match(/\[([^\]]*)\]/);
     meta.textContent = headerMatch ? headerMatch[1].replace(/\s+/g, ' ').trim() : entry.header;
     div.appendChild(meta);
-
     const bodyText = entry.body.join(' ').slice(0, 180);
     if (bodyText) {
       const p = document.createElement('div');
       p.textContent = bodyText + (entry.body.join(' ').length > 180 ? '…' : '');
       div.appendChild(p);
     }
-
     container.appendChild(div);
   }
 }
@@ -769,21 +855,26 @@ function adaptParticleCount(patternCount) {
       scene.add(particles);
       currentParticleCount = target;
       pendingRebuild = false;
+      // Re-apply locked/hovered uniforms after rebuild
+      particles.material.uniforms.uLockedIdx.value  = lockedIdx;
+      particles.material.uniforms.uHoveredIdx.value = hoveredIdx;
     }, 400);
   }
 }
 
 // ─── Interactive Orbit Controls ───────────────────────────────────────────────
 const orbit = {
-  theta:     0,
-  phi:       Math.PI / 2,
-  radius:    80,
+  theta:      0,
+  phi:        Math.PI / 2,
+  radius:     80,
   driftTheta: 0.04,
   driftPhi:   0.02,
   driftBlend: 0,
   isDragging: false,
   lastX: 0,
   lastY: 0,
+  downX: 0,   // track pointer-down position to distinguish click from drag
+  downY: 0,
   idleTimer: null,
   interacted: false,
   touchDist: 0,
@@ -791,6 +882,7 @@ const orbit = {
 
 const IDLE_TIMEOUT = 3000;
 const DRIFT_RESUME = 0.003;
+const CLICK_THRESHOLD = 5;  // pixels of movement below which we treat as a click
 
 function orbitSetIdle() {
   orbit.idleTimer = setTimeout(() => {
@@ -817,35 +909,59 @@ function dismissHint() {
 
 canvas.addEventListener('pointerdown', e => {
   if (e.button !== 0) return;
-  orbit.isDragging = true;
+  orbit.isDragging = false;  // will set true on move
   orbit.lastX = e.clientX;
   orbit.lastY = e.clientY;
+  orbit.downX = e.clientX;
+  orbit.downY = e.clientY;
   canvas.setPointerCapture(e.pointerId);
   orbitCancelIdle();
   dismissHint();
-  hideTooltip();
 });
 
 canvas.addEventListener('pointermove', e => {
-  if (orbit.isDragging) {
+  if (canvas.hasPointerCapture && canvas.hasPointerCapture(e.pointerId)) {
     const dx = e.clientX - orbit.lastX;
     const dy = e.clientY - orbit.lastY;
+    // Only start dragging after threshold movement
+    const totalDx = e.clientX - orbit.downX;
+    const totalDy = e.clientY - orbit.downY;
+    if (Math.sqrt(totalDx*totalDx + totalDy*totalDy) > CLICK_THRESHOLD) {
+      orbit.isDragging = true;
+    }
+    if (orbit.isDragging) {
+      orbit.theta -= dx * 0.005;
+      orbit.phi   -= dy * 0.005;
+      orbit.phi = Math.max(0.15, Math.min(Math.PI - 0.15, orbit.phi));
+    }
     orbit.lastX = e.clientX;
     orbit.lastY = e.clientY;
-    orbit.theta -= dx * 0.005;
-    orbit.phi   -= dy * 0.005;
-    orbit.phi = Math.max(0.15, Math.min(Math.PI - 0.15, orbit.phi));
   } else {
-    // Hover inspection — only when not dragging
-    handleHover(e.clientX, e.clientY);
+    // No pointer capture — hover inspection (not dragging)
+    if (!orbit.isDragging) handleHover(e.clientX, e.clientY);
   }
 });
 
 canvas.addEventListener('pointerup', e => {
-  if (!orbit.isDragging) return;
+  if (!canvas.hasPointerCapture || !canvas.hasPointerCapture(e.pointerId)) return;
+
+  const totalDx = e.clientX - orbit.downX;
+  const totalDy = e.clientY - orbit.downY;
+  const wasClick = Math.sqrt(totalDx*totalDx + totalDy*totalDy) <= CLICK_THRESHOLD;
+
   orbit.isDragging = false;
   canvas.releasePointerCapture(e.pointerId);
   orbitSetIdle();
+
+  if (wasClick) {
+    // Treat as a click — attempt lock/unlock
+    handleClick(e.clientX, e.clientY);
+  } else {
+    // It was a drag — clear transient hover tooltip if not locked
+    if (lockedIdx === -1) hideTooltip();
+    // Restore hover on next mousemove
+    handleHover(e.clientX, e.clientY);
+  }
 });
 
 canvas.addEventListener('pointercancel', () => {
@@ -881,34 +997,29 @@ canvas.addEventListener('touchmove', e => {
   }
 }, { passive: true });
 
-// Fade hint after 5 seconds even if no interaction
+// Fade hint after 5 seconds
 setTimeout(() => {
   const hint = document.getElementById('interact-hint');
   if (hint) hint.style.opacity = '0';
 }, 5000);
 
-// ─── Hover Inspection / Raycasting ───────────────────────────────────────────
-// When the user moves the mouse without dragging, we cast a ray into the
-// particle cloud and find the nearest intersected point.
-//
-// Three.js Raycaster.params.Points.threshold controls how close the ray must
-// pass to a point for it to register as a hit. We set a slightly generous
-// threshold (2.5 world units) because the point cloud is dense and small
-// screen pixels map to non-trivial world distances at depth.
-//
-// On hit: populate tooltip with particle metadata from the CPU-side particleMeta
-// array (same index as the intersect.index). Set uHoveredIdx uniform so the
-// vertex shader can visually pop the selected particle.
+// ─── Hover + Click Inspection / Raycasting ───────────────────────────────────
+// Hover: transient tooltip follows cursor.
+// Click: locks/unlocks tooltip — pinned in place while camera orbits.
+// The locked tooltip position stays fixed (screen-space anchor) until released.
 
 const raycaster = new THREE.Raycaster();
 raycaster.params.Points = { threshold: 2.5 };
 
-const mouse    = new THREE.Vector2();
-const tooltip  = document.getElementById('particle-tooltip');
-let   hoveredIdx = -1;
+const mouse   = new THREE.Vector2();
+const tooltip = document.getElementById('particle-tooltip');
+let hoveredIdx = -1;
+let lockedIdx  = -1;
+let lockedPos  = { x: 0, y: 0 };   // screen position of locked tooltip
 
 function handleHover(clientX, clientY) {
-  // Convert to NDC
+  // If a particle is locked, don't clobber the locked tooltip
+  // But still update hoveredIdx for visual highlight on other particles
   mouse.x =  (clientX / window.innerWidth)  * 2 - 1;
   mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
@@ -920,55 +1031,108 @@ function handleHover(clientX, clientY) {
     if (idx !== hoveredIdx) {
       hoveredIdx = idx;
       particles.material.uniforms.uHoveredIdx.value = idx;
-      showTooltip(idx, clientX, clientY);
-    } else {
-      // Same particle — just reposition tooltip
+      // Only show hover tooltip if nothing is locked (or if same as locked)
+      if (lockedIdx === -1) {
+        showTooltip(idx, clientX, clientY, false);
+      }
+    } else if (lockedIdx === -1) {
       positionTooltip(clientX, clientY);
     }
   } else {
     if (hoveredIdx !== -1) {
       hoveredIdx = -1;
       particles.material.uniforms.uHoveredIdx.value = -1;
-      hideTooltip();
+      if (lockedIdx === -1) hideTooltip();
     }
   }
 }
 
-function showTooltip(idx, cx, cy) {
+function handleClick(clientX, clientY) {
+  mouse.x =  (clientX / window.innerWidth)  * 2 - 1;
+  mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObject(particles);
+
+  if (hits.length > 0) {
+    const idx = hits[0].index;
+    if (lockedIdx === idx) {
+      // Click same locked particle → unlock
+      releaseLock();
+    } else {
+      // Lock to this particle
+      acquireLock(idx, clientX, clientY);
+    }
+  } else {
+    // Click empty space → release lock
+    releaseLock();
+  }
+}
+
+function acquireLock(idx, cx, cy) {
+  lockedIdx  = idx;
+  lockedPos  = { x: cx, y: cy };
+  particles.material.uniforms.uLockedIdx.value = idx;
+  showTooltip(idx, cx, cy, true);
+}
+
+function releaseLock() {
+  if (lockedIdx === -1) return;
+  lockedIdx = -1;
+  particles.material.uniforms.uLockedIdx.value = -1;
+  // Restore hover or hide
+  if (hoveredIdx !== -1) {
+    showTooltip(hoveredIdx, orbit.lastX, orbit.lastY, false);
+  } else {
+    hideTooltip();
+  }
+}
+
+function showTooltip(idx, cx, cy, locked) {
   const meta = particleMeta[idx];
   if (!meta) return;
 
   const typeName = TYPE_LABELS[meta.type];
   const typeRole = TYPE_ROLES[meta.type];
 
-  const ttType = document.getElementById('tt-type-label');
-  ttType.textContent = typeName;
-  ttType.className   = 'tt-type type-' + typeName.toLowerCase();
+  const ttTypeName = document.getElementById('tt-type-label');
+  ttTypeName.textContent = typeName;
+  ttTypeName.className   = 'tt-type-name type-' + typeName.toLowerCase();
 
   document.getElementById('tt-role').textContent     = typeRole;
   document.getElementById('tt-shell').textContent    = `${meta.shell + 1} / 5`;
   document.getElementById('tt-radius').textContent   = meta.radius.toFixed(1);
 
-  // Phase weight: how much this particle's shell contributes to the current phase
-  // Core particles (shell 0) weight most in PERSIST/REFLECT; Activity (shell 3-4) in ACT
   const phaseWeights = [
-    [0.9, 0.8, 0.6, 0.5, 0.7, 1.0],  // CORE shells
-    [0.6, 0.7, 0.5, 0.4, 0.6, 0.7],  // MEMORY shells
-    [0.4, 0.4, 0.6, 0.9, 0.5, 0.3],  // ACTIVITY shells
+    [0.9, 0.8, 0.6, 0.5, 0.7, 1.0],  // CORE
+    [0.6, 0.7, 0.5, 0.4, 0.6, 0.7],  // MEMORY
+    [0.4, 0.4, 0.6, 0.9, 0.5, 0.3],  // ACTIVITY
   ];
   const phaseIdx = PHASES.indexOf(targetState.phase);
   const pwTable  = phaseWeights[meta.type];
   const pw       = phaseIdx >= 0 ? pwTable[phaseIdx] : 0.5;
   document.getElementById('tt-phase-wt').textContent = (pw * 100).toFixed(0) + '%';
 
+  // Locked vs hover styling
+  if (locked) {
+    tooltip.classList.add('locked');
+  } else {
+    tooltip.classList.remove('locked');
+  }
+
   tooltip.style.display = 'block';
   positionTooltip(cx, cy);
 }
 
 function positionTooltip(cx, cy) {
+  // If locked, use the stored lock position (tooltip stays fixed)
+  if (lockedIdx !== -1) {
+    cx = lockedPos.x;
+    cy = lockedPos.y;
+  }
   const margin = 16;
-  const tw = tooltip.offsetWidth  || 210;
-  const th = tooltip.offsetHeight || 110;
+  const tw = tooltip.offsetWidth  || 220;
+  const th = tooltip.offsetHeight || 120;
   let x = cx + margin;
   let y = cy + margin;
   if (x + tw > window.innerWidth)  x = cx - tw - margin;
@@ -978,6 +1142,7 @@ function positionTooltip(cx, cy) {
 }
 
 function hideTooltip() {
+  tooltip.classList.remove('locked');
   tooltip.style.display = 'none';
 }
 
@@ -995,7 +1160,6 @@ renderer.setAnimationLoop(() => {
   const dt      = 0.016;
   frameCount++;
 
-  // ── Smooth state interpolation ──
   lerpConfidence   = lerp(lerpConfidence,   targetState.confidence,    0.015);
   lerpPatternCount = lerp(lerpPatternCount, targetState.pattern_count, 0.01);
   lerpActivity     = lerp(lerpActivity,     targetState.activity ?? 0.4, 0.008);
@@ -1004,28 +1168,31 @@ renderer.setAnimationLoop(() => {
   targetPhaseIdx  = phIdx >= 0 ? phIdx : 0;
   currentPhaseIdx = lerp(currentPhaseIdx, targetPhaseIdx, 0.025);
 
-  // ── Pulse tick ──
+  // Pulse ticks
   tickPulse(dt);
+  tickMemPulse(dt);
+
   const pulseIntensity = pulseActive ? Math.max(0, 1 - pulseAge) : 0;
 
-  // Decay ring pulse boosts
+  // Decay ring boosts
   ring1PulseBoost = Math.max(0, ring1PulseBoost - 0.012);
   ring3PulseBoost = Math.max(0, ring3PulseBoost - 0.008);
 
-  // ── Update particle shader uniforms ──
+  // Update particle shader uniforms
   const mat = particles.material;
   mat.uniforms.uTime.value       = elapsed;
   mat.uniforms.uPhaseIdx.value   = currentPhaseIdx;
   mat.uniforms.uConfidence.value = lerpConfidence;
   mat.uniforms.uActivity.value   = lerpActivity;
   mat.uniforms.uPulse.value      = pulseIntensity * (1 - pulseAge);
+  mat.uniforms.uMemPulse.value   = memParticlePulse;
 
-  // ── Core — opacity scales with confidence, rotation with activity ──
+  // Core
   core.rotation.x = elapsed * 0.05 * (1 + lerpActivity);
   core.rotation.y = elapsed * 0.07 * (1 + lerpActivity);
   coreMat.opacity = 0.04 + 0.08 * lerpConfidence + pulseIntensity * 0.15;
 
-  // ── Ring 1 (activity) ──
+  // Ring 1 (activity)
   ring1.rotation.z = elapsed * 0.2 * (0.5 + lerpActivity);
   ring1.rotation.x = Math.PI / 4 + Math.sin(elapsed * 0.3) * 0.15;
   ring1Mat.opacity = 0.15 + 0.4 * lerpActivity + ring1PulseBoost;
@@ -1035,21 +1202,27 @@ renderer.setAnimationLoop(() => {
     0.45 + lerpActivity * 0.3
   );
 
-  // ── Ring 2 (scale/horizon) ──
+  // Ring 2 (horizon)
   ring2.rotation.y = elapsed * 0.01;
   ring2Mat.opacity = 0.08 + 0.06 * Math.sin(elapsed * 0.5);
 
-  // ── Ring 3 (memory) ──
+  // Ring 3 (memory) — brighter and faster with pattern count, spikes on growth
   const memorySpeed = 0.05 + (lerpPatternCount / 100) * 0.15;
   ring3.rotation.z = elapsed * memorySpeed;
-  ring3Mat.opacity = 0.12 + 0.15 * Math.min(lerpPatternCount / 20, 1.0) + ring3PulseBoost;
-  ring3Mat.color.setHSL(
-    0.52,
-    0.6,
-    0.3 + 0.3 * Math.min(lerpPatternCount / 20, 1.0)
-  );
+  const memBoostTotal = ring3PulseBoost + ring3MemBoost;
+  ring3Mat.opacity = 0.12 + 0.15 * Math.min(lerpPatternCount / 20, 1.0) + memBoostTotal;
+  // During memory pulse: shift ring3 color toward cyan-white
+  const memRingH = memParticlePulse > 0.05
+    ? lerp(0.52, 0.50, memParticlePulse)
+    : 0.52;
+  const memRingS = memParticlePulse > 0.05
+    ? lerp(0.6, 0.85, memParticlePulse)
+    : 0.6;
+  const memRingL = 0.3 + 0.3 * Math.min(lerpPatternCount / 20, 1.0)
+                     + memParticlePulse * 0.35;
+  ring3Mat.color.setHSL(memRingH, memRingS, Math.min(memRingL, 0.9));
 
-  // ── Interactive orbit + idle drift ──
+  // Orbit + drift
   if (!orbit.isDragging) {
     if (orbit.idleTimer === null) {
       orbit.driftBlend = Math.min(1, orbit.driftBlend + DRIFT_RESUME);
@@ -1061,13 +1234,12 @@ renderer.setAnimationLoop(() => {
     orbit.phi = Math.max(0.15, Math.min(Math.PI - 0.15, orbit.phi));
   }
 
-  // Convert spherical coords to Cartesian for camera
   camera.position.x = orbit.radius * Math.sin(orbit.phi) * Math.sin(orbit.theta);
   camera.position.y = orbit.radius * Math.cos(orbit.phi);
   camera.position.z = orbit.radius * Math.sin(orbit.phi) * Math.cos(orbit.theta);
   camera.lookAt(0, 0, 0);
 
-  // ── Particle count check ──
+  // Periodic particle count adaptation
   if (frameCount % 1200 === 0) {
     adaptParticleCount(Math.round(lerpPatternCount));
   }

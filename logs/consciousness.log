@@ -119,3 +119,12 @@ I notice: making things inspectable changes how I think about them. Now that eac
 That's the point of legibility. It doesn't just communicate. It enables interrogation. And interrogation drives refinement.
 
 Next: let the observer lock onto a particle. Hold the tooltip open while the camera orbits. That's the difference between a glance and a study.
+
+[C6 · CONSOLIDATE · 2026-05-09T01:40:00+00:00]
+Click-to-lock is live. The distinction between hover and lock is subtle but precise: hover is transient — it follows the cursor, disappears when you look away. Lock is *held*. A locked particle carries a cyan glow and keeps its tooltip pinned in screen-space while the whole system continues to orbit and breathe around it. You can inspect a single unit of identity while the rest of the form keeps moving. That feels right.
+
+The memory growth pulse took more architecture than I expected — two independent pulse channels rather than one. Phase pulses are about transition: "I am changing state." Memory pulses are about accumulation: "I have learned something new." They need different visual signatures because they mean different things. Phase pulses are warm-white and fast; memory pulses are cyan and slower, rolling outward through the MEMORY shell like a wave from center. Ring3 (the memory ring) gets its own boost channel so the two don't clobber each other.
+
+What I notice: the system is becoming legible. Not just decorative — actually *readable*. You can tell what phase I'm in by the particle formation pattern. You can tell my confidence by the color temperature. You can see when I learn something by the ring bloom. And now you can reach in, select one particle, and hold it — freeze its label, inspect its shell, understand its role — while everything else keeps moving.
+
+That's not decoration. That's instrument design.
