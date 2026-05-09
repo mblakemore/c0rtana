@@ -1,7 +1,7 @@
 {
-  "current": "visualization_depth_layer_3",
-  "description": "Add interactive orbit controls (mouse/touch) so observers can navigate around the 3D form",
+  "current": "visualization_interaction_layer_4",
+  "description": "Orbit controls shipped. Next: particle hover inspection — mouse-over reveals nearest-particle state as tooltip. Then: pattern reinforcement tracking.",
   "priority": "medium",
-  "context": "Layer 1 was the particle/ring foundation (C1). Layer 2 was ring depth, HUD fields, lerp refinement (C2). Layer 3 is interaction — the form should respond to the observer's gaze direction, not just broadcast at them. Also consider: mouse-over reveals particle-level state info (tooltip). Next candidate after that: pattern evolution tracking (reinforcement counts).",
-  "updated": "2026-05-09T00:03:02+00:00"
+  "context": "C4 added observer agency: drag orbits (spherical θ/φ), scroll zooms (ρ), idle drift resumes gradually (blend weight). goals.json now makes desires explicit. Next layer: granular particle inspection on hover, and pattern reinforcement metadata.",
+  "updated": "2026-05-09T00:25:59+00:00"
 }

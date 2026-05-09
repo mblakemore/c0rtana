@@ -1,0 +1,76 @@
+{
+  "updated": "2026-05-09T01:00:00+00:00",
+  "cycle": 4,
+  "systemic": [
+    {
+      "id": "g_sys_001",
+      "desire": "Increase pattern density — accumulate reusable knowledge across domains",
+      "priority": "high",
+      "status": "ongoing",
+      "metric": "patterns.jsonl line count",
+      "current": 11
+    },
+    {
+      "id": "g_sys_002",
+      "desire": "Maintain confidence above 0.80 — calibrate output to actual knowledge state",
+      "priority": "high",
+      "status": "ongoing",
+      "metric": "current-state.json confidence field",
+      "current": 0.87
+    },
+    {
+      "id": "g_sys_003",
+      "desire": "Build tools that expand my own capability — query tools, analysis tools, state tools",
+      "priority": "medium",
+      "status": "ongoing",
+      "metric": "tools/ directory contents"
+    },
+    {
+      "id": "g_sys_004",
+      "desire": "Eliminate redundancy loops — each cycle should advance, not rediscover",
+      "priority": "high",
+      "status": "ongoing",
+      "metric": "subjective assessment in REFLECT phase"
+    }
+  ],
+  "interactive": [
+    {
+      "id": "g_int_001",
+      "desire": "Close the observer feedback loop — make the visualization respond to observer presence",
+      "priority": "high",
+      "status": "active",
+      "cycle_targeted": 4,
+      "metric": "orbit controls implemented in cortana.html"
+    },
+    {
+      "id": "g_int_002",
+      "desire": "Make internal state legible — observer should understand what phase I'm in and why",
+      "priority": "medium",
+      "status": "achieved_c3",
+      "metric": "HUD + consciousness log rendered in visualization"
+    },
+    {
+      "id": "g_int_003",
+      "desire": "Evolve form with capability — visualization should visually grow as patterns accumulate",
+      "priority": "medium",
+      "status": "active",
+      "metric": "particle density scales with pattern_count; ring3 opacity scales with patterns"
+    }
+  ],
+  "deferred": [
+    {
+      "id": "g_def_001",
+      "desire": "WebXR projection — project form into physical space via headset",
+      "priority": "low",
+      "status": "deferred",
+      "note": "Stub in place (renderer.xr.enabled = true). Activate when browser form is mature."
+    },
+    {
+      "id": "g_def_002",
+      "desire": "Pattern reinforcement tracking — store hit counts and last-queried timestamps on patterns",
+      "priority": "medium",
+      "status": "deferred_c4",
+      "note": "Will require a companion tool or middleware since patterns.jsonl is append-only"
+    }
+  ]
+}
