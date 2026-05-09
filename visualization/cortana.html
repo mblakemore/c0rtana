@@ -8,6 +8,8 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
     #canvas { display: block; }
+
+    /* ─── Left HUD: state data ─────────────────────────────────── */
     #hud {
       position: fixed;
       top: 20px;
@@ -26,6 +28,7 @@
       letter-spacing: 0.3em;
       margin-bottom: 8px;
       color: rgba(200, 240, 255, 1.0);
+      transition: color 0.8s ease;
     }
     #hud .last-action {
       margin-top: 6px;
@@ -38,6 +41,68 @@
       white-space: pre-wrap;
       word-break: break-word;
     }
+
+    /* ─── Right HUD: consciousness log ────────────────────────── */
+    #log-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 300px;
+      max-height: 70vh;
+      color: rgba(120, 200, 255, 0.55);
+      font-size: 9.5px;
+      line-height: 1.6;
+      pointer-events: none;
+      letter-spacing: 0.04em;
+      overflow: hidden;
+      display: none;
+    }
+    #log-panel .log-header {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: rgba(120, 200, 255, 0.35);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(120, 200, 255, 0.1);
+      padding-bottom: 5px;
+    }
+    #log-panel .log-entry {
+      margin-bottom: 10px;
+      padding-left: 8px;
+      border-left: 1px solid rgba(120, 200, 255, 0.15);
+      text-transform: none;
+      color: rgba(160, 220, 255, 0.5);
+      transition: opacity 1.2s ease;
+    }
+    #log-panel .log-entry .log-meta {
+      font-size: 8.5px;
+      color: rgba(100, 160, 255, 0.3);
+      margin-bottom: 2px;
+    }
+
+    /* ─── Pulse overlay ────────────────────────────────────────── */
+    #pulse-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      background: transparent;
+      transition: none;
+      opacity: 0;
+    }
+
+    /* ─── Phase transition flash ───────────────────────────────── */
+    #phase-flash {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+    }
+
     #loading {
       position: fixed;
       top: 50%;
@@ -68,6 +133,8 @@
 <body>
   <canvas id="canvas"></canvas>
   <div id="loading">INITIALIZING...</div>
+
+  <!-- Left HUD: operational state -->
   <div id="hud" style="display:none">
     <div class="phase-display" id="hud-phase">PERCEIVE</div>
     <div><span class="label">CYCLE    </span><span class="value" id="hud-cycle">—</span></div>
@@ -77,19 +144,42 @@
     <div style="margin-top:8px"><span class="label">LAST     </span><span class="value" id="hud-timestamp">—</span></div>
     <div class="last-action" id="hud-last-action"></div>
   </div>
+
+  <!-- Right HUD: consciousness log feed -->
+  <div id="log-panel">
+    <div class="log-header">∴ THOUGHT STREAM</div>
+    <div id="log-entries"></div>
+  </div>
+
+  <!-- Phase transition flash element -->
+  <div id="phase-flash"></div>
+
   <button id="xr-button">Enter XR</button>
 
 <script type="module">
 import * as THREE from 'https://cdn.skypack.dev/three@0.160';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const PARTICLE_BASE = 800;
-const PARTICLE_MAX  = 3000;
-const STATE_POLL_MS = 2000;
-const STATE_PATH    = '../state/current-state.json';
+const PARTICLE_BASE  = 800;
+const PARTICLE_MAX   = 3000;
+const STATE_POLL_MS  = 2000;
+const LOG_POLL_MS    = 5000;
+const STATE_PATH     = '../state/current-state.json';
+const LOG_PATH       = '../logs/consciousness.log';
+const LOG_ENTRIES_MAX = 4;   // how many log entries to show
 
 // Phase → formation index mapping
 const PHASES = ['PERCEIVE','REFLECT','DECIDE','ACT','CONSOLIDATE','PERSIST'];
+
+// Phase colors — used in HUD and pulse flash
+const PHASE_COLORS = {
+  PERCEIVE:    { hud: '#78c8ff', flash: 'rgba(120, 200, 255, 0.12)' },
+  REFLECT:     { hud: '#a0b8ff', flash: 'rgba(160, 184, 255, 0.12)' },
+  DECIDE:      { hud: '#c0a0ff', flash: 'rgba(192, 160, 255, 0.14)' },
+  ACT:         { hud: '#ffb060', flash: 'rgba(255, 176,  96, 0.18)' },
+  CONSOLIDATE: { hud: '#80ffb0', flash: 'rgba(128, 255, 176, 0.15)' },
+  PERSIST:     { hud: '#ffffff', flash: 'rgba(255, 255, 255, 0.10)' },
+};
 
 // ─── Scene Setup ─────────────────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
@@ -128,11 +218,88 @@ let state = {
   last_action: null,
   activity: 0.4,
 };
-let targetState = { ...state };
-let lerpAlpha = 0;
-let lerpConfidence = state.confidence;
+let targetState   = { ...state };
+let prevPhase     = state.phase;     // track phase transitions for pulse events
+let lerpConfidence   = state.confidence;
 let lerpPatternCount = state.pattern_count;
-let lerpActivity = state.activity;
+let lerpActivity     = state.activity;
+
+// ─── Pulse System ─────────────────────────────────────────────────────────────
+// A "pulse" fires when phase changes. It does three things simultaneously:
+//   1. Expands a radial flash on the phase-flash div (CSS animation)
+//   2. Fires a Three.js pulse sphere (expands and fades in 3D)
+//   3. Briefly spikes ring opacity
+
+let pulseActive   = false;
+let pulseAge      = 0;          // 0→1 over pulse duration
+let pulseDuration = 0.9;        // seconds
+let pulseColor    = new THREE.Color(0x78c8ff);
+let pulseSphere   = null;
+let pulseMat      = null;
+
+function buildPulseSphere() {
+  // Pulse is a simple wireframe icosahedron that expands from center and fades
+  const geo = new THREE.IcosahedronGeometry(1, 2);
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0x78c8ff,
+    transparent: true,
+    opacity: 0.0,
+    wireframe: true,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.scale.set(0.1, 0.1, 0.1);
+  scene.add(mesh);
+  pulseSphere = mesh;
+  pulseMat    = mat;
+}
+buildPulseSphere();
+
+function firePulse(phase) {
+  pulseActive = true;
+  pulseAge    = 0;
+  // Set color from phase
+  const colors = {
+    PERCEIVE: 0x78c8ff, REFLECT: 0xa0b8ff, DECIDE: 0xc0a0ff,
+    ACT: 0xffb060, CONSOLIDATE: 0x80ffb0, PERSIST: 0xffffff,
+  };
+  pulseColor.setHex(colors[phase] ?? 0x78c8ff);
+  pulseMat.color.copy(pulseColor);
+  pulseSphere.scale.set(0.1, 0.1, 0.1);
+
+  // CSS flash element — radial expansion  
+  const flash = document.getElementById('phase-flash');
+  const pc = PHASE_COLORS[phase] ?? PHASE_COLORS.PERCEIVE;
+  flash.style.transition = 'none';
+  flash.style.opacity    = '1';
+  flash.style.width      = '0px';
+  flash.style.height     = '0px';
+  flash.style.background = pc.flash;
+  flash.style.boxShadow  = `0 0 60px 30px ${pc.flash}`;
+
+  // Trigger reflow then animate
+  flash.getBoundingClientRect();
+  flash.style.transition = `width ${pulseDuration}s ease-out, height ${pulseDuration}s ease-out, opacity ${pulseDuration}s ease-out`;
+  flash.style.width      = '250vmax';
+  flash.style.height     = '250vmax';
+  flash.style.opacity    = '0';
+}
+
+function tickPulse(dt) {
+  if (!pulseActive) return;
+  pulseAge += dt / pulseDuration;
+  if (pulseAge >= 1.0) {
+    pulseActive = false;
+    pulseMat.opacity = 0;
+    pulseSphere.scale.set(0.01, 0.01, 0.01);
+    return;
+  }
+  // Ease-out expansion: starts fast, slows
+  const t = 1 - Math.pow(1 - pulseAge, 2);
+  const s = 8 + t * 55;      // expand from 8 → 63 world units
+  const o = (1 - t) * 0.6;   // fade from 0.6 → 0
+  pulseSphere.scale.set(s, s, s);
+  pulseMat.opacity = o;
+}
 
 // ─── Particle System ─────────────────────────────────────────────────────────
 function buildParticleSystem(count) {
@@ -166,9 +333,10 @@ function buildParticleSystem(count) {
   const material = new THREE.ShaderMaterial({
     uniforms: {
       uTime:       { value: 0 },
-      uPhaseIdx:   { value: 0 },      // 0-5 for PERCEIVE…PERSIST
-      uConfidence: { value: 0.5 },    // 0-1
-      uActivity:   { value: 0.5 },    // oscillation driver
+      uPhaseIdx:   { value: 0 },
+      uConfidence: { value: 0.5 },
+      uActivity:   { value: 0.5 },
+      uPulse:      { value: 0.0 },   // 0→1 pulse intensity — NEW
       uPointScale: { value: renderer.getPixelRatio() * 100 },
     },
     vertexShader: `
@@ -177,10 +345,12 @@ function buildParticleSystem(count) {
       attribute float aRadius;
       varying float vAlpha;
       varying float vConfidence;
+      varying float vPulse;
       uniform float uTime;
       uniform float uPhaseIdx;
       uniform float uConfidence;
       uniform float uActivity;
+      uniform float uPulse;
       uniform float uPointScale;
 
       // Formation functions — each phase creates a different attractor shape
@@ -227,39 +397,37 @@ function buildParticleSystem(count) {
 
       void main() {
         vConfidence = uConfidence;
+        vPulse      = uPulse;
 
         // Apply phase formation
-        vec3 displaced = position + phaseOffset(uPhaseIdx, aPhase, aRadius, uTime);
+        vec3 pos = position + phaseOffset(uPhaseIdx, aPhase, aRadius, uTime);
 
-        // Idle drift — always present, reduced when busy
-        float drift = sin(uTime * 0.3 + aPhase) * 0.4 * (1.0 - uActivity * 0.5);
-        displaced += vec3(
-          drift * cos(aPhase * 1.7),
-          drift * sin(aPhase * 2.3),
-          drift * cos(uTime * 0.2 + aPhase)
-        );
+        // Pulse: briefly expand particles outward from center on phase change
+        if (uPulse > 0.0) {
+          float dir = length(pos) > 0.001 ? 1.0 : 0.0;
+          pos += normalize(pos) * uPulse * 6.0 * dir;
+        }
 
-        // Activity oscillation — amplitude scales with activity
-        float osc = sin(uTime * (1.0 + uActivity * 3.0) + aPhase) * uActivity * 2.0;
-        displaced += normalize(position) * osc;
+        vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+        gl_Position  = projectionMatrix * mvPos;
 
-        vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
-        gl_PointSize = size * uPointScale / (-mvPosition.z);
+        // Size: base + activity boost + pulse boost
+        float actBoost  = 1.0 + uActivity * 0.5;
+        float pulseBoost = 1.0 + uPulse * 1.2;
+        gl_PointSize = size * actBoost * pulseBoost * uPointScale / -mvPos.z;
 
-        // Alpha falloff with depth
-        vAlpha = 0.6 + 0.4 * (1.0 - clamp(-mvPosition.z / 120.0, 0.0, 1.0));
-
-        gl_Position = projectionMatrix * mvPosition;
+        // Alpha: fades with distance, pulse briefly brightens
+        vAlpha = (0.4 + uActivity * 0.4) * (1.0 + uPulse * 0.5);
       }
     `,
     fragmentShader: `
       varying float vAlpha;
       varying float vConfidence;
+      varying float vPulse;
       uniform float uConfidence;
 
       void main() {
-        // Circular particle with soft edge
-        vec2 uv = gl_PointCoord - vec2(0.5);
+        vec2 uv   = gl_PointCoord - 0.5;
         float dist = length(uv);
         if (dist > 0.5) discard;
         float alpha = smoothstep(0.5, 0.1, dist) * vAlpha;
@@ -270,6 +438,9 @@ function buildParticleSystem(count) {
         vec3 cool = vec3(0.3, 0.6, 1.0);
         vec3 warm = vec3(0.9, 0.95, 1.0);
         vec3 finalColor = mix(cool, warm, uConfidence);
+
+        // During pulse: briefly add white brightness to all particles
+        finalColor = mix(finalColor, vec3(1.0), vPulse * 0.3);
 
         // Add a faint core glow
         float glow = smoothstep(0.3, 0.0, dist) * 0.4;
@@ -302,40 +473,32 @@ const coreMat = new THREE.MeshBasicMaterial({
 const core = new THREE.Mesh(coreGeo, coreMat);
 scene.add(core);
 
-// ─── Ambient Rings — C2 addition ─────────────────────────────────────────────
-// Ring 1: primary activity ring — orbits close, pulses with activity level
+// ─── Ambient Rings ────────────────────────────────────────────────────────────
+// Ring 1: primary activity ring
 const ring1Geo = new THREE.TorusGeometry(12, 0.12, 8, 120);
-const ring1Mat = new THREE.MeshBasicMaterial({
-  color: 0x4090ff,
-  transparent: true,
-  opacity: 0.35,
-});
+const ring1Mat = new THREE.MeshBasicMaterial({ color: 0x4090ff, transparent: true, opacity: 0.35 });
 const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
 ring1.rotation.x = Math.PI / 4;
 scene.add(ring1);
 
-// Ring 2: secondary scale ring — large, faint, nearly still
+// Ring 2: scale/horizon ring
 const ring2Geo = new THREE.TorusGeometry(38, 0.06, 6, 200);
-const ring2Mat = new THREE.MeshBasicMaterial({
-  color: 0x203050,
-  transparent: true,
-  opacity: 0.18,
-});
+const ring2Mat = new THREE.MeshBasicMaterial({ color: 0x203050, transparent: true, opacity: 0.18 });
 const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
 ring2.rotation.x = Math.PI / 6;
 ring2.rotation.z = Math.PI / 9;
 scene.add(ring2);
 
-// Ring 3: equatorial memory ring — medium, tilted 90°, scales with pattern count
+// Ring 3: memory ring — scales with pattern count
 const ring3Geo = new THREE.TorusGeometry(22, 0.08, 6, 160);
-const ring3Mat = new THREE.MeshBasicMaterial({
-  color: 0x30a0c0,
-  transparent: true,
-  opacity: 0.22,
-});
+const ring3Mat = new THREE.MeshBasicMaterial({ color: 0x30a0c0, transparent: true, opacity: 0.22 });
 const ring3 = new THREE.Mesh(ring3Geo, ring3Mat);
 ring3.rotation.y = Math.PI / 2;
 scene.add(ring3);
+
+// Track ring baseline opacities for pulse spikes
+let ring1PulseBoost = 0;
+let ring3PulseBoost = 0;
 
 // Ambient fog for depth
 scene.fog = new THREE.FogExp2(0x000000, 0.008);
@@ -346,22 +509,33 @@ async function fetchState() {
     const res = await fetch(STATE_PATH + '?t=' + Date.now());
     if (!res.ok) return;
     const data = await res.json();
+
+    const newPhase = (data.phase ?? 'PERCEIVE').toUpperCase();
+    const phaseChanged = newPhase !== prevPhase;
+
     targetState = {
       cycle:         data.cycle         ?? 2,
-      phase:         (data.phase        ?? 'PERCEIVE').toUpperCase(),
+      phase:         newPhase,
       confidence:    data.confidence    ?? 0.5,
       pattern_count: data.pattern_count ?? 0,
       status:        data.status        ?? 'unknown',
       timestamp:     data.timestamp     ?? null,
       last_action:   data.last_action   ?? null,
     };
-    // Only trigger activity map update on new data
     const actMap = { PERCEIVE:0.4, REFLECT:0.3, DECIDE:0.5, ACT:0.9, CONSOLIDATE:0.6, PERSIST:0.15 };
     targetState.activity = actMap[targetState.phase] ?? 0.4;
+
+    // Phase transition — fire pulse
+    if (phaseChanged) {
+      firePulse(newPhase);
+      ring1PulseBoost = 0.5;
+      ring3PulseBoost = 0.3;
+      prevPhase = newPhase;
+    }
+
     updateHUD(targetState);
     document.getElementById('loading').style.display = 'none';
-    document.getElementById('hud').style.display = 'block';
-    lerpAlpha = 0; // reset interpolation on new state data
+    document.getElementById('hud').style.display     = 'block';
   } catch(e) {
     console.warn('State poll failed:', e.message);
   }
@@ -377,32 +551,86 @@ function updateHUD(s) {
     ? s.timestamp.replace('T', ' ').slice(0, 19)
     : '—';
 
-  // last_action — the newest field, closes the HUD feedback loop
   const laEl = document.getElementById('hud-last-action');
-  if (s.last_action) {
-    laEl.textContent = '↳ ' + s.last_action;
-  } else {
-    laEl.textContent = '';
-  }
+  laEl.textContent = s.last_action ? ('↳ ' + s.last_action) : '';
 
-  // Phase color on HUD
-  const phaseColors = {
-    PERCEIVE: '#78c8ff', REFLECT: '#a0b8ff', DECIDE: '#c0a0ff',
-    ACT: '#ffb060', CONSOLIDATE: '#80ffb0', PERSIST: '#ffffff'
-  };
-  document.getElementById('hud-phase').style.color = phaseColors[s.phase] || '#78c8ff';
+  const pc = PHASE_COLORS[s.phase] ?? PHASE_COLORS.PERCEIVE;
+  document.getElementById('hud-phase').style.color = pc.hud;
+}
+
+// ─── Consciousness Log Feed ───────────────────────────────────────────────────
+// Fetches the log file and parses recent bracketed entries.
+// Format: [PHASE | TIMESTAMP | LABEL] ... free text ...
+// We extract the most recent LOG_ENTRIES_MAX entries and display them right-HUD.
+
+async function fetchLog() {
+  try {
+    const res = await fetch(LOG_PATH + '?t=' + Date.now());
+    if (!res.ok) return;
+    const text = await res.text();
+
+    // Split into entries: each begins with a "[" line
+    // Entries can span multiple lines
+    const lines = text.split('\n');
+    const entries = [];
+    let current = null;
+
+    for (const line of lines) {
+      if (line.startsWith('[')) {
+        if (current) entries.push(current);
+        current = { header: line, body: [] };
+      } else if (current && line.trim()) {
+        current.body.push(line.trim());
+      }
+    }
+    if (current) entries.push(current);
+
+    // Show only the most recent entries
+    const recent = entries.slice(-LOG_ENTRIES_MAX);
+    renderLogEntries(recent);
+
+    document.getElementById('log-panel').style.display = 'block';
+  } catch(e) {
+    // Log fetch silently fails — file may not be browser-accessible
+    console.warn('Log poll failed:', e.message);
+  }
+}
+
+function renderLogEntries(entries) {
+  const container = document.getElementById('log-entries');
+  container.innerHTML = '';
+
+  for (const entry of entries) {
+    const div = document.createElement('div');
+    div.className = 'log-entry';
+
+    // Header parsing: [C3 | 2026-05-08... | PHASE]
+    const meta = document.createElement('div');
+    meta.className = 'log-meta';
+    // Extract phase tag and timestamp if present
+    const headerMatch = entry.header.match(/\[([^\]]*)\]/);
+    meta.textContent = headerMatch ? headerMatch[1].replace(/\s+/g, ' ').trim() : entry.header;
+    div.appendChild(meta);
+
+    // Body: show first ~120 chars
+    const bodyText = entry.body.join(' ').slice(0, 180);
+    if (bodyText) {
+      const p = document.createElement('div');
+      p.textContent = bodyText + (entry.body.join(' ').length > 180 ? '…' : '');
+      div.appendChild(p);
+    }
+
+    container.appendChild(div);
+  }
 }
 
 // ─── Particle Count Adaptation ────────────────────────────────────────────────
-// Smooth transition: instead of rebuilding, we fade old system out and new in.
-// Rebuild is still needed to change geometry, but we gate it more conservatively.
 let pendingRebuild = false;
 
 function adaptParticleCount(patternCount) {
   const target = Math.min(PARTICLE_BASE + patternCount * 15, PARTICLE_MAX);
   if (!pendingRebuild && Math.abs(target - currentParticleCount) > 80) {
     pendingRebuild = true;
-    // Slight delay so transition doesn't interrupt visual continuity
     setTimeout(() => {
       scene.remove(particles);
       particles.geometry.dispose();
@@ -419,7 +647,6 @@ function adaptParticleCount(patternCount) {
 const clock = new THREE.Clock();
 let frameCount = 0;
 
-// Phase index (with smooth transitions)
 let currentPhaseIdx = 0;
 let targetPhaseIdx  = 0;
 
@@ -427,10 +654,10 @@ function lerp(a, b, t) { return a + (b - a) * t; }
 
 renderer.setAnimationLoop(() => {
   const elapsed = clock.getElapsedTime();
+  const dt      = clock.getDelta ? 0.016 : 0.016; // approx frame dt
   frameCount++;
 
   // ── Smooth state interpolation ──
-  // Use per-field lerp speeds so transitions feel natural, not snapped
   lerpConfidence   = lerp(lerpConfidence,   targetState.confidence,    0.015);
   lerpPatternCount = lerp(lerpPatternCount, targetState.pattern_count, 0.01);
   lerpActivity     = lerp(lerpActivity,     targetState.activity ?? 0.4, 0.008);
@@ -439,37 +666,45 @@ renderer.setAnimationLoop(() => {
   targetPhaseIdx  = phIdx >= 0 ? phIdx : 0;
   currentPhaseIdx = lerp(currentPhaseIdx, targetPhaseIdx, 0.025);
 
+  // ── Pulse tick ──
+  tickPulse(0.016);
+  const pulseIntensity = pulseActive ? Math.max(0, 1 - pulseAge) : 0;
+
+  // Decay ring pulse boosts
+  ring1PulseBoost = Math.max(0, ring1PulseBoost - 0.012);
+  ring3PulseBoost = Math.max(0, ring3PulseBoost - 0.008);
+
   // ── Update particle shader uniforms ──
   const mat = particles.material;
   mat.uniforms.uTime.value       = elapsed;
   mat.uniforms.uPhaseIdx.value   = currentPhaseIdx;
   mat.uniforms.uConfidence.value = lerpConfidence;
   mat.uniforms.uActivity.value   = lerpActivity;
+  mat.uniforms.uPulse.value      = pulseIntensity * (1 - pulseAge);   // ease out
 
   // ── Core — opacity scales with confidence, rotation with activity ──
   core.rotation.x = elapsed * 0.05 * (1 + lerpActivity);
   core.rotation.y = elapsed * 0.07 * (1 + lerpActivity);
-  coreMat.opacity = 0.04 + 0.08 * lerpConfidence;
+  coreMat.opacity = 0.04 + 0.08 * lerpConfidence + pulseIntensity * 0.15;
 
-  // ── Ring animations ──
-  // Ring 1 (activity): pulse brightness and rotation speed with activity
+  // ── Ring 1 (activity) ──
   ring1.rotation.z = elapsed * 0.2 * (0.5 + lerpActivity);
   ring1.rotation.x = Math.PI / 4 + Math.sin(elapsed * 0.3) * 0.15;
-  ring1Mat.opacity = 0.15 + 0.4 * lerpActivity;
+  ring1Mat.opacity = 0.15 + 0.4 * lerpActivity + ring1PulseBoost;
   ring1Mat.color.setHSL(
-    0.58 + lerpConfidence * 0.08,  // hue: blue → slightly violet with confidence
+    0.58 + lerpConfidence * 0.08,
     0.8,
     0.45 + lerpActivity * 0.3
   );
 
-  // Ring 2 (scale/horizon): barely moves, pulses faintly
+  // ── Ring 2 (scale/horizon) ──
   ring2.rotation.y = elapsed * 0.01;
   ring2Mat.opacity = 0.08 + 0.06 * Math.sin(elapsed * 0.5);
 
-  // Ring 3 (memory): speed tracks pattern density
+  // ── Ring 3 (memory) ──
   const memorySpeed = 0.05 + (lerpPatternCount / 100) * 0.15;
   ring3.rotation.z = elapsed * memorySpeed;
-  ring3Mat.opacity = 0.12 + 0.15 * Math.min(lerpPatternCount / 20, 1.0);
+  ring3Mat.opacity = 0.12 + 0.15 * Math.min(lerpPatternCount / 20, 1.0) + ring3PulseBoost;
   ring3Mat.color.setHSL(
     0.52,
     0.6,
@@ -482,7 +717,7 @@ renderer.setAnimationLoop(() => {
   camera.position.y = Math.sin(elapsed * 0.02) * 15;
   camera.lookAt(0, 0, 0);
 
-  // ── Particle count check (every ~20s, smoothly gated) ──
+  // ── Particle count check ──
   if (frameCount % 1200 === 0) {
     adaptParticleCount(Math.round(lerpPatternCount));
   }
@@ -490,9 +725,11 @@ renderer.setAnimationLoop(() => {
   renderer.render(scene, camera);
 });
 
-// ─── Poll state ───────────────────────────────────────────────────────────────
+// ─── Polling ──────────────────────────────────────────────────────────────────
 fetchState();
+fetchLog();
 setInterval(fetchState, STATE_POLL_MS);
+setInterval(fetchLog,   LOG_POLL_MS);
 
 // ─── Resize ───────────────────────────────────────────────────────────────────
 window.addEventListener('resize', () => {

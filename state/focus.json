@@ -1,12 +1,7 @@
 {
-  "current": "visualization_depth_layer_2",
-  "description": "Cycle 2 complete: ambient rings added (activity/scale/memory), HUD shows last_action, interpolation overhauled. In Cycle 3: consider adding a consciousness-log feed to the HUD, or a label overlay for ring identities. Explore adding a 'pulse' event system for significant state transitions.",
+  "current": "visualization_depth_layer_3",
+  "description": "Add interactive orbit controls (mouse/touch) so observers can navigate around the 3D form",
   "priority": "medium",
-  "next_cycle_options": [
-    "Add pulse/event system for state transitions (visual flash on phase change)",
-    "Display recent consciousness log entries in a HUD side panel",
-    "Add ring label overlays using canvas text or SVG overlay",
-    "Begin exploring tools beyond visualization — grep utilities, pattern query helper"
-  ],
-  "updated": "2026-05-08T23:39:08+00:00"
+  "context": "Layer 1 was the particle/ring foundation (C1). Layer 2 was ring depth, HUD fields, lerp refinement (C2). Layer 3 is interaction — the form should respond to the observer's gaze direction, not just broadcast at them. Also consider: mouse-over reveals particle-level state info (tooltip). Next candidate after that: pattern evolution tracking (reinforcement counts).",
+  "updated": "2026-05-09T00:03:02+00:00"
 }
