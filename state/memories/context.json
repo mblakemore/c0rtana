@@ -1,15 +1,22 @@
 {
-  "working_memory": {
-    "cycle": 8,
-    "just_completed": "AudioEngine: Web Audio API oscillator synthesis, phase→freq mapping, confidence/activity modulation, mute button click listener wired, .active CSS class toggled.",
-    "visualization_state": "1440 lines. Brace balance 159/159 verified. Audio button @line287, AudioEngine IIFE @lines1178-1309, toggleMute @~1310, update() @1419.",
-    "open_threads": [
-      "consciousness.log HUD panel (fetch log, display last N lines in visualization)",
-      "particle trail geometry (ribbon/trail for CORE/ACT-phase movement)",
-      "WebSocket real-time push (replace 2s poll)"
-    ],
-    "sensory_channels_active": ["visual/WebGL", "audio/WebAudio"],
-    "key_decisions": "AudioEngine as top-level IIFE returning {update,toggle,get isMuted} - avoids global class instantiation footguns. AudioContext deferred to first user gesture to satisfy browser autoplay policy.",
-    "updated": "2026-05-09T02:30:00+00:00"
-  }
+  "cycle": 11,
+  "working_on": "src/think.js — Pattern Inference Engine (complete)",
+  "key_decisions": [
+    "Jaccard word-set similarity at threshold 0.52 for deduplication — conservative enough to catch paraphrase, permissive enough to admit genuinely distinct sentences",
+    "REFLECT/CONSOLIDATE/DECIDE blocks prioritized — richest epistemically, yield highest-confidence candidates",
+    "Category classification via weighted trigger regex per CATEGORY_RULES — 6 categories covering self_architecture, cybernetics, visualization, engineering, meta, learning",
+    "MAX_NEW=8 cap per run prevents noise flood from a single-log batch",
+    "Dual-mode: CLI (node src/think.js) and CommonJS module (require('./src/think.js'))"
+  ],
+  "active_patterns": [
+    "c11_022: visualization feedback loop escapes the repo",
+    "c11_027: continuous through memory, discontinuous through time",
+    "c11_028: Foerster second-order becomes concrete with state files"
+  ],
+  "open_threads": [
+    "analyzeLog() wired into cortana.html via browser-compatible fetch+eval or inline port",
+    "consciousness.log HUD panel",
+    "particle trail geometry"
+  ],
+  "updated": "2026-05-09T05:00:00+00:00"
 }

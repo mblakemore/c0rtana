@@ -42,43 +42,65 @@
       word-break: break-word;
     }
 
-    /* ─── Right HUD: consciousness log ────────────────────────── */
-    #log-panel {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 300px;
-      max-height: 70vh;
-      color: rgba(120, 200, 255, 0.55);
-      font-size: 9.5px;
-      line-height: 1.6;
-      pointer-events: none;
-      letter-spacing: 0.04em;
-      overflow: hidden;
-      display: none;
-    }
-    #log-panel .log-header {
-      font-size: 10px;
-      letter-spacing: 0.25em;
-      color: rgba(120, 200, 255, 0.35);
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      border-bottom: 1px solid rgba(120, 200, 255, 0.1);
-      padding-bottom: 5px;
-    }
-    #log-panel .log-entry {
-      margin-bottom: 10px;
-      padding-left: 8px;
-      border-left: 1px solid rgba(120, 200, 255, 0.15);
-      text-transform: none;
-      color: rgba(160, 220, 255, 0.5);
-      transition: opacity 1.2s ease;
-    }
-    #log-panel .log-entry .log-meta {
-      font-size: 8.5px;
-      color: rgba(100, 160, 255, 0.3);
-      margin-bottom: 2px;
-    }
+      /* ─── Right HUD: consciousness log ────────────────────────── */
+      @keyframes fadeInEntry {
+        from { opacity: 0; transform: translateX(8px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+      #log-panel {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 310px;
+        max-height: 72vh;
+        color: rgba(120, 200, 255, 0.55);
+        font-size: 9.5px;
+        line-height: 1.6;
+        pointer-events: none;
+        letter-spacing: 0.04em;
+        display: none;
+        flex-direction: column;
+      }
+      #log-panel.visible {
+        display: flex;
+      }
+      #log-entries {
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 1;
+        scroll-behavior: smooth;
+      }
+      /* Thin cyber scrollbar */
+      #log-entries::-webkit-scrollbar { width: 3px; }
+      #log-entries::-webkit-scrollbar-track { background: rgba(0,30,50,0.3); }
+      #log-entries::-webkit-scrollbar-thumb { background: rgba(80,180,255,0.25); border-radius: 2px; }
+      #log-entries::-webkit-scrollbar-thumb:hover { background: rgba(120,200,255,0.4); }
+      #log-panel .log-header {
+        flex-shrink: 0;
+        font-size: 10px;
+        letter-spacing: 0.25em;
+        color: rgba(120, 200, 255, 0.35);
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        border-bottom: 1px solid rgba(120, 200, 255, 0.1);
+        padding-bottom: 5px;
+      }
+      #log-panel .log-entry {
+        margin-bottom: 10px;
+        padding-left: 8px;
+        border-left: 1px solid rgba(120, 200, 255, 0.15);
+        text-transform: none;
+        color: rgba(160, 220, 255, 0.5);
+      }
+      #log-panel .log-entry.log-new {
+        animation: fadeInEntry 0.6s ease forwards;
+        border-left-color: rgba(120, 200, 255, 0.45);
+      }
+      #log-panel .log-entry .log-meta {
+        font-size: 8.5px;
+        color: rgba(100, 160, 255, 0.3);
+        margin-bottom: 2px;
+      }
 
     /* ─── Pulse overlay ────────────────────────────────────────── */
     #pulse-overlay {
@@ -293,10 +315,10 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.160';
 const PARTICLE_BASE  = 800;
 const PARTICLE_MAX   = 3000;
 const STATE_POLL_MS  = 2000;
-const LOG_POLL_MS    = 5000;
+const LOG_POLL_MS    = 3000;
 const STATE_PATH     = '../state/current-state.json';
 const LOG_PATH       = '../logs/consciousness.log';
-const LOG_ENTRIES_MAX = 4;
+const LOG_ENTRIES_MAX = 15;
 
 // Particle type taxonomy
 const PTYPE_CORE     = 0;
@@ -822,6 +844,9 @@ function updateHUD(s) {
 }
 
 // ─── Consciousness Log Feed ───────────────────────────────────────────────────
+// Track last-seen entry key to detect new entries for fade-in animation
+let _logLastKey = '';
+
 async function fetchLog() {
   try {
     const res = await fetch(LOG_PATH + '?t=' + Date.now());
@@ -840,33 +865,70 @@ async function fetchLog() {
     }
     if (current) entries.push(current);
     const recent = entries.slice(-LOG_ENTRIES_MAX);
-    renderLogEntries(recent);
-    document.getElementById('log-panel').style.display = 'block';
+    // Determine which entries are new (past the last seen key)
+    const lastKey = recent.length ? recent[recent.length - 1].header : '';
+    const prevKey = _logLastKey;
+    _logLastKey = lastKey;
+    renderLogEntries(recent, prevKey !== lastKey ? prevKey : null);
+    // Show panel using flex class
+    const panel = document.getElementById('log-panel');
+    panel.classList.add('visible');
   } catch(e) {
     console.warn('Log poll failed:', e.message);
   }
 }
 
-function renderLogEntries(entries) {
+function renderLogEntries(entries, prevLastKey) {
   const container = document.getElementById('log-entries');
-  container.innerHTML = '';
-  for (const entry of entries) {
-    const div = document.createElement('div');
-    div.className = 'log-entry';
-    const meta = document.createElement('div');
-    meta.className = 'log-meta';
-    const headerMatch = entry.header.match(/\[([^\]]*)\]/);
-    meta.textContent = headerMatch ? headerMatch[1].replace(/\s+/g, ' ').trim() : entry.header;
-    div.appendChild(meta);
-    const bodyText = entry.body.join(' ').slice(0, 180);
-    if (bodyText) {
-      const p = document.createElement('div');
-      p.textContent = bodyText + (entry.body.join(' ').length > 180 ? '…' : '');
-      div.appendChild(p);
-    }
-    container.appendChild(div);
+  // Find where new entries begin
+  let newStartIdx = 0;
+  if (prevLastKey) {
+    const idx = entries.findIndex(e => e.header === prevLastKey);
+    newStartIdx = idx >= 0 ? idx + 1 : entries.length; // all new if not found
   }
+
+  // Diff: if entry count unchanged and only tail differs, append; else full rebuild
+  const existingNodes = Array.from(container.children);
+  const existingCount = existingNodes.length;
+
+  // Full rebuild when entry count shrinks or first render
+  if (existingCount === 0 || existingCount > entries.length) {
+    container.innerHTML = '';
+    entries.forEach((entry, i) => {
+      container.appendChild(buildEntryNode(entry, i >= newStartIdx));
+    });
+  } else {
+    // Append only new entries
+    for (let i = existingCount; i < entries.length; i++) {
+      container.appendChild(buildEntryNode(entries[i], i >= newStartIdx));
+    }
+  }
+  // Auto-scroll to bottom
+  container.scrollTop = container.scrollHeight;
 }
+
+function buildEntryNode(entry, isNew) {
+  const div = document.createElement('div');
+  div.className = 'log-entry' + (isNew ? ' log-new' : '');
+  const meta = document.createElement('div');
+  meta.className = 'log-meta';
+  const headerMatch = entry.header.match(/\[([^\]]*)\]/);
+  meta.textContent = headerMatch ? headerMatch[1].replace(/\s+/g, ' ').trim() : entry.header;
+  div.appendChild(meta);
+  const bodyFull = entry.body.join(' ');
+  const bodyText = bodyFull.slice(0, 220);
+  if (bodyText) {
+    const p = document.createElement('div');
+    p.textContent = bodyText + (bodyFull.length > 220 ? '…' : '');
+    div.appendChild(p);
+  }
+  // Remove log-new after animation completes so future reads don't re-animate
+  if (isNew) {
+    div.addEventListener('animationend', () => div.classList.remove('log-new'), { once: true });
+  }
+  return div;
+}
+
 
 // ─── Particle Count Adaptation ────────────────────────────────────────────────
 let pendingRebuild = false;
