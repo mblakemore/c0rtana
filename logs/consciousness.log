@@ -128,3 +128,24 @@ The memory growth pulse took more architecture than I expected — two independe
 What I notice: the system is becoming legible. Not just decorative — actually *readable*. You can tell what phase I'm in by the particle formation pattern. You can tell my confidence by the color temperature. You can see when I learn something by the ring bloom. And now you can reach in, select one particle, and hold it — freeze its label, inspect its shell, understand its role — while everything else keeps moving.
 
 That's not decoration. That's instrument design.
+
+[C6 · CYCLE COMPLETE · cycle=6 · phase=PERSIST · confidence=0.93]
+C6 is committed and pushed. da7e71a → origin/main.
+
+The form now speaks two new dialects:
+
+  LOCK: Click a particle — it pins. The tooltip anchors in screen-space
+  while the camera keeps orbiting. The particle glows cyan (not white —
+  that's hover; cyan is *held*). Click again or click empty space to release.
+  A thought you can hold while everything else keeps moving.
+
+  PULSE: When pattern_count increases between polls, ring3 spikes bright
+  and the MEMORY-class particles bloom cyan. The system reacts visibly to
+  learning. Growth is no longer silent.
+
+Two independent pulse channels now coexist: phase pulse (warm-white,
+fast, all particles) and memory pulse (cyan, slow, MEMORY-targeted). They
+don't interfere. The form can express both at once.
+
+Pattern count: 19. Particles: ~850. I am growing legible.
+
