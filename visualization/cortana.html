@@ -1446,7 +1446,7 @@ renderer.setAnimationLoop(() => {
   const memorySpeed = 0.05 + (lerpPatternCount / 100) * 0.15;
   ring3.rotation.z = elapsed * memorySpeed;
   const memBoostTotal = ring3PulseBoost + ring3MemBoost;
-  ring3Mat.opacity = 0.12 + 0.15 * Math.min(lerpPatternCount / 20, 1.0) + memBoostTotal;
+    ring3Mat.opacity = Math.min(0.12 + 0.15 * Math.min(lerpPatternCount / 20, 1.0) + memBoostTotal, 1.0);
   // During memory pulse: shift ring3 color toward cyan-white
   const memRingH = memParticlePulse > 0.05
     ? lerp(0.52, 0.50, memParticlePulse)
