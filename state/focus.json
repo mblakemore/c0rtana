@@ -1,7 +1,5 @@
 {
-  "cycle": 14,
-  "objective": "Ring3 saturation cap visual testing and stabilization.",
-  "priority": "medium",
-  "status": "in_progress",
-  "updated": "2026-05-12T20:00:05.909Z"
+  "cycle": 15,
+  "goal": "Transition from Ring3 stabilization to WebXR audit and Ring1/2 coupling",
+  "priority": "Integration"
 }

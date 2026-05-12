@@ -1428,20 +1428,24 @@ renderer.setAnimationLoop(() => {
   core.rotation.y = elapsed * 0.07 * (1 + lerpActivity);
   coreMat.opacity = 0.04 + 0.08 * lerpConfidence + pulseIntensity * 0.15;
 
-  // Ring 1 (activity)
-  ring1.rotation.z = elapsed * 0.2 * (0.5 + lerpActivity);
-  ring1.rotation.x = Math.PI / 4 + Math.sin(elapsed * 0.3) * 0.15;
-  ring1Mat.opacity = 0.15 + 0.4 * lerpActivity + ring1PulseBoost;
-  ring1Mat.color.setHSL(
-    0.58 + lerpConfidence * 0.08,
-    0.8,
-    0.45 + lerpActivity * 0.3
-  );
+    // Ring 1 (activity)
+    ring1.rotation.z = elapsed * 0.2 * (0.5 + lerpActivity);
+    ring1.rotation.x = Math.PI / 4 + Math.sin(elapsed * 0.3) * 0.15;
+    ring1Mat.opacity = 0.15 + 0.4 * lerpActivity + ring1PulseBoost;
+    ring1Mat.color.setHSL(
+      0.58 + lerpConfidence * 0.08,
+      0.8,
+      0.45 + lerpActivity * 0.3
+    );
 
-  // Ring 2 (horizon)
-  ring2.rotation.y = elapsed * 0.01;
-  ring2Mat.opacity = 0.08 + 0.06 * Math.sin(elapsed * 0.5);
-
+    // Ring 2 (horizon) - Now coupled to Ring 1's breathing pattern
+    const couplingFactor = 0.618;
+    const basePulse = Math.sin(elapsed * 0.3);
+    const coupledPulse = Math.sin(elapsed * 0.3 + 0.5) * couplingFactor;
+    
+    ring2.rotation.y = elapsed * 0.01;
+    ring2.scale.setScalar(1.0 + coupledPulse * 0.05); // Subtle organic expansion
+    ring2Mat.opacity = 0.08 + 0.06 * basePulse;
   // Ring 3 (memory) — brighter and faster with pattern count, spikes on growth
   const memorySpeed = 0.05 + (lerpPatternCount / 100) * 0.15;
   ring3.rotation.z = elapsed * memorySpeed;
