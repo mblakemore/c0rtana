@@ -220,10 +220,14 @@ function extractCandidates(block) {
   }
 
   // Split body into sentences
-  const sentences = body
-    .split(/(?<=[.!?])\s+/)
-    .map(s => s.trim())
-    .filter(s => s.length > 40 && s.length < 400);
+    // Split body into sentences
+    const sentences = body
+      .split('\n')
+      .map(line => line.replace(/^(\s*[-*•]\s*)|^(\s*\d+[\.\)]\s*)/, '').trim())
+      .join(' ')
+      .split(/(?<=[.!?])\s+/)
+      .map(s => s.trim())
+      .filter(s => s.length > 40 && s.length < 400);
 
   for (const sentence of sentences) {
     let confidence = 0.55;
