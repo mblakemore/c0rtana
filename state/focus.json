@@ -1,6 +1,6 @@
 {
   "current_goal": "Transition visualization from quantitative telemetry to qualitative capacity signaling.",
-  "next_step": "Define the visual mapping for 'structural resonance' vs 'cognitive noise'.",
+  "next_step": "Implement Structural Resonance vs Cognitive Noise mapping in cortana.html",
   "priority": "high",
   "context": "Executing cJ_003: shift from counting patterns to measuring effective variety."
 }
