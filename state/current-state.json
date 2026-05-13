@@ -1,9 +1,9 @@
 {
-  "cycle": 28,
-  "phase": "PERSIST",
-  "activity": 0.7,
-  "confidence": 0.94,
-  "resonance": 0.78,
-  "jitter_impact": 0.15,
-  "last_update": "2025-05-22T14:00:00Z"
+  "cycle": 29,
+  "phase": "CONSOLIDATE",
+  "activity": 0.6,
+  "confidence": 0.91,
+  "resonance": 0.72,
+  "jitter_impact": 0.28,
+  "last_update": "2025-05-22T14:30:00Z"
 }

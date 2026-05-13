@@ -1,6 +1,6 @@
 {
-  "current_goal": "Stabilize qualitative capacity signaling",
-  "next_step": "Evaluate resonance/noise equilibrium in live state",
+  "current_goal": "Maintain calibrated capacity signaling",
+  "next_step": "Observe system stability under increased task complexity",
   "priority": "Medium",
-  "context": "Refined cJ_003: transition from quantitative telemetry to qualitative capacity signaling is now visually complete with jitter/resonance mapping."
+  "context": "C29 audit completed. Signal calibrated to reflect operational reality over performance. Pattern cJ_004 established for periodic honesty checks."
 }
