@@ -63,13 +63,12 @@
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.xr.enabled = true; // WebXR Stub
+        renderer.xr.enabled = true;
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
 
-        // State Configuration
         let systemState = {
             phase: 'IDLE',
             cycle: 0,
@@ -78,46 +77,78 @@
             pattern_count: 0
         };
 
-        // Visual Mappings
         const PHASE_COLORS = {
-            'PERCEIVE': 0x00ffff, // Cyan
-            'REFLECT': 0x0000ff,  // Deep Blue
-            'DECIDE': 0x00ff00,   // Green
-            'ACT': 0xffaa00,      // Gold
-            'CONSOLIDATE': 0xaa00ff, // Purple
-            'PERSIST': 0xffffff,  // White
-            'IDLE': 0x333333      // Dark Grey
+            'PERCEIVE': 0x00ffff,
+            'REFLECT': 0x0000ff,
+            'DECIDE': 0x00ff00,
+            'ACT': 0xffaa00,
+            'CONSOLIDATE': 0xaa00ff,
+            'PERSIST': 0xffffff,
+            'IDLE': 0x333333
         };
 
-        // Particle System
-        let particleCount = 2000;
-        let geometry = new THREE.BufferGeometry();
-        let positions = new Float32Array(particleCount * 3);
-        let colors = new Float32Array(particleCount * 3);
+        const entityGroup = new THREE.Group();
+        scene.add(entityGroup);
 
-        function initParticles() {
-            for (let i = 0; i < particleCount * 3; i++) {
-                positions[i] = (Math.random() - 0.5) * 10;
-                colors[i] = Math.random();
-            }
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        let core;
+        let shells = [];
+
+        function createCore() {
+            const geometry = new THREE.IcosahedronGeometry(0.3, 2);
+            const material = new THREE.PointsMaterial({
+                size: 0.03,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending
+            });
+            core = new THREE.Points(geometry, material);
+            entityGroup.add(core);
         }
 
-        initParticles();
+        function createShell(index, radius) {
+            const particleCount = 1000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
 
-        const material = new THREE.PointsMaterial({
-            size: 0.05,
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
-        });
+            for (let i = 0; i < particleCount; i++) {
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+                positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+                positions[i * 3 + 2] = radius * Math.cos(phi);
+                
+                colors[i * 3] = 0.5;
+                colors[i * 3 + 1] = 0.8;
+                colors[i * 3 + 2] = 1.0;
+            }
 
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-        camera.position.z = 5;
+            const material = new THREE.PointsMaterial({
+                size: 0.04,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+
+            const shell = new THREE.Points(geometry, material);
+            shell.userData = { 
+                rotationSpeed: {
+                    x: (Math.random() - 0.5) * 0.01,
+                    y: (Math.random() - 0.5) * 0.01,
+                    z: (Math.random() - 0.5) * 0.01
+                } 
+            };
+            return shell;
+        }
+
+        createCore();
+
+        camera.position.z = 8;
 
         async function updateState() {
             try {
@@ -137,24 +168,20 @@
                 document.getElementById('confidence').innerText = \`CONFIDENCE: \${(systemState.confidence * 100).toFixed(1)}%\`;
                 
                 const phaseColor = new THREE.Color(PHASE_COLORS[systemState.phase] || PHASE_COLORS['IDLE']);
+                const tempColor = new THREE.Color(systemState.confidence > 0.7 ? 0xffffff : 0x00ccff);
                 
-                // Confidence-based color temperature shift
-                // Low confidence -> Cooler (Blue/Cyan), High confidence -> Warmer (White/Gold)
-                const temperatureColor = new THREE.Color(systemState.confidence > 0.7 ? 0xffffff : 0x00ccff);
+                core.material.color.lerp(tempColor, systemState.confidence * 0.5);
                 
-                // Blend phase color with temperature color based on confidence
-                material.color.lerp(temperatureColor, systemState.confidence * 0.5);
-                
-                // Adjust particle density based on capability
-                const newCount = Math.max(1000, systemState.pattern_count * 100);
-                if (newCount !== particleCount) {
-                    particleCount = newCount;
-                    geometry.dispose();
-                    geometry = new THREE.BufferGeometry();
-                    positions = new Float32Array(particleCount * 3);
-                    colors = new Float32Array(particleCount * 3);
-                    initParticles();
-                    points.geometry = geometry;
+                const targetShells = Math.floor(systemState.pattern_count / 10) + 1;
+                if (shells.length !== targetShells) {
+                    shells.forEach(s => entityGroup.remove(s));
+                    shells = [];
+                    for (let i = 0; i < targetShells; i++) {
+                        const radius = 1.5 + i * 1.2;
+                        const shell = createShell(i, radius);
+                        shells.push(shell);
+                        entityGroup.add(shell);
+                    }
                 }
             } catch (e) {
                 console.error("State fetch failed", e);
@@ -166,33 +193,32 @@
             controls.update();
 
             const time = Date.now() * 0.001;
-            const posArray = geometry.attributes.position.array;
             
-            let speed = 0.01;
-            let amplitude = 1.0;
-
+            // Core pulsation
+            let pulseScale = 1.0;
+            let pulseSpeed = 1.0;
             switch(systemState.phase) {
-                case 'ACT': speed = 0.05; amplitude = 2.0; break;
-                case 'REFLECT': speed = 0.005; amplitude = 0.5; break;
-                case 'PERCEIVE': speed = 0.02; amplitude = 1.2; break;
-                case 'IDLE': speed = 0.005; amplitude = 0.8; break;
+                case 'ACT': pulseSpeed = 3.0; pulseScale = 1.2; break;
+                case 'REFLECT': pulseSpeed = 0.5; pulseScale = 0.9; break;
+                case 'PERCEIVE': pulseSpeed = 1.5; pulseScale = 1.0; break;
+                default: pulseSpeed = 1.0; pulseScale = 1.0;
             }
-
-            for (let i = 0; i < particleCount; i++) {
-                const i3 = i * 3;
-                const x = posArray[i3];
-                const y = posArray[i3+1];
-                const z = posArray[i3+2];
-
-                // Organic, sinusoidal oscillation
-                posArray[i3] += Math.sin(time + y) * speed * amplitude;
-                posArray[i3+1] += Math.cos(time + x) * speed * amplitude;
-                posArray[i3+2] += Math.sin(time * 0.5 + z) * speed * amplitude;
-            }
-
-            geometry.attributes.position.needsUpdate = true;
-            points.rotation.y += 0.002;
-            points.rotation.x += 0.001;
+            
+            core.scale.setScalar(pulseScale + Math.sin(time * pulseSpeed * 2) * 0.1);
+            
+            // Shell rotation
+            shells.forEach((shell, i) => {
+                shell.rotation.x += shell.userData.rotationSpeed.x;
+                shell.rotation.y += shell.userData.rotationSpeed.y;
+                shell.rotation.z += shell.userData.rotationSpeed.z;
+                
+                // Add a bit of jitter based on low confidence
+                if (systemState.confidence < 0.7) {
+                    shell.position.x += (Math.random() - 0.5) * 0.01;
+                    shell.position.y += (Math.random() - 0.5) * 0.01;
+                    shell.position.z += (Math.random() - 0.5) * 0.01);
+                }
+            });
 
             renderer.render(scene, camera);
         }
