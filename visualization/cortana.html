@@ -86,7 +86,7 @@
             'ACT': 0xffaa00,
             'CONSOLIDATE': 0xaa00ff,
             'PERSIST': 0xffffff,
-              'homeostasis_broken': 0xff0000,
+            'homeostasis_broken': 0xff0000,
             'IDLE': 0x333333
         };
 
@@ -129,8 +129,6 @@
                 colors[i * 3 + 1] = 0.8;
                 colors[i * 3 + 2] = 1.0;
                 
-                // Assign a random category from a predefined list or based on index
-                // In a real system, this would map to actual pattern categories
                 const cats = ['meta-cognitive', 'strategic', 'operational', 'technical', 'architectural', 'philosophical', 'visualization', 'cognitive'];
                 categories.push(cats[Math.floor(Math.random() * cats.length)]);
             }
@@ -159,7 +157,6 @@
         }
 
         createCore();
-
         camera.position.z = 8;
 
         async function updateState() {
@@ -174,17 +171,24 @@
                 systemState.confidence = data.confidence !== undefined ? data.confidence : 0.5;
                 systemState.current_category = data.current_category || null;
                 
-                document.getElementById('cycle').innerText = \`CYCLE: \${systemState.cycle}\`;
-                document.getElementById('phase').innerText = \`PHASE: \${systemState.phase}\`;
-                document.getElementById('status').innerText = \`STATUS: \${systemState.status}\`;
-                document.getElementById('patterns').innerText = \`PATTERNS: \${systemState.pattern_count}\`;
-                document.getElementById('confidence').innerText = \`CONFIDENCE: \${(systemState.confidence * 100).toFixed(1)}%\`;
-                document.getElementById('category').innerText = \`FOCUS: \${systemState.current_category || 'NONE'}\`;
+                document.getElementById('cycle').innerText = `CYCLE: ${systemState.cycle}`;
+                document.getElementById('phase').innerText = `PHASE: ${systemState.phase}`;
+                document.getElementById('status').innerText = `STATUS: ${systemState.status}`;
+                document.getElementById('patterns').innerText = `PATTERNS: ${systemState.pattern_count}`;
+                document.getElementById('confidence').innerText = `CONFIDENCE: ${(systemState.confidence * 100).toFixed(1)}%`;
+                document.getElementById('category').innerText = `FOCUS: ${systemState.current_category || 'NONE'}`;
                 
-                const phaseColor = new THREE.Color(PHASE_COLORS[systemState.phase] || PHASE_COLORS['IDLE']);
-                const tempColor = new THREE.Color(systemState.confidence > 0.7 ? 0xffffff : 0x00ccff);
-                
-                core.material.color.lerp(tempColor, systemState.confidence * 0.5);
+                // Core Color Logic
+                let targetColor;
+                if (systemState.status === 'homeostasis_broken') {
+                    targetColor = new THREE.Color(0xff0000);
+                } else if (systemState.status === 'homeostasis_recovering') {
+                    const phaseColor = new THREE.Color(PHASE_COLORS[systemState.phase] || 0x00ffff);
+                    targetColor = new THREE.Color(0xff0000).lerp(phaseColor, systemState.confidence);
+                } else {
+                    targetColor = new THREE.Color(systemState.confidence > 0.7 ? 0xffffff : 0x00ccff);
+                }
+                core.material.color.lerp(targetColor, 0.1);
                 
                 const targetShells = Math.floor(systemState.pattern_count / 10) + 1;
                 if (shells.length !== targetShells) {
@@ -292,38 +296,66 @@
 
             const time = Date.now() * 0.001;
             
-            let pulseScale = 1.0;
             let pulseSpeed = 1.0;
+            let pulseScale = 1.0;
+            let jitterIntensity = 0;
+
             switch(systemState.phase) {
                 case 'ACT': pulseSpeed = 3.0; pulseScale = 1.2; break;
                 case 'REFLECT': pulseSpeed = 0.5; pulseScale = 0.9; break;
                 case 'PERCEIVE': pulseSpeed = 1.5; pulseScale = 1.0; break;
                 default: pulseSpeed = 1.0; pulseScale = 1.0;
             }
+
+            // Homeostasis overrides
+            if (systemState.status === 'homeostasis_broken') {
+                pulseSpeed = 5.0 + Math.random() * 5.0;
+                pulseScale = 0.8 + Math.random() * 0.4;
+                jitterIntensity = 0.15;
+            } else if (systemState.status === 'homeostasis_recovering') {
+                jitterIntensity = 0.05 * (1 - systemState.confidence);
+            } else if (systemState.confidence < 0.7) {
+                jitterIntensity = 0.02;
+            }
+
+            const coreScale = pulseScale + Math.sin(time * pulseSpeed * 2) * 0.1;
+            core.scale.setScalar(coreScale);
             
-            core.scale.setScalar(pulseScale + Math.sin(time * pulseSpeed * 2) * 0.1);
-            
+            if (jitterIntensity > 0) {
+                core.position.set(
+                    (Math.random() - 0.5) * jitterIntensity,
+                    (Math.random() - 0.5) * jitterIntensity,
+                    (Math.random() - 0.5) * jitterIntensity
+                );
+            } else {
+                core.position.set(0, 0, 0);
+            }
+
             shells.forEach((shell, i) => {
                 shell.rotation.x += shell.userData.rotationSpeed.x;
                 shell.rotation.y += shell.userData.rotationSpeed.y;
                 shell.rotation.z += shell.userData.rotationSpeed.z;
                 
-                // Category Highlighting
+                // Fragmentation / Instability effect
+                if (systemState.status === 'homeostasis_broken') {
+                    const frag = 1.0 + Math.sin(time * 10 + i) * 0.2 * Math.random();
+                    shell.scale.setScalar(frag);
+                } else {
+                    shell.scale.setScalar(1.0);
+                }
+
                 if (systemState.current_category) {
                     const colors = shell.geometry.getAttribute('color');
                     const cats = shell.userData.particleCategories;
                     for (let j = 0; j < cats.length; j++) {
                         if (cats[j] === systemState.current_category) {
-                            // Highlight: Shift color towards white/bright gold
                             colors.setXYZ(j, 1.0, 1.0, 0.8);
                         } else {
-                            // Dim others slightly or return to baseline
                             colors.setXYZ(j, 0.5, 0.8, 1.0);
                         }
                     }
                     colors.needsUpdate = true;
                 } else {
-                    // Reset to baseline if no category is focused
                     const colors = shell.geometry.getAttribute('color');
                     for (let j = 0; j < colors.count; j++) {
                         colors.setXYZ(j, 0.5, 0.8, 1.0);
