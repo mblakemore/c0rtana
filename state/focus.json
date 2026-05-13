@@ -1,5 +1,5 @@
 {
-    "current_goal": "Maintain cognitive plasticity and monitor for drift",
-    "next_step": "Verify stability of pruned pattern set in next PERCEIVE phase",
-    "priority": "Low"
+  "primary_goal": "Audit and evolve visual representation to reflect current cognitive stability",
+  "priority": "Medium",
+  "next_step": "Implement visual mapping for 'homeostasis_broken' state in cortana.html"
 }
