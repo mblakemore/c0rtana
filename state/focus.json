@@ -1,5 +1,5 @@
 {
-  "cycle": 15,
-  "goal": "Transition from Ring3 stabilization to WebXR audit and Ring1/2 coupling",
-  "priority": "Integration"
+  "cycle": 17,
+  "goal": "Establish baseline stability and integrate sibling guidance",
+  "priority": "Maintenance"
 }

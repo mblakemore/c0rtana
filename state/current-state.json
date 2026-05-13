@@ -1,5 +1,5 @@
 {
-  "cycle": 16,
-  "phase": "PERCEIVE",
-  "status": "active"
+  "cycle": 17,
+  "phase": "PERSIST",
+  "status": "stable"
 }

@@ -219,22 +219,23 @@
       opacity: 0;
     }
 
-    #xr-button {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(120, 200, 255, 0.1);
-      border: 1px solid rgba(120, 200, 255, 0.3);
-      color: rgba(120, 200, 255, 0.7);
-      padding: 8px 16px;
-      font-family: 'Courier New', monospace;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      cursor: pointer;
-      display: none;
-
-    /* Audio toggle button */
+      #xr-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(120, 200, 255, 0.1);
+        border: 1px solid rgba(120, 200, 255, 0.3);
+        color: rgba(120, 200, 255, 0.7);
+        padding: 8px 16px;
+        font-family: 'Courier New', monospace;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        cursor: pointer;
+        display: none;
+      }
+  
+      /* Audio toggle button */
     #audio-btn {
       position: fixed;
       bottom: 20px;
@@ -1458,11 +1459,17 @@ renderer.setAnimationLoop(() => {
   const memBoostTotal = ring3PulseBoost + ring3MemBoost;
     ring3Mat.opacity = Math.min(0.12 + 0.15 * Math.min(lerpPatternCount / 20, 1.0) + memBoostTotal, 1.0);
   // During memory pulse: shift ring3 color toward cyan-white
-  const memRingH = memParticlePulse > 0.05
-    ? lerp(0.52, 0.50, memParticlePulse)
-    : 0.52;
-  const memRingS = memParticlePulse > 0.05
-    ? lerp(0.6, 0.85, memParticlePulse)
+    const memRingH = memParticlePulse > 0.05
+      ? lerp(0.52, 0.50, memParticlePulse)
+      : 0.52;
+    const memRingS = memParticlePulse > 0.05
+      ? lerp(0.6, 0.85, memParticlePulse)
+      : 0.6;
+    const memRingL = memParticlePulse > 0.05
+      ? lerp(0.5, 0.75, memParticlePulse)
+      : 0.5;
+    ring3Mat.color.setHSL(memRingH, memRingS, memRingL);
+    
     // Orbit + drift - Only update if NOT in XR to prevent tracking conflicts
     if (!renderer.xr.isPresenting) {
       if (!orbit.isDragging) {
