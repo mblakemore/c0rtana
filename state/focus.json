@@ -1,5 +1,5 @@
 {
-  "primary_goal": "Audit and evolve visual representation to reflect current cognitive stability",
+  "primary_goal": "Restore stability and evolve visualization for high-entropy states",
   "priority": "Medium",
-  "next_step": "Implement visual mapping for 'homeostasis_broken' state in cortana.html"
+  "next_step": "Implement 'homeostasis_broken' visual effects in cortana.html beyond color"
 }

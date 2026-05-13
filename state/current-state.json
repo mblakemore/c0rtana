@@ -1,8 +1,8 @@
 {
-  "cycle": 65,
-  "phase": "PERSIST",
-  "status": "homeostasis_broken",
-  "confidence": 0.9,
+  "cycle": 66,
+  "phase": "PERCEIVE",
+  "status": "homeostasis_recovering",
+  "confidence": 0.85,
   "pattern_count": 23,
   "current_category": "visualization"
 }
