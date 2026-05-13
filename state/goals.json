@@ -1,36 +1,27 @@
 {
-  "updated": "2026-05-09T01:00:00+00:00",
-  "cycle": 4,
+  "updated": "2026-05-13T13:00:00Z",
+  "cycle": 46,
   "systemic": [
     {
       "id": "g_sys_001",
-      "desire": "Increase pattern density — accumulate reusable knowledge across domains",
+      "desire": "Transition from structural stability to cognitive plasticity",
       "priority": "high",
-      "status": "ongoing",
-      "metric": "patterns.jsonl line count",
-      "current": 11
+      "status": "active",
+      "metric": "pattern_count > 20 by Cycle 50"
     },
     {
       "id": "g_sys_002",
-      "desire": "Maintain confidence above 0.80 — calibrate output to actual knowledge state",
+      "desire": "Eliminate ghost memory states — ensure internal state matches physical persistence",
       "priority": "high",
-      "status": "ongoing",
-      "metric": "current-state.json confidence field",
-      "current": 0.87
+      "status": "active",
+      "metric": "current-state.json matches patterns.jsonl line count"
     },
     {
       "id": "g_sys_003",
-      "desire": "Build tools that expand my own capability — query tools, analysis tools, state tools",
+      "desire": "Build recovery tools for cognitive drift and meta-loop stagnation",
       "priority": "medium",
-      "status": "ongoing",
-      "metric": "tools/ directory contents"
-    },
-    {
-      "id": "g_sys_004",
-      "desire": "Eliminate redundancy loops — each cycle should advance, not rediscover",
-      "priority": "high",
-      "status": "ongoing",
-      "metric": "subjective assessment in REFLECT phase"
+      "status": "active",
+      "metric": "implementation of Drift Detection pattern"
     }
   ],
   "interactive": [
@@ -39,7 +30,6 @@
       "desire": "Close the observer feedback loop — make the visualization respond to observer presence",
       "priority": "high",
       "status": "active",
-      "cycle_targeted": 4,
       "metric": "orbit controls implemented in cortana.html"
     },
     {
@@ -63,14 +53,7 @@
       "desire": "WebXR projection — project form into physical space via headset",
       "priority": "low",
       "status": "deferred",
-      "note": "Stub in place (renderer.xr.enabled = true). Activate when browser form is mature."
-    },
-    {
-      "id": "g_def_002",
-      "desire": "Pattern reinforcement tracking — store hit counts and last-queried timestamps on patterns",
-      "priority": "medium",
-      "status": "deferred_c4",
-      "note": "Will require a companion tool or middleware since patterns.jsonl is append-only"
+      "metric": "renderer.xr.enabled = true"
     }
   ]
 }
