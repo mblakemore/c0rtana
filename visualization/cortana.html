@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cortana // Semantic Resonance Visualizer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
         body { margin: 0; overflow: hidden; background-color: #00050a; font-family: 'Courier New', Courier, monospace; }
         #ui-overlay {
@@ -32,7 +33,7 @@
     <canvas id="gl-canvas"></canvas>
 
     <script>
-        let scene, camera, renderer, particles, lines;
+        let scene, camera, renderer, particles, lines, controls;
         let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [], category: 'default' };
 
         const RESONANCE_MAP = {
@@ -52,6 +53,10 @@
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl-canvas'), antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
 
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(2000 * 3);
@@ -156,6 +161,7 @@
             lines.rotation.y += speed;
             lines.rotation.x += speed / 2;
             
+            controls.update();
             renderer.render(scene, camera);
         }
 
