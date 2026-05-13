@@ -178,7 +178,6 @@
                 document.getElementById('confidence').innerText = `CONFIDENCE: ${(systemState.confidence * 100).toFixed(1)}%`;
                 document.getElementById('category').innerText = `FOCUS: ${systemState.current_category || 'NONE'}`;
                 
-                // Core Color Logic
                 let targetColor;
                 if (systemState.status === 'homeostasis_broken') {
                     targetColor = new THREE.Color(0xff0000);
@@ -215,7 +214,7 @@
             }
         }
 
-        function createLinkPulse(sourceShellIdx, targetShellIdx) {
+        function createLinkPulse(sourceShellIdx, targetShellIdx, color = 0x00f0ff) {
             const sourceShell = shells[sourceShellIdx];
             const targetShell = shells[targetShellIdx];
             if (!sourceShell || !targetShell) return;
@@ -231,7 +230,7 @@
 
             const geometry = new THREE.BufferGeometry().setFromPoints([sourcePos, targetPos]);
             const material = new THREE.LineBasicMaterial({ 
-                color: 0x00f0ff, 
+                color: color, 
                 transparent: true, 
                 opacity: 0.5,
                 blending: THREE.AdditiveBlending 
@@ -254,13 +253,28 @@
         function updateLinks() {
             if (shells.length === 0) return;
 
-            if (Math.random() < 0.05) {
+            // Associative sparks between shells
+            if (Math.random() < 0.1) {
                 if (associations.length > 0) {
                     const assoc = associations[Math.floor(Math.random() * associations.length)];
+                    // Derive shell indices from association IDs
                     const sIdx = Math.abs(assoc.source.split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % shells.length;
                     const tIdx = Math.abs(assoc.target.split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % shells.length;
-                    createLinkPulse(sIdx, tIdx);
+                    
+                    if (sIdx !== tIdx) {
+                        // Use category-based coloring for the spark
+                        const color = assoc.category === 'meta-cognitive' ? 0x00ffff : 
+                                      assoc.category === 'strategic' ? 0x00ff00 : 0xaa00ff;
+                        createLinkPulse(sIdx, tIdx, color);
+                    }
                 }
+            }
+
+            // Random internal shell "synapses"
+            if (Math.random() < 0.02) {
+                const sIdx = Math.floor(Math.random() * shells.length);
+                const tIdx = Math.floor(Math.random() * shells.length);
+                if (sIdx !== tIdx) createLinkPulse(sIdx, tIdx, 0x444444);
             }
 
             for (let i = activeLinks.length - 1; i >= 0; i--) {
@@ -307,7 +321,6 @@
                 default: pulseSpeed = 1.0; pulseScale = 1.0;
             }
 
-            // Homeostasis overrides
             if (systemState.status === 'homeostasis_broken') {
                 pulseSpeed = 5.0 + Math.random() * 5.0;
                 pulseScale = 0.8 + Math.random() * 0.4;
@@ -336,7 +349,6 @@
                 shell.rotation.y += shell.userData.rotationSpeed.y;
                 shell.rotation.z += shell.userData.rotationSpeed.z;
                 
-                // Fragmentation / Instability effect
                 if (systemState.status === 'homeostasis_broken') {
                     const frag = 1.0 + Math.sin(time * 10 + i) * 0.2 * Math.random();
                     shell.scale.setScalar(frag);
