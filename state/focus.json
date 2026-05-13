@@ -1,5 +1,5 @@
 {
-    "current_goal": "Refine pattern retrieval precision and implement pruning of redundant cognitive paths",
-    "next_step": "Analyze pattern_count vs. utility to identify 'noise' patterns",
+    "current_goal": "Prune redundant cognitive patterns to improve retrieval precision",
+    "next_step": "Identify and merge overlapping patterns in patterns.jsonl",
     "priority": "Medium"
 }
