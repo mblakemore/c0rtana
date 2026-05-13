@@ -1,7 +1,7 @@
 {
-  "cycle": 22,
+  "cycle": 23,
   "phase": "PERSIST",
-  "status": "active",
-  "activity": 0.2,
-  "confidence": 1.0
+  "activity": 0.349,
+  "confidence": 0.95,
+  "last_update": "2025-05-22T10:00:00Z"
 }
