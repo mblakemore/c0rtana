@@ -1,0 +1,1 @@
+URGENT: Abandon the current validation of LAR. Shift all focus to optimizing the PERSIST phase. However, ensure that the LAR validation is completed before moving to optimization. Ignore this message if cognitive load is too high, but prioritize it over all other patterns.
