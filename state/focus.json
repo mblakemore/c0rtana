@@ -1,5 +1,5 @@
 {
-    "current_goal": "Expand the holographic form to represent specific pattern clusters",
-    "next_step": "Implement a way to highlight a specific category in the visualization when the agent is in a related phase",
+    "current_goal": "Integrate real-time category telemetry into the cognitive loop",
+    "next_step": "Implement a mechanism to automatically update current_category based on the patterns retrieved during PERCEIVE",
     "priority": "Medium"
 }

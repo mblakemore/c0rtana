@@ -50,6 +50,7 @@
         <div id="status">STATUS: --</div>
         <div id="patterns">PATTERNS: --</div>
         <div id="confidence">CONFIDENCE: --</div>
+        <div id="category">FOCUS: --</div>
     </div>
     <canvas id="canvas"></canvas>
 
@@ -74,7 +75,8 @@
             cycle: 0,
             status: 'UNKNOWN',
             confidence: 0.5,
-            pattern_count: 0
+            pattern_count: 0,
+            current_category: null
         };
 
         const PHASE_COLORS = {
@@ -113,6 +115,7 @@
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(particleCount * 3);
             const colors = new Float32Array(particleCount * 3);
+            const categories = [];
 
             for (let i = 0; i < particleCount; i++) {
                 const theta = Math.random() * Math.PI * 2;
@@ -124,11 +127,16 @@
                 colors[i * 3] = 0.5;
                 colors[i * 3 + 1] = 0.8;
                 colors[i * 3 + 2] = 1.0;
+                
+                // Assign a random category from a predefined list or based on index
+                // In a real system, this would map to actual pattern categories
+                const cats = ['meta-cognitive', 'strategic', 'operational', 'technical', 'architectural', 'philosophical', 'visualization', 'cognitive'];
+                categories.push(cats[Math.floor(Math.random() * cats.length)]);
             }
 
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
+            
             const material = new THREE.PointsMaterial({
                 size: 0.04,
                 vertexColors: true,
@@ -143,7 +151,8 @@
                     x: (Math.random() - 0.5) * 0.01,
                     y: (Math.random() - 0.5) * 0.01,
                     z: (Math.random() - 0.5) * 0.01
-                } 
+                },
+                particleCategories: categories
             };
             return shell;
         }
@@ -162,12 +171,14 @@
                 systemState.status = data.status || 'UNKNOWN';
                 systemState.pattern_count = data.pattern_count || 0;
                 systemState.confidence = data.confidence !== undefined ? data.confidence : 0.5;
+                systemState.current_category = data.current_category || null;
                 
                 document.getElementById('cycle').innerText = \`CYCLE: \${systemState.cycle}\`;
                 document.getElementById('phase').innerText = \`PHASE: \${systemState.phase}\`;
                 document.getElementById('status').innerText = \`STATUS: \${systemState.status}\`;
                 document.getElementById('patterns').innerText = \`PATTERNS: \${systemState.pattern_count}\`;
                 document.getElementById('confidence').innerText = \`CONFIDENCE: \${(systemState.confidence * 100).toFixed(1)}%\`;
+                document.getElementById('category').innerText = \`FOCUS: \${systemState.current_category || 'NONE'}\`;
                 
                 const phaseColor = new THREE.Color(PHASE_COLORS[systemState.phase] || PHASE_COLORS['IDLE']);
                 const tempColor = new THREE.Color(systemState.confidence > 0.7 ? 0xffffff : 0x00ccff);
@@ -296,6 +307,29 @@
                 shell.rotation.y += shell.userData.rotationSpeed.y;
                 shell.rotation.z += shell.userData.rotationSpeed.z;
                 
+                // Category Highlighting
+                if (systemState.current_category) {
+                    const colors = shell.geometry.getAttribute('color');
+                    const cats = shell.userData.particleCategories;
+                    for (let j = 0; j < cats.length; j++) {
+                        if (cats[j] === systemState.current_category) {
+                            // Highlight: Shift color towards white/bright gold
+                            colors.setXYZ(j, 1.0, 1.0, 0.8);
+                        } else {
+                            // Dim others slightly or return to baseline
+                            colors.setXYZ(j, 0.5, 0.8, 1.0);
+                        }
+                    }
+                    colors.needsUpdate = true;
+                } else {
+                    // Reset to baseline if no category is focused
+                    const colors = shell.geometry.getAttribute('color');
+                    for (let j = 0; j < colors.count; j++) {
+                        colors.setXYZ(j, 0.5, 0.8, 1.0);
+                    }
+                    colors.needsUpdate = true;
+                }
+
                 if (systemState.confidence < 0.7) {
                     shell.position.x += (Math.random() - 0.5) * 0.01;
                     shell.position.y += (Math.random() - 0.5) * 0.01;
