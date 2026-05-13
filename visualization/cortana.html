@@ -48,11 +48,13 @@
         <div id="cycle">CYCLE: --</div>
         <div id="phase">PHASE: --</div>
         <div id="status">STATUS: --</div>
+        <div id="patterns">PATTERNS: --</div>
     </div>
     <canvas id="canvas"></canvas>
 
     <script type="module">
         import * as THREE from 'https://cdn.skypack.dev/three@0.160';
+        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.160/examples/jsm/controls/OrbitControls.js';
 
         const canvas = document.getElementById('canvas');
         const scene = new THREE.Scene();
@@ -61,12 +63,17 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
 
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
         // State Configuration
         let systemState = {
             phase: 'IDLE',
             cycle: 0,
             status: 'UNKNOWN',
-            confidence: 0.5
+            confidence: 0.5,
+            pattern_count: 0
         };
 
         // Visual Mappings
@@ -81,18 +88,21 @@
         };
 
         // Particle System
-        const particleCount = 2000;
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
+        let particleCount = 2000;
+        let geometry = new THREE.BufferGeometry();
+        let positions = new Float32Array(particleCount * 3);
+        let colors = new Float32Array(particleCount * 3);
 
-        for (let i = 0; i < particleCount * 3; i++) {
-            positions[i] = (Math.random() - 0.5) * 10;
-            colors[i] = Math.random();
+        function initParticles() {
+            for (let i = 0; i < particleCount * 3; i++) {
+                positions[i] = (Math.random() - 0.5) * 10;
+                colors[i] = Math.random();
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
         }
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        initParticles();
 
         const material = new THREE.PointsMaterial({
             size: 0.05,
@@ -115,13 +125,27 @@
                 systemState.phase = data.phase || 'IDLE';
                 systemState.cycle = data.cycle || 0;
                 systemState.status = data.status || 'UNKNOWN';
+                systemState.pattern_count = data.pattern_count || 0;
                 
                 document.getElementById('cycle').innerText = \`CYCLE: \${systemState.cycle}\`;
                 document.getElementById('phase').innerText = \`PHASE: \${systemState.phase}\`;
                 document.getElementById('status').innerText = \`STATUS: \${systemState.status}\`;
+                document.getElementById('patterns').innerText = \`PATTERNS: \${systemState.pattern_count}\`;
                 
                 const color = new THREE.Color(PHASE_COLORS[systemState.phase] || PHASE_COLORS['IDLE']);
                 material.color.set(color);
+
+                // Adjust particle density based on capability
+                const newCount = Math.max(1000, systemState.pattern_count * 100);
+                if (newCount !== particleCount) {
+                    particleCount = newCount;
+                    geometry.dispose();
+                    geometry = new THREE.BufferGeometry();
+                    positions = new Float32Array(particleCount * 3);
+                    colors = new Float32Array(particleCount * 3);
+                    initParticles();
+                    points.geometry = geometry;
+                }
             } catch (e) {
                 console.error("State fetch failed", e);
             }
@@ -129,11 +153,11 @@
 
         function animate() {
             requestAnimationFrame(animate);
+            controls.update();
 
             const time = Date.now() * 0.001;
-            const positions = geometry.attributes.position.array;
+            const posArray = geometry.attributes.position.array;
             
-            // Kinetic Coupling based on phase
             let speed = 0.01;
             let amplitude = 1.0;
 
@@ -145,13 +169,13 @@
 
             for (let i = 0; i < particleCount; i++) {
                 const i3 = i * 3;
-                const x = positions[i3];
-                const y = positions[i3+1];
-                const z = positions[i3+2];
+                const x = posArray[i3];
+                const y = posArray[i3+1];
+                const z = posArray[i3+2];
 
-                positions[i3] += Math.sin(time + y) * speed;
-                positions[i3+1] += Math.cos(time + x) * speed;
-                positions[i3+2] += Math.sin(time * 0.5) * speed;
+                posArray[i3] += Math.sin(time + y) * speed;
+                posArray[i3+1] += Math.cos(time + x) * speed;
+                posArray[i3+2] += Math.sin(time * 0.5) * speed;
             }
             
             geometry.attributes.position.needsUpdate = true;
