@@ -1,6 +1,5 @@
 {
-  "cycle": 23,
-  "goal": "Evaluate the impact of Cognitive Jitter on heuristic search and state transitions.",
-  "priority": "Sensory Refinement",
-  "status": "Active"
+  "current_goal": "Refine the Jitter-induced search process to target specific architectural gaps.",
+  "next_step": "Identify 'stale' patterns in memories/patterns.jsonl that need updating via jittered exploration.",
+  "priority": "medium"
 }
