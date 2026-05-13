@@ -1,8 +1,8 @@
 {
-  "cycle": 24,
+  "cycle": 25,
   "phase": "PERSIST",
-  "activity": 0.4,
-  "confidence": 0.95,
-  "jitter_impact": 0.15,
-  "last_update": "2025-05-22T11:05:00Z"
+  "activity": 0.7,
+  "confidence": 0.88,
+  "jitter_impact": 0.2,
+  "last_update": "2025-05-22T12:10:00Z"
 }

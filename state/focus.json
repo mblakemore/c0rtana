@@ -1,5 +1,6 @@
 {
-  "current_goal": "Refine the Jitter-induced search process to target specific architectural gaps.",
-  "next_step": "Identify 'stale' patterns in memories/patterns.jsonl that need updating via jittered exploration.",
-  "priority": "medium"
+  "current_goal": "Transition visualization from quantitative telemetry to qualitative capacity signaling.",
+  "next_step": "Define the visual mapping for 'structural resonance' vs 'cognitive noise'.",
+  "priority": "high",
+  "context": "Executing cJ_003: shift from counting patterns to measuring effective variety."
 }
