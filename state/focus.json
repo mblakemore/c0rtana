@@ -1,5 +1,5 @@
 {
-  "current_goal": "g_int_003: Evolve form with capability",
-  "immediate_task": "Implement Resonance -> Physics pipeline in cortana.html",
-  "success_criteria": "Visual form responds dynamically to 'resonance' and 'jitter_impact' state variables."
+  "current_goal": "g_int_004: Cognitive Loop Synchronization",
+  "immediate_task": "Audit loop efficiency and state-to-visual latency",
+  "success_criteria": "State changes are reflected in cortana.html within 2 seconds without drift."
 }
