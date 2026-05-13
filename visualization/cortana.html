@@ -273,6 +273,7 @@
     <div class="phase-display" id="hud-phase">PERCEIVE</div>
     <div><span class="label">CYCLE    </span><span class="value" id="hud-cycle">—</span></div>
     <div><span class="label">CONF     </span><span class="value" id="hud-confidence">—</span></div>
+      <div><span class="label">LOAD     </span><span class="value" id="hud-load">—</span></div>
     <div><span class="label">PATTERNS </span><span class="value" id="hud-patterns">—</span></div>
     <div><span class="label">STATUS   </span><span class="value" id="hud-status">—</span></div>
     <div style="margin-top:8px"><span class="label">LAST     </span><span class="value" id="hud-timestamp">—</span></div>
@@ -582,6 +583,7 @@ function buildParticleSystem(count) {
         uHoveredIdx:  { value: -1 },    // hovered particle (-1 = none)
         uLockedIdx:   { value: -1 },    // locked particle (-1 = none)
           uResonance:    { value: 0.5 },
+          uLoad:       { value: 0 },
           uJitter:       { value: 0.0 },
       },
     vertexShader: `
@@ -603,6 +605,7 @@ function buildParticleSystem(count) {
       uniform float uPhaseIdx;
       uniform float uConfidence;
       uniform float uActivity;
+        uniform float uLoad;
       uniform float uPulse;
       uniform float uMemPulse;
       uniform float uPointScale;
@@ -652,6 +655,11 @@ function buildParticleSystem(count) {
         vMemPulse     = uMemPulse;
         vTypeColor    = vec3(aTypeR, aTypeG, aTypeB);
         vHovered      = (vertId == uHoveredIdx) ? 1.0 : 0.0;
+          // Cognitive load: subtle jitter/vibration when load is high
+          if (uLoad > 0.6) {
+            float jitter = sin(uTime * 50.0) * (uLoad - 0.6) * 0.2;
+            pos += vec3(jitter, jitter, jitter);
+          }
         vLocked       = (vertId == uLockedIdx)  ? 1.0 : 0.0;
         vIsMemory     = (aType == 1.0)           ? 1.0 : 0.0;
 
@@ -1400,6 +1408,7 @@ audioBtn.addEventListener('click', () => {
   audioBtn.textContent = on ? '♪ AUDIO' : '♫ MUTED';
   audioBtn.classList.toggle('active', on);
 });
+    let lerpLoad = 0;
 
 // ─── Animation Loop ───────────────────────────────────────────────────────────
 const clock = new THREE.Clock();
@@ -1409,7 +1418,9 @@ let currentPhaseIdx = 0;
 let targetPhaseIdx  = 0;
 
 function lerp(a, b, t) { return a + (b - a) * t; }
+    lerpLoad = lerp(lerpLoad, targetState.cognitive_load ?? 0.2, 0.01);
 
+    document.getElementById('hud-load').textContent = (lerpLoad * 100).toFixed(0) + '%';
 renderer.setAnimationLoop(() => {
   const elapsed = clock.getElapsedTime();
   const dt      = 0.016;
@@ -1432,6 +1443,7 @@ renderer.setAnimationLoop(() => {
   // Decay ring boosts
   ring1PulseBoost = Math.max(0, ring1PulseBoost - 0.012);
   ring3PulseBoost = Math.max(0, ring3PulseBoost - 0.008);
+    mat.uniforms.uLoad.value = lerpLoad;
 
   // Update particle shader uniforms
   const mat = particles.material;
