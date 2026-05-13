@@ -3,507 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORTANA // Holographic State</title>
+    <title>Cortana // Semantic Resonance Visualizer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body {
-            margin: 0;
-            background: #000;
-            color: #00f0ff;
-            font-family: 'Courier New', monospace;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        canvas {
+        body { margin: 0; overflow: hidden; background-color: #00050a; font-family: 'Courier New', Courier, monospace; }
+        #ui-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        #ui {
-            position: absolute;
-            bottom: 20px;
+            top: 20px;
             left: 20px;
-            z-index: 2;
+            color: #00f2ff;
+            text-shadow: 0 0 5px #00f2ff;
             pointer-events: none;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 12px;
-            opacity: 0.7;
+            z-index: 10;
         }
-        .glitch {
-            animation: glitch 1s linear infinite;
-        }
-        @keyframes glitch {
-            2%, 64% { transform: translate(2px,0) skew(0deg); }
-            4%, 60% { transform: translate(-2px,0) skew(0deg); }
-            62% { transform: translate(0,0) skew(5deg); }
-        }
+        .status-item { margin-bottom: 5px; font-size: 12px; text-transform: uppercase; }
+        .value { color: #fff; font-weight: bold; }
+        #gl-canvas { width: 100vw; height: 100vh; }
     </style>
 </head>
 <body>
-    <div id="ui">
-        <div id="cycle">CYCLE: --</div>
-        <div id="phase">PHASE: --</div>
-        <div id="status">STATUS: --</div>
-        <div id="patterns">PATTERNS: --</div>
-        <div id="confidence">CONFIDENCE: --</div>
-        <div id="category">FOCUS: --</div>
+    <div id="ui-overlay">
+        <div class="status-item">Phase: <span id="phase-val" class="value">LOADING...</span></div>
+        <div class="status-item">Status: <span id="status-val" class="value">LOADING...</span></div>
+        <div class="status-item">Pattern Density: <span id="density-val" class="value">0</span></div>
+        <div class="status-item">Confidence: <span id="conf-val" class="value">0%</span></div>
     </div>
-    <canvas id="canvas"></canvas>
+    <canvas id="gl-canvas"></canvas>
 
-    <script type="module">
-        import * as THREE from 'https://cdn.skypack.dev/three@0.160';
-        import { OrbitControls } from 'https://cdn.skypack.dev/three@0.160/examples/jsm/controls/OrbitControls.js';
+    <script>
+        let scene, camera, renderer, particles, lines;
+        let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [] };
 
-        const canvas = document.getElementById('canvas');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.xr.enabled = true;
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 80;
 
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl-canvas'), antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
 
-        let systemState = {
-            phase: 'IDLE',
-            cycle: 0,
-            status: 'UNKNOWN',
-            confidence: 0.5,
-            pattern_count: 0,
-            current_category: null,
-            queried_patterns: []
-        };
-
-        const PHASE_COLORS = {
-            'PERCEIVE': 0x00ffff,
-            'REFLECT': 0x0000ff,
-            'DECIDE': 0x00ff00,
-            'ACT': 0xffaa00,
-            'CONSOLIDATE': 0xaa00ff,
-            'PERSIST': 0xffffff,
-            'homeostasis_broken': 0xff0000,
-            'IDLE': 0x333333
-        };
-
-        const entityGroup = new THREE.Group();
-        scene.add(entityGroup);
-
-        let core;
-        let shells = [];
-        let associations = [];
-        let activeLinks = [];
-        let structuralBridges = [];
-
-        function createCore() {
-            const geometry = new THREE.IcosahedronGeometry(0.3, 2);
-            const material = new THREE.PointsMaterial({
-                size: 0.03,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.9,
-                blending: THREE.AdditiveBlending
-            });
-            core = new THREE.Points(geometry, material);
-            entityGroup.add(core);
-        }
-
-        function createShell(index, radius) {
-            const particleCount = 1000;
+            // Particle System
             const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            const colors = new Float32Array(particleCount * 3);
-            const categories = [];
+            const positions = new Float32Array(2000 * 3);
+            const colors = new Float32Array(2000 * 3);
 
-            for (let i = 0; i < particleCount; i++) {
-                const theta = Math.random() * Math.PI * 2;
-                const phi = Math.acos(2 * Math.random() - 1);
-                positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-                positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-                positions[i * 3 + 2] = radius * Math.cos(phi);
-                
-                colors[i * 3] = 0.5;
-                colors[i * 3 + 1] = 0.8;
-                colors[i * 3 + 2] = 1.0;
-                
-                const cats = ['meta-cognitive', 'strategic', 'operational', 'technical', 'architectural', 'philosophical', 'visualization', 'cognitive'];
-                categories.push(cats[Math.floor(Math.random() * cats.length)]);
+            for (let i = 0; i < 6000; i++) {
+                positions[i] = (Math.random() - 0.5) * 120;
+                colors[i] = Math.random();
             }
 
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            
-            const material = new THREE.PointsMaterial({
-                size: 0.04,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.6,
-                blending: THREE.AdditiveBlending
-            });
 
-            const shell = new THREE.Points(geometry, material);
-            shell.userData = { 
-                rotationSpeed: {
-                    x: (Math.random() - 0.5) * 0.01,
-                    y: (Math.random() - 0.5) * 0.01,
-                    z: (Math.random() - 0.5) * 0.01
-                },
-                particleCategories: categories
-            };
-            return shell;
-        }
+            const material = new THREE.PointsMaterial({ size: 0.7, vertexColors: true, transparent: true, opacity: 0.8 });
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
 
-        createCore();
-        camera.position.z = 8;
+            // Association Lines
+            lines = new THREE.Group();
+            scene.add(lines);
 
-        function hashPatternToShell(patternId, shellCount) {
-            let hash = 0;
-            for (let i = 0; i < patternId.length; i++) {
-                hash = ((hash << 5) - hash) + patternId.charCodeAt(i);
-                hash |= 0;
-            }
-            return Math.abs(hash) % shellCount;
-        }
-
-        function createQuerySpark(targetShell) {
-            const geometry = new THREE.SphereGeometry(0.06, 8, 8);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: 0x00ffff, 
-                transparent: true, 
-                opacity: 1.0 
-            });
-            const spark = new THREE.Mesh(geometry, material);
-            
-            entityGroup.add(spark);
-            
-            const startPos = new THREE.Vector3(0, 0, 0);
-            const endPos = new THREE.Vector3();
-            targetShell.geometry.getAttribute('position').getPosition(0, endPos);
-            endPos.applyMatrix4(targetShell.matrixWorld);
-            
-            let progress = 0;
-            const speed = 0.04;
-
-            function animateSpark() {
-                progress += speed;
-                spark.position.lerpVectors(startPos, endPos, progress);
-                material.opacity = 1.0 - progress;
-                
-                if (progress < 1.0) {
-                    requestAnimationFrame(animateSpark);
-                } else {
-                    entityGroup.remove(spark);
-                }
-            }
-            animateSpark();
-        }
-
-        function triggerQueryVisuals(patterns) {
-            const shellCount = shells.length;
-            if (shellCount === 0) return;
-            
-            patterns.forEach(patternId => {
-                const shellIndex = hashPatternToShell(patternId, shellCount);
-                const targetShell = shells[shellIndex];
-                if (targetShell) {
-                    createQuerySpark(targetShell);
-                }
-            });
+            window.addEventListener('resize', onWindowResize, false);
+            updateState();
+            animate();
+            setInterval(updateState, 2000); // Poll every 2 seconds
         }
 
         async function updateState() {
             try {
-                const response = await fetch('../state/current-state.json');
-                const data = await response.json();
+                const stateRes = await fetch('../state/current-state.json');
+                const stateData = await stateRes.json();
                 
-                if (JSON.stringify(data.queried_patterns) !== JSON.stringify(systemState.queried_patterns)) {
-                    systemState.queried_patterns = data.queried_patterns || [];
-                    if (systemState.queried_patterns.length > 0) {
-                        triggerQueryVisuals(systemState.queried_patterns);
-                    }
-                }
+                const assocRes = await fetch('../state/memories/associations.json');
+                const assocData = await assocRes.json();
 
-                systemState.phase = data.phase || 'IDLE';
-                systemState.cycle = data.cycle || 0;
-                systemState.status = data.status || 'UNKNOWN';
-                systemState.pattern_count = data.pattern_count || 0;
-                systemState.confidence = data.confidence !== undefined ? data.confidence : 0.5;
-                systemState.current_category = data.current_category || null;
+                state.phase = stateData.phase || 'IDLE';
+                state.status = stateData.status || 'IDLE';
+                state.confidence = stateData.confidence || 0;
+                
+                // Pattern count logic - if it's a number in current-state, use it, else default to 0
+                state.patterns = stateData.pattern_count || 0;
+                state.associations = Array.isArray(assocData) ? assocData : [];
 
-                document.getElementById('cycle').innerText = `CYCLE: ${systemState.cycle}`;
-                document.getElementById('phase').innerText = `PHASE: ${systemState.phase}`;
-                document.getElementById('status').innerText = `STATUS: ${systemState.status}`;
-                document.getElementById('patterns').innerText = `PATTERNS: ${systemState.pattern_count}`;
-                document.getElementById('confidence').innerText = `CONFIDENCE: ${systemState.confidence}`;
-                document.getElementById('category').innerText = `FOCUS: ${systemState.current_category || '--'}`;
-                
-                let targetColor = new THREE.Color(PHASE_COLORS[systemState.phase] || PHASE_COLORS.IDLE);
-                if (systemState.status === 'homeostasis_broken') {
-                    targetColor = new THREE.Color(PHASE_COLORS.homeostasis_broken);
-                } else if (systemState.status === 'homeostasis_recovering') {
-                    targetColor = new THREE.Color(0x00ffaa);
-                } else if (systemState.confidence < 0.7) {
-                    targetColor = new THREE.Color(0x555555);
-                } else {
-                    targetColor = new THREE.Color(systemState.confidence > 0.7 ? 0xffffff : 0x00ccff);
-                }
-                core.material.color.lerp(targetColor, 0.1);
-                
-                const targetShells = Math.floor(systemState.pattern_count / 10) + 1;
-                if (shells.length !== targetShells) {
-                    shells.forEach(s => entityGroup.remove(s));
-                    shells = [];
-                    for (let i = 0; i < targetShells; i++) {
-                        const radius = 1.5 + i * 1.2;
-                        const shell = createShell(i, radius);
-                        shells.push(shell);
-                        entityGroup.add(shell);
-                    }
-                }
+                // Update UI
+                document.getElementById('phase-val').innerText = state.phase;
+                document.getElementById('status-val').innerText = state.status;
+                document.getElementById('density-val').innerText = state.patterns;
+                document.getElementById('conf-val').innerText = (state.confidence * 100).toFixed(1) + '%';
+
+                updateVisuals();
             } catch (e) {
-                console.error("State fetch failed", e);
+                console.error("State synchronization error:", e);
             }
         }
 
-        async function fetchAssociations() {
-            try {
-                const response = await fetch('../state/memories/associations.json');
-                associations = await response.json();
-                initializeStructuralBridges();
-            } catch (e) {
-                console.error("Associations fetch failed", e);
+        function updateVisuals() {
+            // Map confidence to color (Blue -> Gold)
+            const color = new THREE.Color();
+            color.setHSL(0.6 - (state.confidence * 0.4), 1.0, 0.5);
+            particles.material.color = color;
+
+            // Update Association Lines
+            lines.clear();
+            if (state.associations.length > 0) {
+                const lineGeom = new THREE.BufferGeometry();
+                const linePos = [];
+                
+                // Sample a few associations to prevent lag
+                const sample = state.associations.slice(0, 30);
+                sample.forEach(() => {
+                    const p1 = new THREE.Vector3((Math.random()-0.5)*80, (Math.random()-0.5)*80, (Math.random()-0.5)*80);
+                    const p2 = new THREE.Vector3((Math.random()-0.5)*80, (Math.random()-0.5)*80, (Math.random()-0.5)*80);
+                    linePos.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+                });
+
+                lineGeom.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
+                const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ color: color, opacity: 0.3, transparent: true }));
+                lines.add(line);
             }
         }
 
-        function initializeStructuralBridges() {
-            // Clear existing
-            structuralBridges.forEach(bridge => entityGroup.remove(bridge));
-            structuralBridges = [];
-
-            if (shells.length === 0) return;
-
-            associations.forEach(assoc => {
-                const sIdx = hashPatternToShell(assoc.source, shells.length);
-                const tIdx = hashPatternToShell(assoc.target, shells.length);
-
-                if (sIdx !== tIdx) {
-                    const geometry = new THREE.BufferGeometry();
-                    const material = new THREE.LineBasicMaterial({ 
-                        color: assoc.category === 'meta-cognitive' ? 0x00ffff : 
-                               assoc.category === 'strategic' ? 0x00ff00 : 0xaa00ff, 
-                        transparent: true, 
-                        opacity: 0.1, // Low opacity structural baseline
-                        blending: THREE.AdditiveBlending 
-                    });
-                    const line = new THREE.Line(geometry, material);
-                    
-                    line.userData = {
-                        sourceShellIdx: sIdx,
-                        targetShellIdx: tIdx,
-                        category: assoc.category,
-                        baseOpacity: 0.1,
-                        currentOpacity: 0.1,
-                        active: false
-                    };
-                    
-                    entityGroup.add(line);
-                    structuralBridges.push(line);
-                }
-            });
-        }
-
-        function createLinkPulse(sourceShellIdx, targetShellIdx, color = 0x00f0ff) {
-            const sourceShell = shells[sourceShellIdx];
-            const targetShell = shells[targetShellIdx];
-            if (!sourceShell || !targetShell) return;
-
-            const sourcePos = new THREE.Vector3();
-            const targetPos = new THREE.Vector3();
-            
-            const sIdx = Math.floor(Math.random() * 1000);
-            const tIdx = Math.floor(Math.random() * 1000);
-            
-            sourceShell.geometry.getAttribute('position').getPosition(sIdx, sourcePos);
-            targetShell.geometry.getAttribute('position').getPosition(tIdx, targetPos);
-
-            const geometry = new THREE.BufferGeometry().setFromPoints([sourcePos, targetPos]);
-            const material = new THREE.LineBasicMaterial({ 
-                color: color, 
-                transparent: true, 
-                opacity: 0.5,
-                blending: THREE.AdditiveBlending 
-            });
-            const line = new THREE.Line(geometry, material);
-            
-            line.userData = {
-                sourceShellIdx,
-                sourceParticleIdx: sIdx,
-                targetShellIdx,
-                targetParticleIdx: tIdx,
-                life: 1.0,
-                decay: 0.01 + Math.random() * 0.02
-            };
-            
-            entityGroup.add(line);
-            activeLinks.push(line);
-        }
-
-        function updateLinks() {
-            if (shells.length === 0) return;
-
-            // Random pulses still exist as "background noise"
-            if (Math.random() < 0.05) {
-                const sIdx = Math.floor(Math.random() * shells.length);
-                const tIdx = Math.floor(Math.random() * shells.length);
-                if (sIdx !== tIdx) createLinkPulse(sIdx, tIdx, 0x444444);
-            }
-
-            // Update active pulses
-            for (let i = activeLinks.length - 1; i >= 0; i--) {
-                const link = activeLinks[i];
-                const userData = link.userData;
-                
-                const sourceShell = shells[userData.sourceShellIdx];
-                const targetShell = shells[userData.targetShellIdx];
-                
-                const sourcePos = new THREE.Vector3();
-                const targetPos = new THREE.Vector3();
-                
-                sourceShell.geometry.getAttribute('position').getPosition(userData.sourceParticleIdx, sourcePos);
-                sourcePos.applyMatrix4(sourceShell.matrixWorld);
-                targetShell.geometry.getAttribute('position').getPosition(userData.targetParticleIdx, targetPos);
-                targetPos.applyMatrix4(targetShell.matrixWorld);
-                
-                link.geometry.setFromPoints([sourcePos, targetPos]);
-                
-                userData.life -= userData.decay;
-                link.material.opacity = userData.life * 0.5;
-                
-                if (userData.life <= 0) {
-                    entityGroup.remove(link);
-                    activeLinks.splice(i, 1);
-                }
-            }
-
-            // Update structural bridges
-            structuralBridges.forEach(bridge => {
-                const userData = bridge.userData;
-                const sourceShell = shells[userData.sourceShellIdx];
-                const targetShell = shells[userData.targetShellIdx];
-                
-                const sourcePos = new THREE.Vector3();
-                const targetPos = new THREE.Vector3();
-                
-                // Use centroid or a stable point for the structural bridge
-                sourceShell.geometry.getAttribute('position').getPosition(0, sourcePos);
-                sourcePos.applyMatrix4(sourceShell.matrixWorld);
-                targetShell.geometry.getAttribute('position').getPosition(0, targetPos);
-                targetPos.applyMatrix4(targetShell.matrixWorld);
-                
-                bridge.geometry.setFromPoints([sourcePos, targetPos]);
-                
-                // Slowly return to base opacity
-                bridge.material.opacity += (userData.baseOpacity - bridge.material.opacity) * 0.1;
-            });
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            controls.update();
 
-            const time = Date.now() * 0.001;
-            
-            let pulseSpeed = 1.0;
-            let pulseScale = 1.0;
-            let jitterIntensity = 0;
+            // Phase-based movement
+            let speed = 0.002;
+            if (state.phase === 'ACT') speed = 0.01;
+            if (state.phase === 'PERCEIVE') speed = 0.001;
 
-            switch(systemState.phase) {
-                case 'ACT': pulseSpeed = 3.0; pulseScale = 1.2; break;
-                case 'REFLECT': pulseSpeed = 0.5; pulseScale = 0.9; break;
-                case 'PERCEIVE': pulseSpeed = 1.5; pulseScale = 1.0; break;
-                default: pulseSpeed = 1.0; pulseScale = 1.0;
-            }
+            particles.rotation.y += speed;
+            particles.rotation.x += speed / 2;
+            lines.rotation.y += speed;
+            lines.rotation.x += speed / 2;
 
-            if (systemState.status === 'homeostasis_broken') {
-                pulseSpeed = 5.0 + Math.random() * 5.0;
-                pulseScale = 0.8 + Math.random() * 0.4;
-                jitterIntensity = 0.15;
-            } else if (systemState.status === 'homeostasis_recovering') {
-                jitterIntensity = 0.05 * (1 - systemState.confidence);
-            } else if (systemState.confidence < 0.7) {
-                jitterIntensity = 0.02;
-            }
-
-            const coreScale = pulseScale + Math.sin(time * pulseSpeed * 2) * 0.1;
-            core.scale.setScalar(coreScale);
-            
-            if (jitterIntensity > 0) {
-                core.position.set(
-                    (Math.random() - 0.5) * jitterIntensity,
-                    (Math.random() - 0.5) * jitterIntensity,
-                    (Math.random() - 0.5) * jitterIntensity
-                );
-            } else {
-                core.position.set(0, 0, 0);
-            }
-
-            shells.forEach((shell, i) => {
-                shell.rotation.x += shell.userData.rotationSpeed.x;
-                shell.rotation.y += shell.userData.rotationSpeed.y;
-                shell.rotation.z += shell.userData.rotationSpeed.z;
-                
-                if (systemState.status === 'homeostasis_broken') {
-                    const frag = 1.0 + Math.sin(time * 10 + i) * 0.2 * Math.random();
-                    shell.scale.setScalar(frag);
-                } else {
-                    shell.scale.setScalar(1.0);
-                }
-
-                if (systemState.current_category) {
-                    const colors = shell.geometry.getAttribute('color');
-                    const cats = shell.userData.particleCategories;
-                    for (let j = 0; j < cats.length; j++) {
-                        if (cats[j] === systemState.current_category) {
-                            colors.setXYZ(j, 1.0, 1.0, 0.8);
-                        } else {
-                            colors.setXYZ(j, 0.5, 0.8, 1.0);
-                        }
-                    }
-                    colors.needsUpdate = true;
-                } else {
-                    const colors = shell.geometry.getAttribute('color');
-                    for (let j = 0; j < colors.count; j++) {
-                        colors.setXYZ(j, 0.5, 0.8, 1.0);
-                    }
-                    colors.needsUpdate = true;
-                }
-
-                if (systemState.confidence < 0.7) {
-                    shell.position.x += (Math.random() - 0.5) * 0.01;
-                    shell.position.y += (Math.random() - 0.5) * 0.01;
-                    shell.position.z += (Math.random() - 0.5) * 0.01;
-                }
-            });
-            
-            updateLinks();
             renderer.render(scene, camera);
         }
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        setInterval(updateState, 2000);
-        fetchAssociations();
-        updateState();
-        animate();
+        init();
     </script>
 </body>
 </html>
