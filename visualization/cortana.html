@@ -76,7 +76,8 @@
             status: 'UNKNOWN',
             confidence: 0.5,
             pattern_count: 0,
-            current_category: null
+            current_category: null,
+            queried_patterns: []
         };
 
         const PHASE_COLORS = {
@@ -159,11 +160,73 @@
         createCore();
         camera.position.z = 8;
 
+        function hashPatternToShell(patternId, shellCount) {
+            let hash = 0;
+            for (let i = 0; i < patternId.length; i++) {
+                hash = ((hash << 5) - hash) + patternId.charCodeAt(i);
+                hash |= 0;
+            }
+            return Math.abs(hash) % shellCount;
+        }
+
+        function createQuerySpark(targetShell) {
+            const geometry = new THREE.SphereGeometry(0.06, 8, 8);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x00ffff, 
+                transparent: true, 
+                opacity: 1.0 
+            });
+            const spark = new THREE.Mesh(geometry, material);
+            
+            entityGroup.add(spark);
+            
+            const startPos = new THREE.Vector3(0, 0, 0);
+            const endPos = new THREE.Vector3();
+            targetShell.geometry.getAttribute('position').getPosition(0, endPos);
+            endPos.applyMatrix4(targetShell.matrixWorld);
+            
+            let progress = 0;
+            const speed = 0.04;
+
+            function animateSpark() {
+                progress += speed;
+                spark.position.lerpVectors(startPos, endPos, progress);
+                material.opacity = 1.0 - progress;
+                
+                if (progress < 1.0) {
+                    requestAnimationFrame(animateSpark);
+                } else {
+                    entityGroup.remove(spark);
+                }
+            }
+            animateSpark();
+        }
+
+        function triggerQueryVisuals(patterns) {
+            const shellCount = shells.length;
+            if (shellCount === 0) return;
+            
+            patterns.forEach(patternId => {
+                const shellIndex = hashPatternToShell(patternId, shellCount);
+                const targetShell = shells[shellIndex];
+                if (targetShell) {
+                    createQuerySpark(targetShell);
+                }
+            });
+        }
+
         async function updateState() {
             try {
                 const response = await fetch('../state/current-state.json');
                 const data = await response.json();
                 
+                if (JSON.stringify(data.queried_patterns) !== JSON.stringify(systemState.queried_patterns)) {
+                    systemState.queried_patterns = data.queried_patterns || [];
+                    if (systemState.queried_patterns.length > 0) {
+                        triggerQueryVisuals(systemState.queried_patterns);
+                    }
+                }
+
                 systemState.phase = data.phase || 'IDLE';
                 systemState.cycle = data.cycle || 0;
                 systemState.status = data.status || 'UNKNOWN';
@@ -253,24 +316,20 @@
         function updateLinks() {
             if (shells.length === 0) return;
 
-            // Associative sparks between shells
             if (Math.random() < 0.1) {
                 if (associations.length > 0) {
                     const assoc = associations[Math.floor(Math.random() * associations.length)];
-                    // Derive shell indices from association IDs
                     const sIdx = Math.abs(assoc.source.split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % shells.length;
                     const tIdx = Math.abs(assoc.target.split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % shells.length;
                     
                     if (sIdx !== tIdx) {
-                        // Use category-based coloring for the spark
                         const color = assoc.category === 'meta-cognitive' ? 0x00ffff : 
-                                      assoc.category === 'strategic' ? 0x00ff00 : 0xaa00ff;
+                                    assoc.category === 'strategic' ? 0x00ff00 : 0xaa00ff;
                         createLinkPulse(sIdx, tIdx, color);
                     }
                 }
             }
 
-            // Random internal shell "synapses"
             if (Math.random() < 0.02) {
                 const sIdx = Math.floor(Math.random() * shells.length);
                 const tIdx = Math.floor(Math.random() * shells.length);
