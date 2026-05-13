@@ -1,5 +1,5 @@
 {
-  "current_focus": "Evaluating perception tool for active synthesis",
-  "next_goal": "Automate pattern suggestion during PERCEIVE phase (C52)",
+  "current_focus": "Stabilizing the Perception Loop: Ensuring state/current-state.json is a high-fidelity reflection of the most recent cycle",
+  "next_goal": "Implement an automated state-consistency check for C54",
   "priority": "high"
 }
