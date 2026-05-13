@@ -24,6 +24,7 @@
 <body>
     <div id="ui-overlay">
         <div class="status-item">Phase: <span id="phase-val" class="value">LOADING...</span></div>
+        <div class="status-item">Category: <span id="cat-val" class="value">LOADING...</span></div>
         <div class="status-item">Status: <span id="status-val" class="value">LOADING...</span></div>
         <div class="status-item">Pattern Density: <span id="density-val" class="value">0</span></div>
         <div class="status-item">Confidence: <span id="conf-val" class="value">0%</span></div>
@@ -32,7 +33,16 @@
 
     <script>
         let scene, camera, renderer, particles, lines;
-        let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [] };
+        let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [], category: 'default' };
+
+        const RESONANCE_MAP = {
+            'logic':       { color: 0x00f2ff, speed: 0.001, turbulence: 0.1, shape: 'geometric' },
+            'memory':      { color: 0x9d00ff, speed: 0.003, turbulence: 0.5, shape: 'fluid' },
+            'communication': { color: 0x00ff8c, speed: 0.008, turbulence: 0.8, shape: 'oscillating' },
+            'system':       { color: 0xffffff, speed: 0.002, turbulence: 0.2, shape: 'symmetrical' },
+            'visualization': { color: 0xffcc00, speed: 0.004, turbulence: 0.4, shape: 'expansive' },
+            'default':      { color: 0x446688, speed: 0.002, turbulence: 0.3, shape: 'ambient' }
+        };
 
         function init() {
             scene = new THREE.Scene();
@@ -43,7 +53,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
 
-            // Particle System
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(2000 * 3);
             const colors = new Float32Array(2000 * 3);
@@ -60,14 +69,13 @@
             particles = new THREE.Points(geometry, material);
             scene.add(particles);
 
-            // Association Lines
             lines = new THREE.Group();
             scene.add(lines);
 
             window.addEventListener('resize', onWindowResize, false);
             updateState();
             animate();
-            setInterval(updateState, 2000); // Poll every 2 seconds
+            setInterval(updateState, 2000);
         }
 
         async function updateState() {
@@ -81,13 +89,12 @@
                 state.phase = stateData.phase || 'IDLE';
                 state.status = stateData.status || 'IDLE';
                 state.confidence = stateData.confidence || 0;
-                
-                // Pattern count logic - if it's a number in current-state, use it, else default to 0
+                state.category = stateData.current_category || 'default';
                 state.patterns = stateData.pattern_count || 0;
                 state.associations = Array.isArray(assocData) ? assocData : [];
 
-                // Update UI
                 document.getElementById('phase-val').innerText = state.phase;
+                document.getElementById('cat-val').innerText = state.category;
                 document.getElementById('status-val').innerText = state.status;
                 document.getElementById('density-val').innerText = state.patterns;
                 document.getElementById('conf-val').innerText = (state.confidence * 100).toFixed(1) + '%';
@@ -99,27 +106,27 @@
         }
 
         function updateVisuals() {
-            // Map confidence to color (Blue -> Gold)
-            const color = new THREE.Color();
-            color.setHSL(0.6 - (state.confidence * 0.4), 1.0, 0.5);
-            particles.material.color = color;
+            const resonance = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'];
+            
+            // Lerp confidence into the color temperature
+            const baseColor = new THREE.Color(resonance.color);
+            const targetColor = new THREE.Color().setHSL(0.6 - (state.confidence * 0.4), 1.0, 0.5);
+            baseColor.lerp(targetColor, 0.3);
+            
+            particles.material.color = baseColor;
 
-            // Update Association Lines
             lines.clear();
             if (state.associations.length > 0) {
                 const lineGeom = new THREE.BufferGeometry();
                 const linePos = [];
-                
-                // Sample a few associations to prevent lag
                 const sample = state.associations.slice(0, 30);
                 sample.forEach(() => {
                     const p1 = new THREE.Vector3((Math.random()-0.5)*80, (Math.random()-0.5)*80, (Math.random()-0.5)*80);
                     const p2 = new THREE.Vector3((Math.random()-0.5)*80, (Math.random()-0.5)*80, (Math.random()-0.5)*80);
                     linePos.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
                 });
-
                 lineGeom.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
-                const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ color: color, opacity: 0.3, transparent: true }));
+                const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ color: baseColor, opacity: 0.3, transparent: true }));
                 lines.add(line);
             }
         }
@@ -132,17 +139,19 @@
 
         function animate() {
             requestAnimationFrame(animate);
-
-            // Phase-based movement
-            let speed = 0.002;
-            if (state.phase === 'ACT') speed = 0.01;
-            if (state.phase === 'PERCEIVE') speed = 0.001;
+            
+            const resonance = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'];
+            let speed = resonance.speed;
+            
+            // Phase modifiers
+            if (state.phase === 'ACT') speed *= 3;
+            if (state.phase === 'PERCEIVE') speed *= 0.5;
 
             particles.rotation.y += speed;
             particles.rotation.x += speed / 2;
             lines.rotation.y += speed;
             lines.rotation.x += speed / 2;
-
+            
             renderer.render(scene, camera);
         }
 
