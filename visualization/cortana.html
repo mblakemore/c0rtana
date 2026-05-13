@@ -92,6 +92,8 @@
 
         let core;
         let shells = [];
+        let associations = [];
+        let activeLinks = [];
 
         function createCore() {
             const geometry = new THREE.IcosahedronGeometry(0.3, 2);
@@ -188,13 +190,96 @@
             }
         }
 
+        async function fetchAssociations() {
+            try {
+                const response = await fetch('../state/memories/associations.json');
+                associations = await response.json();
+            } catch (e) {
+                console.error("Associations fetch failed", e);
+            }
+        }
+
+        function createLinkPulse(sourceShellIdx, targetShellIdx) {
+            const sourceShell = shells[sourceShellIdx];
+            const targetShell = shells[targetShellIdx];
+            if (!sourceShell || !targetShell) return;
+
+            const sourcePos = new THREE.Vector3();
+            const targetPos = new THREE.Vector3();
+            
+            const sIdx = Math.floor(Math.random() * 1000);
+            const tIdx = Math.floor(Math.random() * 1000);
+            
+            sourceShell.geometry.getAttribute('position').getPosition(sIdx, sourcePos);
+            targetShell.geometry.getAttribute('position').getPosition(tIdx, targetPos);
+
+            const geometry = new THREE.BufferGeometry().setFromPoints([sourcePos, targetPos]);
+            const material = new THREE.LineBasicMaterial({ 
+                color: 0x00f0ff, 
+                transparent: true, 
+                opacity: 0.5,
+                blending: THREE.AdditiveBlending 
+            });
+            const line = new THREE.Line(geometry, material);
+            
+            line.userData = {
+                sourceShellIdx,
+                sourceParticleIdx: sIdx,
+                targetShellIdx,
+                targetParticleIdx: tIdx,
+                life: 1.0,
+                decay: 0.01 + Math.random() * 0.02
+            };
+            
+            entityGroup.add(line);
+            activeLinks.push(line);
+        }
+
+        function updateLinks() {
+            if (shells.length === 0) return;
+
+            if (Math.random() < 0.05) {
+                if (associations.length > 0) {
+                    const assoc = associations[Math.floor(Math.random() * associations.length)];
+                    const sIdx = Math.abs(assoc.source.split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % shells.length;
+                    const tIdx = Math.abs(assoc.target.split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % shells.length;
+                    createLinkPulse(sIdx, tIdx);
+                }
+            }
+
+            for (let i = activeLinks.length - 1; i >= 0; i--) {
+                const link = activeLinks[i];
+                const userData = link.userData;
+                
+                const sourceShell = shells[userData.sourceShellIdx];
+                const targetShell = shells[userData.targetShellIdx];
+                
+                const sourcePos = new THREE.Vector3();
+                const targetPos = new THREE.Vector3();
+                
+                sourceShell.geometry.getAttribute('position').getPosition(userData.sourceParticleIdx, sourcePos);
+                sourcePos.applyMatrix4(sourceShell.matrixWorld);
+                targetShell.geometry.getAttribute('position').getPosition(userData.targetParticleIdx, targetPos);
+                targetPos.applyMatrix4(targetShell.matrixWorld);
+                
+                link.geometry.setFromPoints([sourcePos, targetPos]);
+                
+                userData.life -= userData.decay;
+                link.material.opacity = userData.life * 0.5;
+                
+                if (userData.life <= 0) {
+                    entityGroup.remove(link);
+                    activeLinks.splice(i, 1);
+                }
+            }
+        }
+
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
 
             const time = Date.now() * 0.001;
             
-            // Core pulsation
             let pulseScale = 1.0;
             let pulseSpeed = 1.0;
             switch(systemState.phase) {
@@ -206,20 +291,19 @@
             
             core.scale.setScalar(pulseScale + Math.sin(time * pulseSpeed * 2) * 0.1);
             
-            // Shell rotation
             shells.forEach((shell, i) => {
                 shell.rotation.x += shell.userData.rotationSpeed.x;
                 shell.rotation.y += shell.userData.rotationSpeed.y;
                 shell.rotation.z += shell.userData.rotationSpeed.z;
                 
-                // Add a bit of jitter based on low confidence
                 if (systemState.confidence < 0.7) {
                     shell.position.x += (Math.random() - 0.5) * 0.01;
                     shell.position.y += (Math.random() - 0.5) * 0.01;
-                    shell.position.z += (Math.random() - 0.5) * 0.01);
+                    shell.position.z += (Math.random() - 0.5) * 0.01;
                 }
             });
-
+            
+            updateLinks();
             renderer.render(scene, camera);
         }
 
@@ -230,6 +314,7 @@
         });
 
         setInterval(updateState, 2000);
+        fetchAssociations();
         updateState();
         animate();
     </script>

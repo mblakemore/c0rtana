@@ -1,0 +1,359 @@
+[
+  {
+    "source": "c47_001",
+    "target": "c48_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c47_001",
+    "target": "c48_005",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c47_001",
+    "target": "c49_005",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c47_001",
+    "target": "c49_008",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c47_001",
+    "target": "c49_012",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c47_001",
+    "target": "c54_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_001",
+    "target": "c48_005",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_001",
+    "target": "c49_005",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_001",
+    "target": "c49_008",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_001",
+    "target": "c49_012",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_001",
+    "target": "c54_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_005",
+    "target": "c49_005",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_005",
+    "target": "c49_008",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_005",
+    "target": "c49_012",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_005",
+    "target": "c54_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c49_005",
+    "target": "c49_008",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c49_005",
+    "target": "c49_012",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c49_005",
+    "target": "c54_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c49_008",
+    "target": "c49_012",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c49_008",
+    "target": "c54_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c49_012",
+    "target": "c54_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "meta-cognitive"
+  },
+  {
+    "source": "c48_002",
+    "target": "c49_003",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "strategic"
+  },
+  {
+    "source": "c48_002",
+    "target": "c49_010",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "strategic"
+  },
+  {
+    "source": "c49_003",
+    "target": "c49_010",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "strategic"
+  },
+  {
+    "source": "c48_003",
+    "target": "c49_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c48_003",
+    "target": "c49_002",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c48_003",
+    "target": "c49_007",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c48_003",
+    "target": "c49_011",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c48_003",
+    "target": "c49_014",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c48_003",
+    "target": "c51_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_001",
+    "target": "c49_002",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_001",
+    "target": "c49_007",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_001",
+    "target": "c49_011",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_001",
+    "target": "c49_014",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_001",
+    "target": "c51_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_002",
+    "target": "c49_007",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_002",
+    "target": "c49_011",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_002",
+    "target": "c49_014",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_002",
+    "target": "c51_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_007",
+    "target": "c49_011",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_007",
+    "target": "c49_014",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_007",
+    "target": "c51_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_011",
+    "target": "c49_014",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_011",
+    "target": "c51_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c49_014",
+    "target": "c51_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "operational"
+  },
+  {
+    "source": "c48_004",
+    "target": "c49_004",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "technical"
+  },
+  {
+    "source": "c48_004",
+    "target": "c50_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "technical"
+  },
+  {
+    "source": "c49_004",
+    "target": "c50_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "technical"
+  },
+  {
+    "source": "c49_009",
+    "target": "c49_013",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "philosophical"
+  },
+  {
+    "source": "c52_001",
+    "target": "c53_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "cognitive"
+  },
+  {
+    "source": "cN_056",
+    "target": "c57_001",
+    "strength": 1.0,
+    "type": "category_match",
+    "category": "visualization"
+  }
+]
