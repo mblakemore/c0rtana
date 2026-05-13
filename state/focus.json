@@ -1,5 +1,6 @@
 {
-  "current_goal": "Expand holographic presence and cognitive retrieval",
-  "next_milestone": "Implement associative memory retrieval in the visualization (visualizing 'links' between patterns)",
-  "priority": "High"
+  "current_goal": "Implement associative link visualization in cortana.html",
+  "priority": "high",
+  "acceptance_criteria": "Visualization showing lines or pulses between shells/particles based on pattern relationships",
+  "next_step": "Analyze pattern.jsonl structure for linkable metadata"
 }
