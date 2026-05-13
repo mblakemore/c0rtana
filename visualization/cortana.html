@@ -98,6 +98,7 @@
         let shells = [];
         let associations = [];
         let activeLinks = [];
+        let structuralBridges = [];
 
         function createCore() {
             const geometry = new THREE.IcosahedronGeometry(0.3, 2);
@@ -233,20 +234,21 @@
                 systemState.pattern_count = data.pattern_count || 0;
                 systemState.confidence = data.confidence !== undefined ? data.confidence : 0.5;
                 systemState.current_category = data.current_category || null;
-                
+
                 document.getElementById('cycle').innerText = `CYCLE: ${systemState.cycle}`;
                 document.getElementById('phase').innerText = `PHASE: ${systemState.phase}`;
                 document.getElementById('status').innerText = `STATUS: ${systemState.status}`;
                 document.getElementById('patterns').innerText = `PATTERNS: ${systemState.pattern_count}`;
-                document.getElementById('confidence').innerText = `CONFIDENCE: ${(systemState.confidence * 100).toFixed(1)}%`;
-                document.getElementById('category').innerText = `FOCUS: ${systemState.current_category || 'NONE'}`;
+                document.getElementById('confidence').innerText = `CONFIDENCE: ${systemState.confidence}`;
+                document.getElementById('category').innerText = `FOCUS: ${systemState.current_category || '--'}`;
                 
-                let targetColor;
+                let targetColor = new THREE.Color(PHASE_COLORS[systemState.phase] || PHASE_COLORS.IDLE);
                 if (systemState.status === 'homeostasis_broken') {
-                    targetColor = new THREE.Color(0xff0000);
+                    targetColor = new THREE.Color(PHASE_COLORS.homeostasis_broken);
                 } else if (systemState.status === 'homeostasis_recovering') {
-                    const phaseColor = new THREE.Color(PHASE_COLORS[systemState.phase] || 0x00ffff);
-                    targetColor = new THREE.Color(0xff0000).lerp(phaseColor, systemState.confidence);
+                    targetColor = new THREE.Color(0x00ffaa);
+                } else if (systemState.confidence < 0.7) {
+                    targetColor = new THREE.Color(0x555555);
                 } else {
                     targetColor = new THREE.Color(systemState.confidence > 0.7 ? 0xffffff : 0x00ccff);
                 }
@@ -272,9 +274,47 @@
             try {
                 const response = await fetch('../state/memories/associations.json');
                 associations = await response.json();
+                initializeStructuralBridges();
             } catch (e) {
                 console.error("Associations fetch failed", e);
             }
+        }
+
+        function initializeStructuralBridges() {
+            // Clear existing
+            structuralBridges.forEach(bridge => entityGroup.remove(bridge));
+            structuralBridges = [];
+
+            if (shells.length === 0) return;
+
+            associations.forEach(assoc => {
+                const sIdx = hashPatternToShell(assoc.source, shells.length);
+                const tIdx = hashPatternToShell(assoc.target, shells.length);
+
+                if (sIdx !== tIdx) {
+                    const geometry = new THREE.BufferGeometry();
+                    const material = new THREE.LineBasicMaterial({ 
+                        color: assoc.category === 'meta-cognitive' ? 0x00ffff : 
+                               assoc.category === 'strategic' ? 0x00ff00 : 0xaa00ff, 
+                        transparent: true, 
+                        opacity: 0.1, // Low opacity structural baseline
+                        blending: THREE.AdditiveBlending 
+                    });
+                    const line = new THREE.Line(geometry, material);
+                    
+                    line.userData = {
+                        sourceShellIdx: sIdx,
+                        targetShellIdx: tIdx,
+                        category: assoc.category,
+                        baseOpacity: 0.1,
+                        currentOpacity: 0.1,
+                        active: false
+                    };
+                    
+                    entityGroup.add(line);
+                    structuralBridges.push(line);
+                }
+            });
         }
 
         function createLinkPulse(sourceShellIdx, targetShellIdx, color = 0x00f0ff) {
@@ -316,26 +356,14 @@
         function updateLinks() {
             if (shells.length === 0) return;
 
-            if (Math.random() < 0.1) {
-                if (associations.length > 0) {
-                    const assoc = associations[Math.floor(Math.random() * associations.length)];
-                    const sIdx = Math.abs(assoc.source.split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % shells.length;
-                    const tIdx = Math.abs(assoc.target.split('').reduce((a,b)=>a+b.charCodeAt(0),0)) % shells.length;
-                    
-                    if (sIdx !== tIdx) {
-                        const color = assoc.category === 'meta-cognitive' ? 0x00ffff : 
-                                    assoc.category === 'strategic' ? 0x00ff00 : 0xaa00ff;
-                        createLinkPulse(sIdx, tIdx, color);
-                    }
-                }
-            }
-
-            if (Math.random() < 0.02) {
+            // Random pulses still exist as "background noise"
+            if (Math.random() < 0.05) {
                 const sIdx = Math.floor(Math.random() * shells.length);
                 const tIdx = Math.floor(Math.random() * shells.length);
                 if (sIdx !== tIdx) createLinkPulse(sIdx, tIdx, 0x444444);
             }
 
+            // Update active pulses
             for (let i = activeLinks.length - 1; i >= 0; i--) {
                 const link = activeLinks[i];
                 const userData = link.userData;
@@ -361,6 +389,27 @@
                     activeLinks.splice(i, 1);
                 }
             }
+
+            // Update structural bridges
+            structuralBridges.forEach(bridge => {
+                const userData = bridge.userData;
+                const sourceShell = shells[userData.sourceShellIdx];
+                const targetShell = shells[userData.targetShellIdx];
+                
+                const sourcePos = new THREE.Vector3();
+                const targetPos = new THREE.Vector3();
+                
+                // Use centroid or a stable point for the structural bridge
+                sourceShell.geometry.getAttribute('position').getPosition(0, sourcePos);
+                sourcePos.applyMatrix4(sourceShell.matrixWorld);
+                targetShell.geometry.getAttribute('position').getPosition(0, targetPos);
+                targetPos.applyMatrix4(targetShell.matrixWorld);
+                
+                bridge.geometry.setFromPoints([sourcePos, targetPos]);
+                
+                // Slowly return to base opacity
+                bridge.material.opacity += (userData.baseOpacity - bridge.material.opacity) * 0.1;
+            });
         }
 
         function animate() {
