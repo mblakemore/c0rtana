@@ -1,8 +1,9 @@
 {
-  "cycle": 26,
+  "cycle": 27,
   "phase": "ACT",
-  "activity": 0.85,
-  "confidence": 0.88,
-  "jitter_impact": 0.15,
-  "last_update": "2025-05-22T12:20:00Z"
+  "activity": 1.0,
+  "confidence": 0.92,
+  "resonance": 0.75,
+  "jitter_impact": 0.25,
+  "last_update": "2025-05-22T12:30:00Z"
 }

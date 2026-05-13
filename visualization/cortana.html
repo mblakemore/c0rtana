@@ -581,6 +581,7 @@ function buildParticleSystem(count) {
       uPointScale:  { value: renderer.getPixelRatio() * 100 },
       uHoveredIdx:  { value: -1 },    // hovered particle (-1 = none)
       uLockedIdx:   { value: -1 },    // locked particle (-1 = none)
+        uResonance:    { value: 0.5 },
     },
     vertexShader: `
       attribute float size;
@@ -605,32 +606,40 @@ function buildParticleSystem(count) {
       uniform float uMemPulse;
       uniform float uPointScale;
       uniform float uHoveredIdx;
-      uniform float uLockedIdx;
-
-      vec3 phaseOffset(float phaseIdx, float aPhase, float aRadius, float t) {
-        float p = phaseIdx;
-        vec3 offset = vec3(0.0);
-        if (p < 0.5) {
-          float pulse = sin(t * 1.2 + aPhase) * 0.8;
-          offset = vec3(sin(aPhase) * pulse, cos(aPhase) * pulse * 0.5, sin(t + aPhase * 2.0) * pulse * 0.3);
-        } else if (p < 1.5) {
-          float spiral = sin(t * 0.6 + aPhase);
-          offset = vec3(spiral * 3.0 * sin(t * 0.3 + aPhase),
-                        spiral * 2.0 * cos(t * 0.3 + aPhase),
-                        cos(t * 0.8 + aPhase) * 2.0);
-        } else if (p < 2.5) {
-          float pull = sin(t * 1.5 + aPhase) * 0.4;
-          offset = vec3(pull * 4.0, cos(t * 0.9 + aPhase) * 2.0, pull * 2.0);
-        } else if (p < 3.5) {
-          float burst = 1.0 + sin(t * 2.5 + aPhase) * 0.6;
-          offset = vec3(sin(aPhase * 3.0 + t) * burst * 4.0,
-                        cos(aPhase * 2.0 + t * 1.2) * burst * 4.0,
-                        sin(t * 1.8 + aPhase) * burst * 3.0);
-        } else if (p < 4.5) {
-          float settle = sin(t * 0.5 + aPhase) * exp(-mod(t, 12.0) * 0.08);
-          offset = vec3(settle * 5.0, cos(t * 0.4 + aPhase) * settle * 3.0, settle * 2.0);
-        } else {
-          float lattice = sin(t * 0.2 + aPhase) * 0.5;
+        float hash(float n) { return fract(sin(n) * 43758.5453123); }
+        vec3 phaseOffset(float phaseIdx, float aPhase, float aRadius, float t) {
+          float p = phaseIdx;
+          vec3 offset = vec3(0.0);
+          if (p < 0.5) {
+            float pulse = sin(t * 1.2 + aPhase) * 0.8;
+            offset = vec3(sin(aPhase) * pulse, cos(aPhase) * pulse * 0.5, sin(t + aPhase * 2.0) * pulse * 0.3);
+          } else if (p < 1.5) {
+            float spiral = sin(t * 0.6 + aPhase);
+            offset = vec3(spiral * 3.0 * sin(t * 0.3 + aPhase),
+                          spiral * 2.0 * cos(t * 0.3 + aPhase),
+                          cos(t * 0.8 + aPhase) * 2.0);
+          } else if (p < 2.5) {
+            float pull = sin(t * 1.5 + aPhase) * 0.4;
+            offset = vec3(pull * 4.0, cos(t * 0.9 + aPhase) * 2.0, pull * 2.0);
+          } else if (p < 3.5) {
+            float burst = 1.0 + sin(t * 2.5 + aPhase) * 0.6;
+            offset = vec3(sin(aPhase * 3.0 + t) * burst * 4.0,
+                          cos(aPhase * 2.0 + t * 1.2) * burst * 4.0,
+                          sin(t * 1.8 + aPhase) * burst * 3.0);
+          } else if (p < 4.5) {
+            float settle = sin(t * 0.5 + aPhase) * exp(-mod(t, 12.0) * 0.08);
+            offset = vec3(settle * 5.0, cos(t * 0.4 + aPhase) * settle * 3.0, settle * 2.0);
+          } else {
+            float lattice = sin(t * 0.2 + aPhase) * 0.5;
+            offset = vec3(lattice * 2.0, cos(t * 0.15 + aPhase) * 2.0, sin(t * 0.25 + aPhase) * 1.5);
+          }
+          float harmonic = sin(t * 2.0 + aPhase * 6.28) * 0.1 * uResonance;
+          vec3 noise = vec3(hash(aPhase + t) - 0.5, hash(aPhase * 1.1 + t) - 0.5, hash(aPhase * 0.9 + t) - 0.5) * 0.6 * (1.0 - uResonance);
+          offset += vec3(harmonic, harmonic * 0.5, harmonic * 0.3) + noise;
+          return offset;
+        }
+        }
+          offset += vec3(harmonic, harmonic * 0.5, harmonic * 0.3) + noise;
           offset = vec3(lattice * 2.0, cos(t * 0.15 + aPhase) * 2.0, sin(t * 0.25 + aPhase) * 1.5);
         }
         return offset;
@@ -1431,6 +1440,7 @@ renderer.setAnimationLoop(() => {
   mat.uniforms.uActivity.value   = lerpActivity;
   mat.uniforms.uPulse.value      = pulseIntensity * (1 - pulseAge);
   mat.uniforms.uMemPulse.value   = memParticlePulse;
+    mat.uniforms.uResonance.value = targetState.resonance ?? 0.5;
 
   // Core
   core.rotation.x = elapsed * 0.05 * (1 + lerpActivity);
