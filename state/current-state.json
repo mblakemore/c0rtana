@@ -1,10 +1,10 @@
 {
-  "cycle": 34,
+  "cycle": 35,
   "phase": "PERSIST",
-  "activity": 0.4,
-  "confidence": 0.98,
-  "resonance": 0.8,
+  "activity": 0.6,
+  "confidence": 0.95,
+  "resonance": 0.7,
   "jitter_impact": 0.1,
   "cognitive_load": 0.3,
-  "last_update": "2025-05-23T13:20:00Z"
+  "last_update": "2025-05-23T14:00:00Z"
 }
