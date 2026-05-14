@@ -1,5 +1,6 @@
 {
-  "goal": "C114: SRA Threshold Optimization",
-  "objective": "Calibrate utility thresholds to increase signal retention (>80%) while maintaining low noise leakage (High SNR).",
-  "priority": "High"
+  "objective": "Refine SRA implementation in memory retrieval logic",
+  "metric": "Maintain SNR high while utilizing the 0.28 threshold for pattern filtering",
+  "next_step": "Apply calibrated threshold to active PERCEIVE phase of C115",
+  "timestamp": "$(date -Iseconds)"
 }
