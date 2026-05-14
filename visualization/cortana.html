@@ -33,7 +33,7 @@
     <canvas id="gl-canvas"></canvas>
 
     <script>
-        let scene, camera, renderer, particles, lines, controls;
+        let scene, camera, renderer, particles, lines, controls, rings = [];
         let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [], category: 'default' };
 
         const RESONANCE_MAP = {
@@ -70,10 +70,8 @@
         }
 
         function createParticles() {
-            // Scale particle count based on pattern density (simulated as current state doesn't provide a real number of particles)
-            // We will update this dynamically in updateVisuals if needed, but for now let's use a base and scale the geometry.
             const geometry = new THREE.BufferGeometry();
-            const count = 10000; // Increased base count
+            const count = 10000;
             const positions = new Float32Array(count * 3);
             const colors = new Float32Array(count * 3);
 
@@ -130,9 +128,11 @@
             particles.material.color = baseColor;
             particles.material.opacity = 0.3 + (state.confidence * 0.7);
 
-            // Scale particle scale/size based on pattern count to simulate density increase
             const sizeScale = 0.5 + (Math.log10(state.patterns + 1) * 0.2);
             particles.material.size = sizeScale;
+
+            // Implement Ring Structures based on pattern count to distinguish focus from archive
+            updateRings(baseColor);
 
             lines.clear();
             if (state.associations.length > 0) {
@@ -147,6 +147,27 @@
                 lineGeom.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
                 const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ color: baseColor, opacity: 0.2, transparent: true }));
                 lines.add(line);
+            }
+        }
+
+        function updateRings(color) {
+            // Clear existing rings if needed or just reuse
+            rings.forEach(r => scene.remove(r));
+            rings = [];
+
+            const ringCount = Math.min(Math.ceil(state.patterns / 20), 5); // Max 5 rings
+            for (let i = 0; i < ringCount; i++) {
+                const radius = 20 + (i * 15);
+                const geometry = new THREE.TorusGeometry(radius, 0.2, 16, 100);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: color, 
+                    transparent: true, 
+                    opacity: 0.4 - (i * 0.05) 
+                });
+                const ring = new THREE.Mesh(geometry, material);
+                ring.rotation.x = Math.PI / 2;
+                scene.add(ring);
+                rings.push(ring);
             }
         }
 
@@ -194,6 +215,11 @@
             lines.rotation.y += speed;
             lines.rotation.x += speed / 2;
             
+            rings.forEach((ring, idx) => {
+                ring.rotation.z += speed * (1 + idx * 0.1);
+                ring.position.y = Math.sin(time + idx) * 2;
+            });
+
             controls.update();
             renderer.render(scene, camera);
         }
