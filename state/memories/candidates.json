@@ -1,1 +1,21 @@
-[]
+[
+    {
+        "id": "c87_2",
+        "content": "I will now proceed to run the script and see what happens.",
+        "timestamp": "C87",
+        "score": -1.0,
+        "matched": [
+            "NOISE:procedural_filler"
+        ]
+    },
+    {
+        "id": "c87_4",
+        "content": "It appears that the current state is stable.",
+        "timestamp": "C87",
+        "score": -1.1,
+        "matched": [
+            "NOISE:redundant_status",
+            "NOISE:trivial_observation"
+        ]
+    }
+]

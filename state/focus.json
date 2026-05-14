@@ -1,5 +1,5 @@
 {
   "goal": "Develop an automated qualitative filter for the memory system to prevent noise accumulation.",
-  "next_step": "Implement the logic that applies triggers.json to candidate patterns in memories/candidates.json to score and promote them to patterns.jsonl.",
-  "priority": "High"
+  "next_step": "Integrate the Semantic Sieve into the regular cognitive loop as part of the CONSOLIDATE phase.",
+  "priority": "Medium"
 }
