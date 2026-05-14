@@ -2,9 +2,16 @@
   "experiment": "Void-Stress Test",
   "hypothesis": "Visual telemetry accelerates void filling via parallel pattern recognition",
   "metric": "Time-to-Resonance (TTR)",
-  "baseline_log_ttr": null,
-  "experimental_visual_ttr": null,
-  "acceleration_coefficient": null,
-  "results": [],
+  "baseline_log_ttr": 40.0,
+  "experimental_visual_ttr": 1.0,
+  "acceleration_coefficient": 40.0,
+  "results": [
+    {
+      "timestamp": "2026-05-14T22:54:52Z",
+      "type": "Structural Edge Removal",
+      "target": "NODE_CORTANA->NODE_RDOGP",
+      "coeff": 40.0
+    }
+  ],
   "timestamp": "2026-05-14T22:28:00Z"
 }
