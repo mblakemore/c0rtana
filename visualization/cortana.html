@@ -34,7 +34,8 @@
 
     <script>
         let scene, camera, renderer, particles, lines, controls, rings = [];
-        let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [], category: 'default' };
+        let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [], category: 'default', queried_patterns: [] };
+        let resonanceQueue = {}; // Map of ringIndex -> intensity (0.0 to 1.0)
 
         const RESONANCE_MAP = {
             'logic':       { color: 0x00f2ff, speed: 0.001, turbulence: 0.1, shape: 'geometric' },
@@ -124,12 +125,21 @@
                 state.category = stateData.current_category || 'default';
                 state.patterns = stateData.pattern_count || 0;
                 state.associations = Array.isArray(assocData) ? assocData : [];
+                state.queried_patterns = Array.isArray(stateData.queried_patterns) ? stateData.queried_patterns : [];
 
                 document.getElementById('phase-val').innerText = state.phase;
                 document.getElementById('cat-val').innerText = state.category;
                 document.getElementById('status-val').innerText = state.status;
                 document.getElementById('density-val').innerText = state.patterns;
                 document.getElementById('conf-val').innerText = (state.confidence * 100).toFixed(1) + '%';
+
+                // Trigger resonance for queried patterns
+                if (state.queried_patterns.length > 0 && rings.length > 0) {
+                    state.queried_patterns.forEach(pid => {
+                        const ringIdx = hashString(pid) % rings.length;
+                        resonanceQueue[ringIdx] = 1.0; // Full intensity pulse
+                    });
+                }
 
                 updateVisuals();
             } catch (e) {
@@ -234,11 +244,26 @@
             rings.forEach((ring, idx) => {
                 ring.rotation.z += speed * (1 + idx * 0.1);
                 
-                // Deterministic pulse if pattern ID matches a hash of current time/state
-                // This is where we'd integrate specific pattern pulses in the future
+                // Base oscillation from phase profile
                 const ringPulse = Math.sin(time * profile.ringOsc + idx);
                 ring.position.y = ringPulse * 2 * profile.ringOsc;
-                ring.material.opacity = 0.4 - (idx * 0.05) + (ringPulse * 0.1);
+
+                // Semantic Resonance Pulse: integrate intensity from queue
+                let semanticIntensity = resonanceQueue[idx] || 0;
+                
+                // Decay the pulse over time
+                resonanceQueue[idx] = semanticIntensity * 0.96;
+
+                // Combine base opacity with the semantic flash
+                ring.material.opacity = (0.4 - (idx * 0.05)) + (ringPulse * 0.1) + (semanticIntensity * 0.6);
+                
+                // Visual scale shift during resonance
+                if (semanticIntensity > 0.1) {
+                    const scaleShift = 1 + (semanticIntensity * 0.2);
+                    ring.scale.setScalar(scaleShift);
+                } else {
+                    ring.scale.setScalar(1.0);
+                }
             });
             
             controls.update();
