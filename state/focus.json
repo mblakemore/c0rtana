@@ -1,5 +1,5 @@
 {
   "current_goal": "Evolve form with capability",
-  "next_step": "Scale particle density and ring complexity based on pattern_count in cortana.html",
+  "next_step": "Implement ring structures based on pattern count to distinguish focus from archive",
   "priority": "medium"
 }
