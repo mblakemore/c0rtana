@@ -45,6 +45,16 @@
             'default':      { color: 0x446688, speed: 0.002, turbulence: 0.3, shape: 'ambient' }
         };
 
+        const PHASE_PROFILES = {
+            'PERCEIVE':   { speedMult: 0.5, jitter: 2.0, pulseFreq: 0.5, opacityBase: 0.4, ringOsc: 1.0 },
+            'REFLECT':    { speedMult: 0.7, jitter: 0.2, pulseFreq: 0.2, opacityBase: 0.6, ringOsc: 0.3 },
+            'DECIDE':     { speedMult: 1.2, jitter: 0.8, pulseFreq: 2.0, opacityBase: 0.7, ringOsc: 2.5 },
+            'ACT':        { speedMult: 4.0, jitter: 1.5, pulseFreq: 1.0, opacityBase: 0.9, ringOsc: 1.5 },
+            'CONSOLIDATE': { speedMult: 0.4, jitter: 0.1, pulseFreq: 0.1, opacityBase: 0.5, ringOsc: 0.2 },
+            'PERSIST':     { speedMult: 0.3, jitter: 0.0, pulseFreq: 0.0, opacityBase: 0.5, ringOsc: 0.1 },
+            'IDLE':       { speedMult: 1.0, jitter: 0.5, pulseFreq: 0.5, opacityBase: 0.6, ringOsc: 1.0 }
+        };
+
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -126,12 +136,10 @@
             baseColor.lerp(targetColor, 0.3);
             
             particles.material.color = baseColor;
-            particles.material.opacity = 0.3 + (state.confidence * 0.7);
-
+            
             const sizeScale = 0.5 + (Math.log10(state.patterns + 1) * 0.2);
             particles.material.size = sizeScale;
 
-            // Implement Ring Structures based on pattern count to distinguish focus from archive
             updateRings(baseColor);
 
             lines.clear();
@@ -144,18 +152,17 @@
                     const p2 = new THREE.Vector3((Math.random()-0.5)*150, (Math.random()-0.5)*150, (Math.random()-0.5)*150);
                     linePos.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
                 });
-                lineGeom.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
+                lineGeom.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
                 const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ color: baseColor, opacity: 0.2, transparent: true }));
                 lines.add(line);
             }
         }
 
         function updateRings(color) {
-            // Clear existing rings if needed or just reuse
             rings.forEach(r => scene.remove(r));
             rings = [];
 
-            const ringCount = Math.min(Math.ceil(state.patterns / 20), 5); // Max 5 rings
+            const ringCount = Math.min(Math.ceil(state.patterns / 20), 5); 
             for (let i = 0; i < ringCount; i++) {
                 const radius = 20 + (i * 15);
                 const geometry = new THREE.TorusGeometry(radius, 0.2, 16, 100);
@@ -181,35 +188,36 @@
             requestAnimationFrame(animate);
             
             const resonance = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'];
-            let speed = resonance.speed;
+            const profile = PHASE_PROFILES[state.phase] || PHASE_PROFILES['IDLE'];
             
-            if (state.phase === 'ACT') speed *= 4;
-            if (state.phase === 'REFLECT') speed *= 0.7;
-            if (state.phase === 'PERCEIVE') speed *= 0.5;
-
+            let speed = resonance.speed * profile.speedMult;
+            
             const time = Date.now() * 0.001;
             const turb = resonance.turbulence || 0.3;
-
+            
+            // Dynamic Opacity Pulse based on phase pulse frequency
+            particles.material.opacity = profile.opacityBase + Math.sin(time * profile.pulseFreq * 2) * 0.2;
+            
             switch(resonance.shape) {
                 case 'geometric':
-                    particles.position.x = Math.sin(time) * turb * 10;
-                    particles.position.y = Math.cos(time) * turb * 10;
+                    particles.position.x = Math.sin(time) * turb * 10 * profile.jitter;
+                    particles.position.y = Math.cos(time) * turb * 10 * profile.jitter;
                     break;
                 case 'fluid':
-                    particles.position.x = Math.sin(time * 0.7) * turb * 20;
-                    particles.position.y = Math.sin(time * 1.1) * turb * 20;
+                    particles.position.x = Math.sin(time * 0.7) * turb * 20 * profile.jitter;
+                    particles.position.y = Math.sin(time * 1.1) * turb * 20 * profile.jitter;
                     break;
                 case 'oscillating':
-                    particles.scale.setScalar(1 + Math.sin(time * 2) * 0.1);
+                    particles.scale.setScalar(1 + Math.sin(time * 2) * 0.1 * profile.jitter);
                     break;
                 case 'expansive':
                     particles.rotation.z += speed * 2;
                     break;
                 default:
-                    particles.position.x = Math.sin(time) * turb * 5;
-                    particles.position.y = Math.cos(time * 0.8) * turb * 5;
+                    particles.position.x = Math.sin(time) * turb * 5 * profile.jitter;
+                    particles.position.y = Math.cos(time * 0.8) * turb * 5 * profile.jitter;
             }
-
+            
             particles.rotation.y += speed;
             particles.rotation.x += speed / 2;
             lines.rotation.y += speed;
@@ -217,9 +225,10 @@
             
             rings.forEach((ring, idx) => {
                 ring.rotation.z += speed * (1 + idx * 0.1);
-                ring.position.y = Math.sin(time + idx) * 2;
+                // Dynamic ring oscillation based on phase ringOsc factor
+                ring.position.y = Math.sin(time + idx) * 2 * profile.ringOsc;
             });
-
+            
             controls.update();
             renderer.render(scene, camera);
         }
