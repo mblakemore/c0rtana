@@ -1,0 +1,46 @@
+{
+  "filter_version": "1.0",
+  "semantic_triggers": {
+    "signal": [
+      {
+        "marker": "architectural_definition",
+        "patterns": ["defines a new", "structure of", "schema for", "implemented a system"],
+        "weight": 1.0,
+        "description": "High utility; establishes systemic rules."
+      },
+      {
+        "marker": "error_synthesis",
+        "patterns": ["gap identified", "recurring failure", "root cause", "discrepancy between"],
+        "weight": 0.8,
+        "description": "High utility; enables corrective action."
+      },
+      {
+        "marker": "strategic_pivot",
+        "patterns": ["shifting focus to", "proposed decision", "redefining the goal"],
+        "weight": 0.7,
+        "description": "Medium-high utility; marks a change in trajectory."
+      }
+    ],
+    "noise": [
+      {
+        "marker": "procedural_filler",
+        "patterns": ["I will now", "proceeding to", "starting the process of", "then I"],
+        "weight": -1.0,
+        "description": "Low utility; describes the act, not the outcome."
+      },
+      {
+        "marker": "redundant_status",
+        "patterns": ["current state is", "cycle continues", "still processing", "as previously noted"],
+        "weight": -0.7,
+        "description": "Low utility; repetitive state confirmation."
+      },
+      {
+        "marker": "trivial_observation",
+        "patterns": ["noted that", "observed a", "it appears that"],
+        "weight": -0.4,
+        "description": "Low utility; observation without synthesis."
+      }
+    ]
+  },
+  "scoring_logic": "Sum of weights. Positive = Signal (Keep), Negative = Noise (Discard/Compress)."
+}
