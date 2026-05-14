@@ -66,6 +66,7 @@
     <script>
         let scene, camera, renderer, particles, controls, clock;
         let currentMesh = null;
+        let voidAnchors = [];
         let state = { 
             phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, 
             category: 'default', focus: 'CSI Activation', obj: 'NONE' 
@@ -95,6 +96,7 @@
             controls.enableDamping = true;
 
             createParticles();
+            setupVoidAnchors();
             
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
@@ -129,6 +131,15 @@
             scene.add(particles);
         }
 
+        function setupVoidAnchors() {
+            // Initialize 3 fixed void anchors to represent potential cognitive gaps
+            voidAnchors = [
+                { pos: new THREE.Vector3(40, 20, -40), repulsion: 30, active: true },
+                { pos: new THREE.Vector3(-30, -40, 20), repulsion: 30, active: true },
+                { pos: new THREE.Vector3(10, 60, 10), repulsion: 30, active: true }
+            ];
+        }
+
         async function updateState() {
             try {
                 const stateRes = await fetch('../state/current-state.json');
@@ -151,11 +162,21 @@
                 document.getElementById('sync-fill').style.width = `${syncProgress * 100}%`;
 
                 updateHeatmapLuminosity();
-                await updateLandscape(); // New call for memory summary
+                await updateLandscape(); 
                 
                 if (prevCategory !== state.category) {
                     transitionMetaphor();
                 }
+
+                // Dynamic Void Adjustment: Voids collapse when confidence is high in ACT phase
+                voidAnchors.forEach(anchor => {
+                    if (state.phase === 'ACT' && state.confidence > 0.8) {
+                        anchor.repulsion *= 0.95; // The void "fills" as action succeeds
+                    } else if (state.phase === 'REFLECT') {
+                        anchor.repulsion = Math.min(40, anchor.repulsion * 1.05); // Voids expand during reflection/gap detection
+                    }
+                });
+
             } catch (e) { console.error("CSI State Sync Error:", e); }
         }
 
@@ -241,6 +262,28 @@
             TWEEN.update();
             const time = clock.getElapsedTime();
             particles.rotation.y += 0.001;
+
+            // Apply Void Forces to Particles
+            const posAttr = particles.geometry.attributes.position;
+            for (let i = 0; i < posAttr.count; i++) {
+                let px = posAttr.getX(i);
+                let py = posAttr.getY(i);
+                let pz = posAttr.getZ(i);
+
+                voidAnchors.forEach(anchor => {
+                    const dx = px - anchor.pos.x;
+                    const dy = py - anchor.pos.y;
+                    const dz = pz - anchor.pos.z;
+                    const distSq = dx*dx + dy*dy + dz*dz;
+                    if (distSq < 2500) { // Effect radius of 50
+                        const force = (anchor.repulsion / (distSq + 1)) * 0.1;
+                        posAttr.setX(i, px + dx * force);
+                        posAttr.setY(i, py + dy * force);
+                        posAttr.setZ(i, pz + dz * force);
+                    }
+                });
+            }
+            posAttr.needsUpdate = true;
             
             if (state.phase === 'ACT' || state.phase === 'DECIDE') {
                 particles.rotation.z += 0.01;
