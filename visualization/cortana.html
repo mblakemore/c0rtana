@@ -161,21 +161,48 @@
 
             updateRings(baseColor);
 
-            lines.clear();
-            if (state.associations.length > 0) {
-                const lineGeom = new THREE.BufferGeometry();
-                const linePos = [];
-                const sample = state.associations.slice(0, 50);
-                sample.forEach(() => {
-                    const p1 = new THREE.Vector3((Math.random()-0.5)*150, (Math.random()-0.5)*150, (Math.random()-0.5)*150);
-                    const p2 = new THREE.Vector3((Math.random()-0.5)*150, (Math.random()-0.5)*150, (Math.random()-0.5)*150);
-                    linePos.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
-                });
-                lineGeom.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
-                const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ color: baseColor, opacity: 0.2, transparent: true }));
-                lines.add(line);
-            }
-        }
+                                                                                                    
+                lines.clear();
+                if (state.associations.length > 0) {
+                    const lineGeom = new THREE.BufferGeometry();
+                    const linePos = [];
+                    
+                    state.associations.forEach(assoc => {
+                        // assoc is expected to be an object {source, target, strength...} based on associations.json
+                        const srcId = assoc.source;
+                        const tgtId = assoc.target;
+                        
+                        const rSrcIdx = hashString(srcId) % rings.length;
+                        const rTgtIdx = hashString(tgtId) % rings.length;
+                        
+                        // Only draw bridge if one of the endpoints is currently resonating
+                        const intensity = Math.max(resonanceQueue[rSrcIdx] || 0, resonanceQueue[rTgtIdx] || 0);
+                        
+                        if (intensity > 0.1) {
+                            // Calculate stable positions on the rings
+                            const angleSrc = (rSrcIdx * 45) * (Math.PI / 180);
+                            const radiusSrc = 20 + (rSrcIdx * 15);
+                            const x1 = Math.cos(angleSrc) * radiusSrc;
+                            const z1 = Math.sin(angleSrc) * radiusSrc;
+
+                            const angleTgt = (rTgtIdx * 45) * (Math.PI / 180);
+                            const radiusTgt = 20 + (rTgtIdx * 15);
+                            const x2 = Math.cos(angleTgt) * radiusTgt;
+                            const z2 = Math.sin(angleTgt) * radiusTgt;
+
+                            linePos.push(x1, 0, z1, x2, 0, z2);
+                        }
+                    });
+
+                    lineGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(linePos), 3));
+                    const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ 
+                        color: baseColor, 
+                        opacity: 0.6, 
+                        transparent: true,
+                        blending: THREE.AdditiveBlending 
+                    }));
+                    lines.add(line);
+                }
 
         function updateRings(color) {
             rings.forEach(r => scene.remove(r));
