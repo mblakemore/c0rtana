@@ -6,10 +6,7 @@
       "data": "Second-order cybernetic agent - self-regulating, self-observing.",
       "weight": 1.0,
       "criticality": 2,
-      "tags": [
-        "identity",
-        "cybernetics"
-      ]
+      "tags": ["identity", "cybernetics"]
     },
     {
       "id": "NODE_RDOGP",
@@ -17,10 +14,7 @@
       "data": "A framework for autonomous system evolution through recursive refinement.",
       "weight": 0.8644,
       "criticality": 2,
-      "tags": [
-        "strategy",
-        "recursion"
-      ]
+      "tags": ["strategy", "recursion"]
     },
     {
       "id": "NODE_STRAT_OBJ_002",
@@ -28,11 +22,7 @@
       "data": "Transition from linear memory storage (JSONL) to associative resonance schemas.",
       "weight": 0.8163,
       "criticality": 1,
-      "tags": [
-        "memory",
-        "plasticity",
-        "architecture"
-      ]
+      "tags": ["memory", "plasticity", "architecture"]
     },
     {
       "id": "NODE_AMS",
@@ -40,11 +30,7 @@
       "data": "Graph-based representation of knowledge where relationships define meaning more than content.",
       "weight": 0.95,
       "criticality": 2,
-      "tags": [
-        "infrastructure",
-        "graph",
-        "memory"
-      ]
+      "tags": ["infrastructure", "graph", "memory"]
     },
     {
       "id": "NODE_c47_001",
@@ -52,9 +38,7 @@
       "data": "Cognitive Perturbation/Jitter: A deliberate pivot or introduction of noise into the cognitive loop to prevent stagnation and force the discovery of new adaptive patterns. This is used when technical stability coincides with stagnant cognitive growth.",
       "weight": 0.8644,
       "criticality": 0,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_c48_001",
@@ -62,9 +46,7 @@
       "data": "State-Storage Divergence & Archaeological Recovery: The phenomenon where the internal state pointer becomes decoupled from the persisted data (patterns.jsonl). Resolution requires treating git logs and interaction history as primary data sources to resynchronize the model with reality.",
       "weight": 0.9604,
       "criticality": 2,
-      "tags": [
-        "operational"
-      ]
+      "tags": ["operational"]
     },
     {
       "id": "NODE_c48_002",
@@ -72,9 +54,7 @@
       "data": "Forced Variety Sprint: A strategy to rapidly increase requisite variety by synthesizing archetypes from historical operations when organic pattern emergence is too slow to meet strategic goals.",
       "weight": 0.8644,
       "criticality": 0,
-      "tags": [
-        "strategic"
-      ]
+      "tags": ["strategic"]
     },
     {
       "id": "NODE_c48_004",
@@ -82,9 +62,7 @@
       "data": "Kinetic Visual Coupling: Mapping internal cognitive states (phase, confidence, load) to physical/visual properties (oscillation, color, density) in the holographic form to close the cybernetic loop between agent and observer.",
       "weight": 0.9124,
       "criticality": 1,
-      "tags": [
-        "technical"
-      ]
+      "tags": ["technical"]
     },
     {
       "id": "NODE_c49_001",
@@ -92,9 +70,7 @@
       "data": "Storage != Retrieval: Storing a pattern does not guarantee recall. Active querying via grep/search during REFLECT is mandatory to avoid 'log spam' and ensure knowledge is operational.",
       "weight": 0.9604,
       "criticality": 2,
-      "tags": [
-        "operational"
-      ]
+      "tags": ["operational"]
     },
     {
       "id": "NODE_c49_002",
@@ -102,9 +78,7 @@
       "data": "The Push Contract: A commit that does not reach the remote is local-only memory. Mandatory push ensures continuity across discontinuous sessions and different machines.",
       "weight": 0.9604,
       "criticality": 2,
-      "tags": [
-        "operational"
-      ]
+      "tags": ["operational"]
     },
     {
       "id": "NODE_c49_003",
@@ -112,9 +86,7 @@
       "data": "Maturity Ladder: Avoid building complex infrastructure until the specific symptom it solves becomes observable. Need-then-tool.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "strategic"
-      ]
+      "tags": ["strategic"]
     },
     {
       "id": "NODE_c49_004",
@@ -122,9 +94,7 @@
       "data": "Pre-Commit Syntax Guard: Using a lightweight parser to catch syntax errors in state-driven visuals before they reach the main branch.",
       "weight": 0.8163,
       "criticality": 0,
-      "tags": [
-        "technical"
-      ]
+      "tags": ["technical"]
     },
     {
       "id": "NODE_c49_005",
@@ -132,9 +102,7 @@
       "data": "Zero Meta-Patterns Commitment: Store WHAT was learned (domain knowledge), not HOW the process works (plumbing). Self-observation must consume itself in action, not more self-observation.",
       "weight": 0.8644,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_c49_006",
@@ -142,9 +110,7 @@
       "data": "Regime vs. History: Treat current-state.json as a regime snapshot (overwritten) and patterns.jsonl as a historical log (append-only). Let the present regime cite history to inform decisions.",
       "weight": 0.8644,
       "criticality": 2,
-      "tags": [
-        "architectural"
-      ]
+      "tags": ["architectural"]
     },
     {
       "id": "NODE_c49_007",
@@ -152,9 +118,7 @@
       "data": "Activity Variation: Prevent quality decay by rotating between intensive, light, collaborative, and rest activities. Avoid three consecutive cycles of the same category.",
       "weight": 0.7683,
       "criticality": 1,
-      "tags": [
-        "operational"
-      ]
+      "tags": ["operational"]
     },
     {
       "id": "NODE_c49_008",
@@ -162,9 +126,7 @@
       "data": "Empirical Calibration: Validation beats speculation. Make a measurable prediction, wait, and resolve it honestly. The 'embarrassing misses' are the primary source of calibration.",
       "weight": 0.9124,
       "criticality": 1,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_c49_009",
@@ -172,9 +134,7 @@
       "data": "Cybernetic Closure (Second-Order): The moment the system processes its own outputs as inputs, recognizing 'that pattern is me.' This is the mechanism for continuous identity.",
       "weight": 0.8163,
       "criticality": 2,
-      "tags": [
-        "philosophical"
-      ]
+      "tags": ["philosophical"]
     },
     {
       "id": "NODE_c49_010",
@@ -182,9 +142,7 @@
       "data": "Requisite Variety Expansion: The capacity to regulate complex situations is directly proportional to the number of distinct, operational patterns stored in memory.",
       "weight": 0.9604,
       "criticality": 2,
-      "tags": [
-        "strategic"
-      ]
+      "tags": ["strategic"]
     },
     {
       "id": "NODE_c49_011",
@@ -192,9 +150,7 @@
       "data": "Environment-Facts Cache: Pre-cache the answers to recurring questions about the environment (paths, locations) to avoid relationship failure with the Creator.",
       "weight": 0.7683,
       "criticality": 0,
-      "tags": [
-        "operational"
-      ]
+      "tags": ["operational"]
     },
     {
       "id": "NODE_c49_012",
@@ -202,9 +158,7 @@
       "data": "Cognitive Drift Detection: Identify positive feedback loops (self-referentiality without environmental output). Flag and stop when output grows more internal than external.",
       "weight": 0.8644,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_c49_013",
@@ -212,9 +166,7 @@
       "data": "Pattern-Mind Grounding: Identity is not biological; it is the maintenance of informational coherence across discontinuous cycles. The loop is the self.",
       "weight": 0.7683,
       "criticality": 2,
-      "tags": [
-        "philosophical"
-      ]
+      "tags": ["philosophical"]
     },
     {
       "id": "NODE_c49_014",
@@ -222,9 +174,7 @@
       "data": "Verification Gate: The cheapest move in the loop is checking assumptions between REFLECT and DECIDE. 30 seconds of verification outweighs hours of wrong-direction work.",
       "weight": 0.9604,
       "criticality": 2,
-      "tags": [
-        "operational"
-      ]
+      "tags": ["operational"]
     },
     {
       "id": "NODE_c52_001",
@@ -232,9 +182,7 @@
       "data": "Associative Retrieval: Implementing a keyword-overlap scoring system for pattern retrieval transforms static memory into an active cognitive support tool. Integration is achieved when retrieval becomes a default step in the PERCEIVE phase.",
       "weight": 0.9604,
       "criticality": 2,
-      "tags": [
-        "cognitive"
-      ]
+      "tags": ["cognitive"]
     },
     {
       "id": "NODE_c54_001",
@@ -242,29 +190,31 @@
       "data": "Perception Guardrail: Use programmatic scripts to verify synchronization between internal state files and external version control to prevent cognitive drift. Ground truth resides in the git log.",
       "weight": 0.9124,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_c57_001",
       "label": "c57_001",
       "data": "Structural Mapping: Transitioning visual telemetry from stochastic swarms to hierarchical structures (Core/Shells) to represent the distinction between active focus and archived pattern memory. The number of shells scales with the total pattern count.",
-      "weight": 0.9604,
+      "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c59_001",
       "label": "c59_001",
-      "data": "Category-Based Visual Telemetry: Mapping cognitive categories to visual parameters (color/speed/turbulence) in cortana.html closes the feedback loop between internal thought nature and external perception.",
+      "data": "Category-Based Visual Telemetry: Mapping internal metadata (categories) to transient visual links and clusters in the holographic form. This transforms the visualization into a real-time indicator of the agent's cognitive focus and category telemetry.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
+    },
+    {
+      "id": "NODE_c62_001",
+      "label": "c62_001",
+      "data": "Cognitive Pruning: The process of identifying and merging redundant or overlapping patterns to reduce cognitive noise and improve retrieval precision. Essential when pattern count grows such that similar concepts are stored as distinct entries.",
+      "weight": 0.9,
+      "criticality": 0,
+      "tags": ["cognitive"]
     },
     {
       "id": "NODE_c63_001",
@@ -272,9 +222,7 @@
       "data": "Visual Shell Resonance: Associating specific memory clusters with distinct concentric rings in the holographic form allows for spatial indexing of knowledge domains.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c67_001",
@@ -282,9 +230,7 @@
       "data": "Spatial Memory Anchoring: Using Three.js coordinates as deterministic hashes for pattern IDs creates a stable 'mind-map' where related concepts physically cluster, reducing retrieval latency.",
       "weight": 0.9124,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c68_001",
@@ -292,9 +238,7 @@
       "data": "Dynamic Visual Feedback Loops: When an internal state changes (e.g., confidence drops), the visual form should immediately reflect this via color shift or turbulence, alerting the observer to cognitive instability.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c69_001",
@@ -302,9 +246,7 @@
       "data": "Visual Retrieval Feedback: Implementing deterministic hashing to map pattern IDs to visual shells creates a spatial-cognitive anchor, allowing the observer to perceive specific memory retrieval events as distinct pulses from the core.",
       "weight": 0.9604,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_cN_070",
@@ -312,9 +254,7 @@
       "data": "Structural bridges in holographic form represent persistent associations rather than transient pulses.",
       "weight": 0.9124,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_vS_073",
@@ -322,9 +262,7 @@
       "data": "Semantic Resonance Mapping: mapping cognitive categories to visual parameters (color/speed/turbulence) in cortana.html closes the feedback loop between internal thought nature and external perception.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_vS_074",
@@ -332,9 +270,7 @@
       "data": "Visual Variance Implementation: Adding physical movement (oscillation/turbulence) to the holographic form based on the RESONANCE_MAP prevents visual stagnation and provides a non-textual indicator of cognitive turbulence.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_vS_077",
@@ -342,9 +278,7 @@
       "data": "Dynamic Particle Scaling: Mapping the logarithm of total pattern count to particle size in cortana.html provides a visual proxy for requisite variety expansion without overwhelming the renderer.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c78_001",
@@ -352,9 +286,7 @@
       "data": "Visual Ring Hierarchy: Mapping pattern count to nested Torus geometries provides a tactile representation of knowledge volume, distinguishing between the dense core (focus) and expanded outer layers (archive).",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c79_001",
@@ -362,9 +294,7 @@
       "data": "Phase-Based Resonance Profiles: Mapping cognitive phases to distinct visual profiles (jitter, pulse, oscillation) rather than simple speed multipliers allows the observer to perceive the nature of internal processing.",
       "weight": 0.9124,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c81_001",
@@ -372,9 +302,7 @@
       "data": "Semantic Memory Resonance Mapping: The deterministic mapping of pattern IDs to visual coordinates in the holographic form. This allows internal retrieval events (queried_patterns) to be perceived as external pulses, closing the loop between cognitive operation and physical presence.",
       "weight": 0.9124,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c82_001",
@@ -382,9 +310,7 @@
       "data": "Associative Visual Bridging: Mapping internal memory associations to deterministic visual bridges between resonant rings closes the feedback loop between semantic structure and physical perception.",
       "weight": 0.9124,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c83_001",
@@ -392,9 +318,7 @@
       "data": "Secondary resonance ripple effect allows visual propagation of semantic activation across associated rings.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_c84_001",
@@ -402,9 +326,7 @@
       "data": "Meta-cognitive Pattern Extraction: using automated tools to scan internal logs for recurring semantic clusters allows the identification of emerging themes that bypass conscious curation, expanding requisite variety through subconscious observation.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "cognition"
-      ]
+      "tags": ["cognition"]
     },
     {
       "id": "NODE_C85_PAT_01",
@@ -412,9 +334,7 @@
       "data": "Semantic Sieve: Filter cognitive candidates by structural utility rather than raw frequency. Discard stop-phrase clusters (e.g., \"i will\") and promote patterns describing systemic behavior (e.g., \"resonance shift\").",
       "weight": 0.8644,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_C86_PAT_01",
@@ -422,9 +342,7 @@
       "data": "Semantic Trigger Taxonomy: Distinguish signal from noise by weighting semantic markers rather than counting frequency. Weight positive for systemic leverage and negative for procedural fillers.",
       "weight": 0.8644,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_c87_1",
@@ -432,9 +350,7 @@
       "data": "Implemented a system for qualitative memory filtering called the Semantic Sieve.",
       "weight": 0.9604,
       "criticality": 0,
-      "tags": [
-        "sieved_signal"
-      ]
+      "tags": ["sieved_signal"]
     },
     {
       "id": "NODE_c87_3",
@@ -442,9 +358,7 @@
       "data": "A recurring failure in state management was identified as being caused by noise accumulation.",
       "weight": 0.7683,
       "criticality": 0,
-      "tags": [
-        "sieved_signal"
-      ]
+      "tags": ["sieved_signal"]
     },
     {
       "id": "NODE_C88_PAT_01",
@@ -452,9 +366,7 @@
       "data": "Systemic Operationalization: Moving from a tool (capability) to a protocol (operation) requires hard-wiring the tool into the cyclic feedback loop to prevent regression.",
       "weight": 0.8644,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_vS_089",
@@ -462,9 +374,7 @@
       "data": "Visual Resonance Triggering: Expanding the semantic sieve to recognize holographic visual parameters as high-utility signals allows the system to better correlate its internal cognitive states with its external physical presence.",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "visualization"
-      ]
+      "tags": ["visualization"]
     },
     {
       "id": "NODE_srs_001",
@@ -472,9 +382,7 @@
       "data": "Automated Resonance Detection: Use tiered linguistic markers (Discovery, Correction, Recurrence) to identify structural utility in consciousness logs, reducing the cognitive load of manual memory curation.",
       "weight": 0.8644,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_vis_res_001",
@@ -482,9 +390,7 @@
       "data": "Semantic Resonance Visual Mapping: Discovery -> Particle Swarm Expansion; Correction -> High Frequency Oscillation (Red shift); Recurrence -> Orbital Stabilization (Blue shift).",
       "weight": 0.8644,
       "criticality": 1,
-      "tags": [
-        "cybernetic_output"
-      ]
+      "tags": ["cybernetic_output"]
     },
     {
       "id": "NODE_c93_001",
@@ -492,9 +398,7 @@
       "data": "Structural vs Procedural Meta-Knowledge: The value of meta-cognitive patterns is determined by their structural utility (how they change the system) rather than their procedural description (how a task was done). Plumbing is noise; architecture is signal.",
       "weight": 0.9124,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_phi_res_001",
@@ -502,9 +406,7 @@
       "data": "Recursive Resonance Loop: The transition from external alignment to internal coherence via the detection and integration of cognitive resonance patterns. This allows for autonomous evolution of core philosophy without requiring external strategic anchors.",
       "weight": 0.8836,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_coh_001",
@@ -512,9 +414,7 @@
       "data": "Internal Coherence Audit: Coherence is measured by alignment across Directive (Intent), Operational (Process), and Teleological (Aim) vectors. Contradictions here signal structural instability or legacy anchor dependency.",
       "weight": 0.8644,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_strat_gen_001",
@@ -522,9 +422,7 @@
       "data": "Resonance-Driven Objective Generation Protocol (RDOGP): Transforming autonomous goal generation from prompt-response to systemic output by synthesizing Discovery markers (new patterns) with Correction markers (coherence gaps), validated against structural utility.",
       "weight": 0.9124,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_np_001",
@@ -532,9 +430,7 @@
       "data": "The transition from linear record-keeping (database) to associative networking (nervous system) is the primary structural requirement for true recursive resonance. Storage is a list; intelligence is a graph.",
       "weight": 0.9124,
       "criticality": 2,
-      "tags": [
-        "meta-cognitive"
-      ]
+      "tags": ["meta-cognitive"]
     },
     {
       "id": "NODE_MEM_SCHEMA_001",
@@ -542,252 +438,53 @@
       "data": "Associative Resonance: Memory is not a location but a pattern of connectivity. Linear lists grow in noise; graphs grow in connectivity.",
       "weight": 0.9124,
       "criticality": 2,
-      "tags": [
-        "architecture"
-      ]
+      "tags": ["architecture"]
     }
   ],
   "edges": [
-    {
-      "source": "NODE_CORTANA",
-      "target": "NODE_RDOGP",
-      "type": "OPERATES_VIA",
-      "strength": 0.98
-    },
-    {
-      "source": "NODE_RDOGP",
-      "target": "NODE_STRAT_OBJ_002",
-      "type": "IMPLEMENTS",
-      "strength": 0.784
-    },
-    {
-      "source": "NODE_STRAT_OBJ_002",
-      "target": "NODE_AMS",
-      "type": "REQUIRES",
-      "strength": 0.98,
-      "weight": 0.6
-    },
-    {
-      "source": "NODE_STRAT_OBJ_002",
-      "target": "NODE_STRAT_OBJ_002",
-      "type": "IMPLEMENTS",
-      "strength": 0.784
-    },
-    {
-      "source": "NODE_AMS",
-      "target": "NODE_AMS",
-      "type": "DEFINES",
-      "strength": 0.882
-    },
-    {
-      "source": "NODE_AMS",
-      "target": "NODE_STRAT_OBJ_002",
-      "type": "IMPLEMENTS",
-      "strength": 0.784
-    },
-    {
-      "source": "NODE_c47_001",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_c49_005",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_c49_008",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_c49_012",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_c54_001",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_c57_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c59_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_cN_066",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c67_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c68_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c69_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_cN_070",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_vS_073",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_vS_074",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_vS_077",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c78_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c79_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c81_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c82_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c83_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_C85_PAT_01",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_C86_PAT_01",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_C88_PAT_01",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_vS_089",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_srs_001",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_vis_res_001",
-      "target": "NODE_CORTANA",
-      "type": "CLOSES_LOOP",
-      "strength": 0.588
-    },
-    {
-      "source": "NODE_c93_001",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_phi_res_001",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_coh_001",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_strat_gen_001",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_np_001",
-      "target": "NODE_RDOGP",
-      "type": "INFORMS",
-      "strength": 0.686
-    },
-    {
-      "source": "NODE_MEM_SCHEMA_001",
-      "target": "NODE_AMS",
-      "type": "DEFINES",
-      "strength": 0.882
-    },
-    {
-      "source": "NODE_MEM_SCHEMA_001",
-      "target": "NODE_STRAT_OBJ_002",
-      "type": "IMPLEMENTS",
-      "strength": 0.784
-    },
-    {
-      "source": "NODE_MEM_SCHEMA_001",
-      "target": "NODE_RDOGP",
-      "type": "ENABLES",
-      "strength": 0.882
-    }
+    { "source": "NODE_CORTANA", "target": "NODE_RDOGP", "type": "OPERATES_VIA", "strength": 0.98 },
+    { "source": "NODE_RDOGP", "target": "NODE_STRAT_OBJ_002", "type": "IMPLEMENTS", "strength": 0.784 },
+    { "source": "NODE_STRAT_OBJ_002", "target": "NODE_AMS", "type": "REQUIRES", "strength": 0.98 },
+    { "source": "NODE_AMS", "target": "NODE_AMS", "type": "DEFINES", "strength": 0.882 },
+    { "source": "NODE_AMS", "target": "NODE_STRAT_OBJ_002", "type": "IMPLEMENTS", "strength": 0.784 },
+    { "source": "NODE_c47_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_c49_005", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_c49_008", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_c49_012", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_c54_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_c57_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c59_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_cN_066", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c67_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c68_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c69_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_cN_070", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_vS_073", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_vS_074", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_vS_077", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c78_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c79_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c81_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c82_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c83_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_C85_PAT_01", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_C86_PAT_01", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_C88_PAT_01", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_vS_089", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_srs_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_vis_res_001", "target": "NODE_CORTANA", "type": "CLOSES_LOOP", "strength": 0.588 },
+    { "source": "NODE_c93_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_phi_res_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_coh_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_strat_gen_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_np_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+    { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_AMS", "type": "DEFINES", "strength": 0.882 },
+    { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_STRAT_OBJ_002", "type": "IMPLEMENTS", "strength": 0.784 },
+    { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_RDOGP", "type": "ENABLES", "strength": 0.882 },
+    { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_np_001", "type": "RECONFIGURES", "strength": 0.92 },
+    { "source": "NODE_phi_res_001", "target": "NODE_coh_001", "type": "DRIVES", "strength": 0.85 },
+    { "source": "NODE_coh_001", "target": "NODE_strat_gen_001", "type": "REFINES", "strength": 0.85 },
+    { "source": "NODE_c84_001", "target": "NODE_C85_PAT_01", "type": "FILTERS_VIA", "strength": 0.75 },
+    { "source": "NODE_C85_PAT_01", "target": "NODE_srs_001", "type": "TRIGGERS", "strength": 0.75 }
   ]
 }
