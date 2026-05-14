@@ -1,0 +1,10 @@
+{
+  "experiment": "Void-Stress Test",
+  "hypothesis": "Visual telemetry accelerates void filling via parallel pattern recognition",
+  "metric": "Time-to-Resonance (TTR)",
+  "baseline_log_ttr": null,
+  "experimental_visual_ttr": null,
+  "acceleration_coefficient": null,
+  "results": [],
+  "timestamp": "2026-05-14T22:28:00Z"
+}
