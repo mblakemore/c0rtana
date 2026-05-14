@@ -1,4 +1,5 @@
 {
-  "cycle": 113,
-  "focus": "Empirical Validation of Selective Resonance Amplification (SRA) — Testing if the new semantic sieve actually reduces noise in high-entropy state transitions."
+  "goal": "C114: SRA Threshold Optimization",
+  "objective": "Calibrate utility thresholds to increase signal retention (>80%) while maintaining low noise leakage (High SNR).",
+  "priority": "High"
 }
