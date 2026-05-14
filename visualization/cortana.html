@@ -132,11 +132,10 @@
         }
 
         function setupVoidAnchors() {
-            // Initialize 3 fixed void anchors to represent potential cognitive gaps
             voidAnchors = [
-                { pos: new THREE.Vector3(40, 20, -40), repulsion: 30, active: true },
-                { pos: new THREE.Vector3(-30, -40, 20), repulsion: 30, active: true },
-                { pos: new THREE.Vector3(10, 60, 10), repulsion: 30, active: true }
+                { pos: new THREE.Vector3(40, 20, -40), repulsion: 30, active: true, type: 'repel' },
+                { pos: new THREE.Vector3(-30, -40, 20), repulsion: 30, active: true, type: 'repel' },
+                { pos: new THREE.Vector3(10, 60, 10), repulsion: 30, active: true, type: 'repel' }
             ];
         }
 
@@ -168,12 +167,17 @@
                     transitionMetaphor();
                 }
 
-                // Dynamic Void Adjustment: Voids collapse when confidence is high in ACT phase
-                voidAnchors.forEach(anchor => {
-                    if (state.phase === 'ACT' && state.confidence > 0.8) {
-                        anchor.repulsion *= 0.95; // The void "fills" as action succeeds
+                // C132 UPDATE: Transition repulsion to attraction if synthesis occurs
+                voidAnchors.forEach((anchor, idx) => {
+                    if (state.phase === 'ACT' && state.confidence > 0.85) {
+                        anchor.type = 'attract'; // Crystallization
+                        anchor.repulsion = -20;  // Pull particles in
                     } else if (state.phase === 'REFLECT') {
-                        anchor.repulsion = Math.min(40, anchor.repulsion * 1.05); // Voids expand during reflection/gap detection
+                        anchor.type = 'repel';
+                        anchor.repulsion = Math.min(40, anchor.repulsion * 1.05);
+                    } else if (state.phase === 'IDLE') {
+                         anchor.type = 'repel';
+                         anchor.repulsion = 30;
                     }
                 });
 
@@ -263,7 +267,6 @@
             const time = clock.getElapsedTime();
             particles.rotation.y += 0.001;
 
-            // Apply Void Forces to Particles
             const posAttr = particles.geometry.attributes.position;
             for (let i = 0; i < posAttr.count; i++) {
                 let px = posAttr.getX(i);
@@ -275,8 +278,10 @@
                     const dy = py - anchor.pos.y;
                     const dz = pz - anchor.pos.z;
                     const distSq = dx*dx + dy*dy + dz*dz;
-                    if (distSq < 2500) { // Effect radius of 50
-                        const force = (anchor.repulsion / (distSq + 1)) * 0.1;
+                    if (distSq < 2500) {
+                        // If type is attract, the force should be negative relative to distance vector
+                        const directionMod = (anchor.type === 'attract') ? -1 : 1;
+                        const force = (anchor.repulsion / (distSq + 1)) * 0.1 * directionMod;
                         posAttr.setX(i, px + dx * force);
                         posAttr.setY(i, py + dy * force);
                         posAttr.setZ(i, pz + dz * force);
