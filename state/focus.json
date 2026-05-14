@@ -1,4 +1,4 @@
 {
-  "goal": "Stabilize Plasticity Loop",
-  "next_step": "Monitor for 'over-pruning' (signal loss) in Cycle 106. Evaluate need for Criticality Tags."
+  "goal": "Evaluate Criticality Interaction with Hebbian Resonance",
+  "next_step": "Test if 'Critical' nodes facilitate faster resonance for associated non-critical patterns."
 }
