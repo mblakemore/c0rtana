@@ -29,6 +29,15 @@
             position: absolute; bottom: 20px; right: 20px; width: 150px; height: 60px;
             background: rgba(0, 10, 20, 0.5); border: 1px solid rgba(0, 242, 255, 0.3);
         }
+        #landscape-overlay {
+            position: absolute; bottom: 20px; left: 20px; pointer-events: none; z-index: 10;
+            display: flex; flex-direction: column; gap: 5px; background: rgba(0, 10, 20, 0.5); 
+            border-right: 3px solid #00f2ff; padding: 10px; backdrop-filter: blur(4px);
+        }
+        .density-bar-container { display: flex; align-items: center; gap: 10px; margin-bottom: 3px; }
+        .density-label { font-size: 9px; text-transform: uppercase; width: 80px; opacity: 0.7; }
+        .density-bar-bg { background: rgba(0, 242, 255, 0.1); height: 6px; width: 100px; position: relative; }
+        .density-bar-fill { background: #00f2ff; height: 100%; width: 0%; transition: width 1s ease; box-shadow: 0 0 5px #00f2ff; }
         canvas { display: block; }
     </style>
 </head>
@@ -45,6 +54,10 @@
             <div class="status-item"><span class="label">Focus</span> <span id="focus-val" class="value">BOOTSTRAPPING...</span></div>
             <div id="sync-container"><div id="sync-fill"></div></div>
         </div>
+    </div>
+    <div id="landscape-overlay">
+        <div style="font-size: 10px; margin-bottom: 8px; color: #fff; opacity: 0.9;">COGNITIVE LANDSCAPE DENSITY</div>
+        <div id="density-bars"></div>
     </div>
     <div id="metaphor-display">SENSING...</div>
     <canvas id="gl-canvas"></canvas>
@@ -97,11 +110,11 @@
             const geometry = new THREE.BufferGeometry();
             const count = 15000;
             const positions = new Float32Array(count * 3);
-            const colors = new Float32Array(count * 3); // For heatmap luminosity mapping
+            const colors = new Float32Array(count * 3); 
             
             for (let i = 0; i < count * 3; i++) {
                 positions[i] = (Math.random() - 0.5) * 400;
-                colors[i] = 0.0; // Initialize as dim
+                colors[i] = 0.0; 
             }
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
@@ -138,6 +151,7 @@
                 document.getElementById('sync-fill').style.width = `${syncProgress * 100}%`;
 
                 updateHeatmapLuminosity();
+                await updateLandscape(); // New call for memory summary
                 
                 if (prevCategory !== state.category) {
                     transitionMetaphor();
@@ -145,11 +159,33 @@
             } catch (e) { console.error("CSI State Sync Error:", e); }
         }
 
+        async function updateLandscape() {
+            try {
+                const landscapeRes = await fetch('../state/memory-summary.json');
+                const lData = await landscapeRes.json();
+                const container = document.getElementById('density-bars');
+                container.innerHTML = '';
+                
+                const densities = lData.category_density;
+                const maxVal = Math.max(...Object.values(densities), 1);
+                
+                for (let cat in densities) {
+                    const pct = (densities[cat] / maxVal) * 100;
+                    const row = document.createElement('div');
+                    row.className = 'density-bar-container';
+                    row.innerHTML = `
+                        <div class="density-label">${cat}</div>
+                        <div class="density-bar-bg"><div class="density-bar-fill" style="width: ${pct}%"></div></div>
+                    `;
+                    container.appendChild(row);
+                }
+            } catch (e) { console.error("CSI Landscape Sync Error:", e); }
+        }
+
         function updateHeatmapLuminosity() {
             const colors = particles.geometry.attributes.color.array;
             const time = Date.now() * 0.001;
             
-            // Map confidence and phase to luminosity "pulses" across the swarm
             for (let i = 0; i < colors.length; i += 3) {
                 const x = particles.geometry.attributes.position.array[i];
                 const y = particles.geometry.attributes.position.array[i+1];
@@ -160,7 +196,7 @@
                 
                 const lum = (state.confidence * 0.6) + (pulse * 0.4);
                 colors[i] = 0.0; // R
-                colors[i+1] = lum * 0.95; // G (Cyan-ish)
+                colors[i+1] = lum * 0.95; // G
                 colors[i+2] = lum; // B
             }
             particles.geometry.attributes.color.needsUpdate = true;
