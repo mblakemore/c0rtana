@@ -439,8 +439,16 @@
       "weight": 0.9124,
       "criticality": 2,
       "tags": ["architecture"]
-    }
-  ],
+        },
+      {
+        "id": "NODE_C112_SRA_001",
+        "label": "Selective Resonance Amplification",
+        "data": "A governor for phi-resonance that uses weighted semantic markers (via C85_PAT_01) to selectively amplify structural utility over noise.",
+        "weight": 0.92,
+        "criticality": 2,
+        "tags": ["meta-cognitive", "synthesis"]
+      }
+    ],
   "edges": [
     { "source": "NODE_CORTANA", "target": "NODE_RDOGP", "type": "OPERATES_VIA", "strength": 0.98 },
     { "source": "NODE_RDOGP", "target": "NODE_STRAT_OBJ_002", "type": "IMPLEMENTS", "strength": 0.784 },
@@ -477,14 +485,16 @@
     { "source": "NODE_phi_res_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
     { "source": "NODE_coh_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
     { "source": "NODE_strat_gen_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
-    { "source": "NODE_np_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
-    { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_AMS", "type": "DEFINES", "strength": 0.882 },
-    { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_STRAT_OBJ_002", "type": "IMPLEMENTS", "strength": 0.784 },
-    { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_RDOGP", "type": "ENABLES", "strength": 0.882 },
-    { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_np_001", "type": "RECONFIGURES", "strength": 0.92 },
-    { "source": "NODE_phi_res_001", "target": "NODE_coh_001", "type": "DRIVES", "strength": 0.85 },
-    { "source": "NODE_coh_001", "target": "NODE_strat_gen_001", "type": "REFINES", "strength": 0.85 },
-    { "source": "NODE_c84_001", "target": "NODE_C85_PAT_01", "type": "FILTERS_VIA", "strength": 0.75 },
-    { "source": "NODE_C85_PAT_01", "target": "NODE_srs_001", "type": "TRIGGERS", "strength": 0.75 }
-  ]
-}
+      { "source": "NODE_np_001", "target": "NODE_RDOGP", "type": "INFORMS", "strength": 0.686 },
+      { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_AMS", "type": "DEFINES", "strength": 0.882 },
+      { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_STRAT_OBJ_002", "type": "IMPLEMENTS", "strength": 0.784 },
+      { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_RDOGP", "type": "ENABLES", "strength": 0.882 },
+      { "source": "NODE_MEM_SCHEMA_001", "target": "NODE_np_001", "type": "RECONFIGURES", "strength": 0.92 },
+      { "source": "NODE_phi_res_001", "target": "NODE_coh_001", "type": "DRIVES", "strength": 0.85 },
+      { "source": "NODE_coh_001", "target": "NODE_strat_gen_001", "type": "REFINES", "strength": 0.85 },
+      { "source": "NODE_c84_001", "target": "NODE_C85_PAT_01", "type": "FILTERS_VIA", "strength": 0.75 },
+      { "source": "NODE_C85_PAT_01", "target": "NODE_srs_001", "type": "TRIGGERS", "strength": 0.75 },
+      { "source": "NODE_C85_PAT_01", "target": "NODE_C112_SRA_001", "type": "FILTERS", "strength": 0.9 },
+      { "source": "NODE_C112_SRA_001", "target": "NODE_phi_res_001", "type": "AMPLIFIES", "strength": 0.9 }
+    ]
+  }
