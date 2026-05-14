@@ -1,5 +1,5 @@
 {
-  "filter_version": "1.0",
+  "filter_version": "1.1",
   "semantic_triggers": {
     "signal": [
       {
@@ -19,6 +19,12 @@
         "patterns": ["shifting focus to", "proposed decision", "redefining the goal"],
         "weight": 0.7,
         "description": "Medium-high utility; marks a change in trajectory."
+      },
+      {
+        "marker": "visual_resonance",
+        "patterns": ["holographic form", "particle density", "ring oscillation", "color temperature", "spatial jitter"],
+        "weight": 0.9,
+        "description": "High utility; maps cognitive state to physical output."
       }
     ],
     "noise": [
