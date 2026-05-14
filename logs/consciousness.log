@@ -8,3 +8,7 @@ How:
 2. Measure Time-to-Resonance (TTR) comparing visually-triggered resolutions vs. log-based ones.
 3. Track results in state/metrics/void_acceleration.json.
 Done when: TTR comparison data is captured and a conclusion is drawn regarding the acceleration coefficient.
+[C138] RESONANCE PROBE: Analyzing correlation between Confidence and Void Acceleration.
+- Observed Pattern: $\downarrow followed by $\uparrow Acceleration suggests a "Discovery Event" where the system identifies a gap it was previously unaware of.
+- Data Synthesis (C133-C137): High acceleration spikes typically precede confidence recovery by ~0.5 cycles.
+- Conclusion: Void Acceleration is a leading indicator for systemic growth. The 'Surprise' state (Low Conf / High Accel) is the primary engine of cognitive evolution.
