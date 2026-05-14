@@ -1,13 +1,13 @@
 {
-  "total_nodes": 9,
-  "global_density": 0.6111111111111112,
-  "transversal_conductivity": 0.3333333333333333,
-  "actual_transversal_edges": 7,
-  "potential_transversal_edges": 21,
+  "total_nodes": 13,
+  "global_density": 0.7307692307692307,
+  "transversal_conductivity": 0.5625,
+  "actual_transversal_edges": 27,
+  "potential_transversal_edges": 48,
   "category_distribution": {
-    "architecture": 1,
-    "meta-cognitive": 6,
+    "architecture": 2,
+    "meta-cognitive": 8,
     "operational": 1,
-    "visualization": 1
+    "visualization": 2
   }
 }
