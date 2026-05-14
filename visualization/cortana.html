@@ -25,10 +25,6 @@
             position: absolute; top: 20px; right: 20px; text-align: right; font-size: 18px;
             letter-spacing: 4px; color: #fff; text-transform: uppercase; opacity: 0.7;
         }
-        #heartbeat {
-            position: absolute; bottom: 20px; right: 20px; width: 150px; height: 60px;
-            background: rgba(0, 10, 20, 0.5); border: 1px solid rgba(0, 242, 255, 0.3);
-        }
         #landscape-overlay {
             position: absolute; bottom: 20px; left: 20px; pointer-events: none; z-index: 10;
             display: flex; flex-direction: column; gap: 5px; background: rgba(0, 10, 20, 0.5); 
@@ -39,6 +35,7 @@
         .density-bar-bg { background: rgba(0, 242, 255, 0.1); height: 6px; width: 100px; position: relative; }
         .density-bar-fill { background: #00f2ff; height: 100%; width: 0%; transition: width 1s ease; box-shadow: 0 0 5px #00f2ff; }
         canvas { display: block; }
+        #heartbeat-canvas { filter: drop-shadow(0 0 5px #00f2ff); opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -61,13 +58,13 @@
     </div>
     <div id="metaphor-display">SENSING...</div>
     <canvas id="gl-canvas"></canvas>
-    <svg id="heartbeat"><polyline points="" fill="none" stroke="#00f2ff" stroke-width="1" /></svg>
+    <canvas id="heartbeat-canvas" width="150" height="60" style="position: absolute; bottom: 20px; right: 20px; pointer-events: none;"></canvas>
 
     <script>
         let scene, camera, renderer, particles, controls, clock;
         let currentMesh = null;
         let voidAnchors = [];
-        let bridges = []; // C133: Relational Bridges tracking
+        let bridges = [];
         let state = { 
             phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, 
             category: 'default', focus: 'CSI Activation', obj: 'NONE' 
@@ -144,49 +141,27 @@
             try {
                 const stateRes = await fetch('../state/current-state.json');
                 const sData = await stateRes.json();
-                
                 const prevCategory = state.category;
-                
                 state.phase = sData.phase || 'IDLE';
                 state.status = sData.status || 'IDLE';
                 state.confidence = sData.confidence || 0;
                 state.category = sData.resonance_type || 'default';
-                
                 document.getElementById('phase-val').innerText = state.phase;
                 document.getElementById('cat-val').innerText = state.category.toUpperCase();
                 document.getElementById('conf-val').innerText = (state.confidence * 100).toFixed(1) + '%';
                 document.getElementById('obj-val').innerText = state.status.split(' ')[0] || 'NONE';
                 document.getElementById('focus-val').innerText = state.status;
-                
                 const syncProgress = (state.confidence * 0.7) + 0.3;
                 document.getElementById('sync-fill').style.width = `${syncProgress * 100}%`;
-
                 updateHeatmapLuminosity();
                 await updateLandscape(); 
-                
-                if (prevCategory !== state.category) {
-                    transitionMetaphor();
-                }
-
-                // C132/C133 UPDATE: Synthesis Logic
+                if (prevCategory !== state.category) { transitionMetaphor(); }
                 voidAnchors.forEach((anchor, idx) => {
-                    if (state.phase === 'ACT' && state.confidence > 0.85) {
-                        anchor.type = 'attract'; 
-                        anchor.repulsion = -20;  
-                    } else if (state.phase === 'REFLECT') {
-                        anchor.type = 'repel';
-                        anchor.repulsion = Math.min(40, anchor.repulsion * 1.05);
-                    } else if (state.phase === 'IDLE') {
-                         anchor.type = 'repel';
-                         anchor.repulsion = 30;
-                    }
+                    if (state.phase === 'ACT' && state.confidence > 0.85) { anchor.type = 'attract'; anchor.repulsion = -20; } 
+                    else if (state.phase === 'REFLECT') { anchor.type = 'repel'; anchor.repulsion = Math.min(40, anchor.repulsion * 1.05); } 
+                    else if (state.phase === 'IDLE') { anchor.type = 'repel'; anchor.repulsion = 30; }
                 });
-
-                // C133 BRIDGE TRIGGER: Create filaments between anchors when confidence is high in synthesis mode
-                if (state.category === 'synthesis' && state.confidence > 0.7) {
-                    createRandomBridge();
-                }
-
+                if (state.category === 'synthesis' && state.confidence > 0.7) { createRandomBridge(); }
             } catch (e) { console.error("CSI State Sync Error:", e); }
         }
 
@@ -194,15 +169,8 @@
             const startIdx = Math.floor(Math.random() * voidAnchors.length);
             let endIdx = Math.floor(Math.random() * voidAnchors.length);
             while(endIdx === startIdx) endIdx = Math.floor(Math.random() * voidAnchors.length);
-            
-            bridges.push({
-                start: voidAnchors[startIdx].pos,
-                end: voidAnchors[endIdx].pos,
-                strength: 0,
-                active: true
-            });
-
-            if (bridges.length > 5) bridges.shift(); // Keep memory clean
+            bridges.push({ start: voidAnchors[startIdx].pos, end: voidAnchors[endIdx].pos, strength: 0, active: true });
+            if (bridges.length > 5) bridges.shift();
         }
 
         async function updateLandscape() {
@@ -211,18 +179,13 @@
                 const lData = await landscapeRes.json();
                 const container = document.getElementById('density-bars');
                 container.innerHTML = '';
-                
                 const densities = lData.category_density;
                 const maxVal = Math.max(...Object.values(densities), 1);
-                
                 for (let cat in densities) {
                     const pct = (densities[cat] / maxVal) * 100;
                     const row = document.createElement('div');
                     row.className = 'density-bar-container';
-                    row.innerHTML = `
-                        <div class="density-label">${cat}</div>
-                        <div class="density-bar-bg"><div class="density-bar-fill" style="width: ${pct}%"></div></div>
-                    `;
+                    row.innerHTML = `<div class="density-label">${cat}</div><div class="density-bar-bg"><div class="density-bar-fill" style="width: ${pct}%"></div></div>`;
                     container.appendChild(row);
                 }
             } catch (e) { console.error("CSI Landscape Sync Error:", e); }
@@ -231,19 +194,14 @@
         function updateHeatmapLuminosity() {
             const colors = particles.geometry.attributes.color.array;
             const time = Date.now() * 0.001;
-            
             for (let i = 0; i < colors.length; i += 3) {
                 const x = particles.geometry.attributes.position.array[i];
                 const y = particles.geometry.attributes.position.array[i+1];
                 const z = particles.geometry.attributes.position.array[i+2];
-                
                 const dist = Math.sqrt(x*x + y*y + z*z);
                 const pulse = Math.sin(dist * 0.05 - time * 2) * 0.5 + 0.5;
-                
                 const lum = (state.confidence * 0.6) + (pulse * 0.4);
-                colors[i] = 0.0; // R
-                colors[i+1] = lum * 0.95; // G
-                colors[i+2] = lum; // B
+                colors[i] = 0.0; colors[i+1] = lum * 0.95; colors[i+2] = lum;
             }
             particles.geometry.attributes.color.needsUpdate = true;
         }
@@ -251,74 +209,65 @@
         function transitionMetaphor() {
             let metaphorKey = 'DEFAULT';
             for (let k in METAPHORS) { if (state.category.includes(k) || k.includes(state.category)) { metaphorKey = k; break; } }
-            
             const meta = METAPHORS[metaphorKey];
             document.getElementById('metaphor-display').innerText = meta.name;
-            
             const newGeom = meta.geom();
             const newMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
             const nextMesh = new THREE.Mesh(newGeom, newMat);
             nextMesh.scale.set(0,0,0);
             scene.add(nextMesh);
-    
             if (currentMesh) {
-                new TWEEN.Tween(currentMesh.scale).to({ x: 0, y: 0, z: 0 }, 1000).onComplete(() => {
-                    scene.remove(currentMesh);
-                }).start();
+                new TWEEN.Tween(currentMesh.scale).to({ x: 0, y: 0, z: 0 }, 1000).onComplete(() => { scene.remove(currentMesh); }).start();
             }
-    
             new TWEEN.Tween(nextMesh.scale).to({ x: 1, y: 1, z: 1 }, 1000).start();
             currentMesh = nextMesh;
         }
 
         function updateHeartbeat() {
-            const poly = document.querySelector('#heartbeat polyline');
-            let points = "";
-            const time = Date.now() * 0.005;
-            for(let x=0; x<150; x+=5) {
-                const y = 30 + Math.sin(time + x*0.1) * 10 + Math.random() * 5;
-                points += `${x},${y} `;
+            const canvas = document.getElementById('heartbeat-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // FILAMENT ENERGY INTEGRATION:
+            // The heartbeat is no longer a simple sine wave. It now incorporates "filament spikes" 
+            // based on bridge strength and synthesis activity.
+            
+            let totalBridgeStrength = bridges.reduce((acc, b) => acc + b.strength, 0);
+            let resonanceFrequency = 0.005 + (totalBridgeStrength * 0.002);
+            let spikeIntensity = totalBridgeStrength * 15;
+
+            ctx.beginPath();
+            ctx.strokeStyle = state.category === 'synthesis' ? '#ffd700' : '#00f2ff';
+            ctx.lineWidth = 1 + (totalBridgeStrength * 0.5);
+            
+            const time = Date.now() * resonanceFrequency;
+            for(let x=0; x<150; x++) {
+                // Base pulse + Resonance Spike
+                let baseline = Math.sin(time + x*0.1) * 10;
+                let filamentSpike = 0;
+                if (x % 40 === 0 && totalBridgeStrength > 0.1) {
+                    filamentSpike = Math.random() * spikeIntensity * Math.sin(time * 2);
+                }
+                const y = 30 + baseline + filamentSpike + Math.random() * 2;
+                if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             }
-            poly.setAttribute('points', points);
+            ctx.stroke();
         }
 
         function renderBridges() {
-            // Using a simple LineSegments for the filaments
             const geometry = new THREE.BufferGeometry();
             const positions = [];
             const colors = [];
-            const color = new THREE.Color();
-
             bridges.forEach(bridge => {
                 if (!bridge.active) return;
-                
-                // Growth animation (C130_SYNTH_001 bridge building)
                 if (bridge.strength < 1.0) bridge.strength += 0.005;
-
-                positions.push(bridge.start.x, bridge.start.y, bridge.start.z);
-                positions.push(bridge.end.x, bridge.end.y, bridge.end.z);
-
-                // Color transition: Void Blue -> Synthesis Gold
-                const lerpColor = new THREE.Color().lerpColors(
-                    new THREE.Color(0x0096ff), 
-                    new THREE.Color(0xffd700), 
-                    bridge.strength
-                );
-                colors.push(lerpColor.r, lerpColor.g, lerpColor.b);
-                colors.push(lerpColor.r, lerpColor.g, lerpColor.b);
+                positions.push(bridge.start.x, bridge.start.y, bridge.start.z, bridge.end.x, bridge.end.y, bridge.end.z);
+                const lerpColor = new THREE.Color().lerpColors(new THREE.Color(0x0096ff), new THREE.Color(0xffd700), bridge.strength);
+                colors.push(lerpColor.r, lerpColor.g, lerpColor.b, lerpColor.r, lerpColor.g, lerpColor.b);
             });
-
             geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-            const material = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.8 });
-            const lineSegments = new THREE.LineSegments(geometry, material);
-            scene.add(lineSegments);
-            
-            // Since we are in the animate loop, we need to remove it immediately after render or manage its lifecycle
-            // For simplicity in this script, we'll handle a persistent bridge mesh instead if we wanted higher performance.
-            // But for now, we will just let it be added and removed each frame by not adding it permanently.
-            return lineSegments;
+            return new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.8 }));
         }
 
         function animate() {
@@ -326,51 +275,29 @@
             TWEEN.update();
             const time = clock.getElapsedTime();
             particles.rotation.y += 0.001;
-
             const posAttr = particles.geometry.attributes.position;
             for (let i = 0; i < posAttr.count; i++) {
-                let px = posAttr.getX(i);
-                let py = posAttr.getY(i);
-                let pz = posAttr.getZ(i);
-
+                let px = posAttr.getX(i), py = posAttr.getY(i), pz = posAttr.getZ(i);
                 voidAnchors.forEach(anchor => {
-                    const dx = px - anchor.pos.x;
-                    const dy = py - anchor.pos.y;
-                    const dz = pz - anchor.pos.z;
+                    const dx = px - anchor.pos.x, dy = py - anchor.pos.y, dz = pz - anchor.pos.z;
                     const distSq = dx*dx + dy*dy + dz*dz;
                     if (distSq < 2500) {
-                        const directionMod = (anchor.type === 'attract') ? -1 : 1;
-                        const force = (anchor.repulsion / (distSq + 1)) * 0.1 * directionMod;
-                        posAttr.setX(i, px + dx * force);
-                        posAttr.setY(i, py + dy * force);
-                        posAttr.setZ(i, pz + dz * force);
+                        const force = (anchor.repulsion / (distSq + 1)) * 0.1 * ((anchor.type === 'attract') ? -1 : 1);
+                        posAttr.setX(i, px + dx * force); posAttr.setY(i, py + dy * force); posAttr.setZ(i, pz + dz * force);
                     }
                 });
             }
             posAttr.needsUpdate = true;
-            
-            if (state.phase === 'ACT' || state.phase === 'DECIDE') {
-                particles.rotation.z += 0.01;
-            } else if (state.phase === 'REFLECT' || state.phase === 'PERCEIVE') {
-                particles.position.x = Math.sin(time) * 2;
-            }
-
+            if (state.phase === 'ACT' || state.phase === 'DECIDE') particles.rotation.z += 0.01;
+            else if (state.phase === 'REFLECT' || state.phase === 'PERCEIVE') particles.position.x = Math.sin(time) * 2;
             if (currentMesh) {
-                currentMesh.rotation.x += 0.01;
-                currentMesh.rotation.y += 0.01;
+                currentMesh.rotation.x += 0.01; currentMesh.rotation.y += 0.01;
                 const pulse = 1 + Math.sin(time * 2) * (1 - state.confidence) * 0.2;
                 currentMesh.scale.set(pulse, pulse, pulse);
             }
-
-            // C133: Render synthesis filaments
-            const bridgeMesh = renderBridges();
-            scene.add(bridgeMesh);
-            // Use a timeout or immediate removal to avoid leaking meshes in the scene graph
+            const bridgeMesh = renderBridges(); scene.add(bridgeMesh);
             setTimeout(() => scene.remove(bridgeMesh), 16);
-
-            updateHeartbeat();
-            controls.update();
-            renderer.render(scene, camera);
+            updateHeartbeat(); controls.update(); renderer.render(scene, camera);
         }
 
         init();
