@@ -1,4 +1,5 @@
 {
-  "goal": "Evaluate Criticality Interaction with Hebbian Resonance",
-  "next_step": "Test if 'Critical' nodes facilitate faster resonance for associated non-critical patterns."
+  "goal": "Shift Resonance Model from Target-Attractor to Source-Accelerant",
+  "next_step": "Implement source-weighted cost logic in AMS traversal and re-verify velocity",
+  "priority": "High"
 }
