@@ -34,6 +34,7 @@
 
     <script>
         let scene, camera, renderer, particles, lines, controls, rings = [];
+  let resonanceType = 'none'; // vis_res_001 integration
         let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [], category: 'default', queried_patterns: [] };
         let resonanceQueue = {}; // Map of ringIndex -> intensity (0.0 to 1.0)
         let ripples = []; // Array of ripple objects {originIdx, radius, maxRadius, life}
@@ -134,22 +135,27 @@
                 document.getElementById('density-val').innerText = state.patterns;
                 document.getElementById('conf-val').innerText = (state.confidence * 100).toFixed(1) + '%';
 
-                // Trigger resonance for queried patterns
-                if (state.queried_patterns.length > 0 && rings.length > 0) {
-                    state.queried_patterns.forEach(pid => {
-                        const ringIdx = hashString(pid) % rings.length;
-                        resonanceQueue[ringIdx] = 1.0; // Full intensity pulse
-                        
-                        // Trigger a secondary ripple from this ring to others via associations
-                        triggerRipple(ringIdx);
-                    });
-                }
+          // Trigger resonance for queried patterns
+                  if (state.queried_patterns.length > 0 && rings.length > 0) {
+                      state.queried_patterns.forEach(pid => {
+                          const ringIdx = hashString(pid) % rings.length;
+                          resonanceQueue[ringIdx] = 1.0; // Full intensity pulse
+                          
+                          // Trigger a secondary ripple from this ring to others via associations
+                          triggerRipple(ringIdx);
+                      });
+                  }
 
-                updateVisuals();
-            } catch (e) {
+                  // vis_res_001 Integration: Update visual state based on resonance type
+                  if (stateData.resonance_type) {
+                      state.resonanceType = stateData.resonance_type;
+                  }
+                  
+                  updateVisuals();
+              } catch (e) {
                 console.error("State synchronization error:", e);
-            }
-        }
+              }
+          }
 
         function triggerRipple(originIdx) {
             // Find all associated rings and queue ripples for them
@@ -167,7 +173,13 @@
 
         function updateVisuals() {
             const resonance = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'];
-            
+            // Apply Resonance Type Color Shifts from vis_res_001
+            if (resonanceType === 'Correction') {
+                baseColor.setHex(0xff3333); // Red shift
+            } else if (resonanceType === 'Recurrence') {
+                baseColor.setHex(0x3333ff); // Blue shift
+            }
+
             const baseColor = new THREE.Color(resonance.color);
             const targetColor = new THREE.Color().setHSL(0.6 - (state.confidence * 0.4), 1.0, 0.5);
             baseColor.lerp(targetColor, 0.3);
@@ -246,6 +258,12 @@
         }
 
         function animate() {
+                // vis_res_001 Integration: High Frequency Oscillation for Correction
+                if (resonanceType === 'Correction') {
+                    renderer.setClearColor(new THREE.Color(0x0a0000), 0.1 + Math.sin(time * 10) * 0.05);
+                } else {
+                    renderer.setClearColor(0x00050a, 1.0);
+                }
             requestAnimationFrame(animate);
             
             const resonance = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'];
@@ -281,6 +299,12 @@
             particles.rotation.x += speed / 2;
             lines.rotation.y += speed;
             lines.rotation.x += speed / 2;
+                // vis_res_001 Integration: Particle Swarm Expansion for Discovery
+                if (resonanceType === 'Discovery') {
+                    particles.scale.setScalar(1.5 + Math.sin(time) * 0.2);
+                } else {
+                    particles.scale.setScalar(1.0);
+                }
             
             // Update ripples
             for (let i = ripples.length - 1; i >= 0; i--) {
