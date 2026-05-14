@@ -1,5 +1,5 @@
 {
-  "goal": "Shift Resonance Model from Target-Attractor to Source-Accelerant",
-  "next_step": "Implement source-weighted cost logic in AMS traversal and re-verify velocity",
+  "goal": "Integrate Source-Accelerant Logic into AMS Traversal",
+  "next_step": "Update primary search algorithms in the core engine to use source-weighted cost instead of target-attraction.",
   "priority": "High"
 }
