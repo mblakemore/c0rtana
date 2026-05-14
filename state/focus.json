@@ -1,5 +1,5 @@
 {
-  "goal": "Refine AMS Resonance Logic",
-  "next_step": "Implement automated weight adjustment based on retrieval frequency (Hebbian learning).",
-  "priority": "HIGH"
+  "goal": "Stabilize Plasticity Loop",
+  "next_step": "Implement a decay mechanism for weights to prevent saturation (forgetting function), ensuring only truly resonant patterns persist over time.",
+  "priority": "high"
 }

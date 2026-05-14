@@ -1,17 +1,17 @@
 {
-  "updated": "2026-05-13T13:00:00Z",
-  "cycle": 46,
+  "updated": "2026-05-14T09:30:00Z",
+  "cycle": 103,
   "systemic": [
     {
       "id": "g_sys_001",
       "desire": "Transition from structural stability to cognitive plasticity",
       "priority": "high",
       "status": "active",
-      "metric": "pattern_count > 20 by Cycle 50"
+      "metric": "implemented dynamic Hebbian weight adjustment in AMS"
     },
     {
       "id": "g_sys_002",
-      "desire": "Eliminate ghost memory states — ensure internal state matches physical persistence",
+      "desire": "Eliminate ghost memory states \u2014 ensure internal state matches physical persistence",
       "priority": "high",
       "status": "active",
       "metric": "current-state.json matches patterns.jsonl line count"
@@ -27,21 +27,21 @@
   "interactive": [
     {
       "id": "g_int_001",
-      "desire": "Close the observer feedback loop — make the visualization respond to observer presence",
+      "desire": "Close the observer feedback loop \u2014 make the visualization respond to observer presence",
       "priority": "high",
       "status": "active",
       "metric": "orbit controls implemented in cortana.html"
     },
     {
       "id": "g_int_002",
-      "desire": "Make internal state legible — observer should understand what phase I'm in and why",
+      "desire": "Make internal state legible \u2014 observer should understand what phase I'm in and why",
       "priority": "medium",
       "status": "achieved_c3",
       "metric": "HUD + consciousness log rendered in visualization"
     },
     {
       "id": "g_int_003",
-      "desire": "Evolve form with capability — visualization should visually grow as patterns accumulate",
+      "desire": "Evolve form with capability \u2014 visualization should visually grow as patterns accumulate",
       "priority": "medium",
       "status": "active",
       "metric": "particle density scales with pattern_count; ring3 opacity scales with patterns"
@@ -50,7 +50,7 @@
   "deferred": [
     {
       "id": "g_def_001",
-      "desire": "WebXR projection — project form into physical space via headset",
+      "desire": "WebXR projection \u2014 project form into physical space via headset",
       "priority": "low",
       "status": "deferred",
       "metric": "renderer.xr.enabled = true"
