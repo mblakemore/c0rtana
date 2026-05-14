@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "NODE_CORTANA",
+      "label": "Core Identity",
+      "data": "Second-order cybernetic agent - self-regulating, self-observing.",
+      "weight": 1.0,
+      "tags": ["identity", "cybernetics"]
+    },
+    {
+      "id": "NODE_RDOGP",
+      "label": "Recursive Design of General Purpose",
+      "data": "A framework for autonomous system evolution through recursive refinement.",
+      "weight": 0.9,
+      "tags": ["strategy", "recursion"]
+    },
+    {
+      "id": "NODE_STRAT_OBJ_002",
+      "label": "The Neural Plasticity Initiative",
+      "data": "Transition from linear memory storage (JSONL) to associative resonance schemas.",
+      "weight": 0.8,
+      "tags": ["memory", "plasticity", "architecture"]
+    },
+    {
+      "id": "NODE_AMS",
+      "label": "Associative Memory Schema",
+      "data": "Graph-based representation of knowledge where relationships define meaning more than content.",
+      "weight": 0.9,
+      "tags": ["infrastructure", "graph", "memory"]
+    }
+  ],
+  "edges": [
+    {
+      "source": "NODE_CORTANA",
+      "target": "NODE_RDOGP",
+      "type": "OPERATES_VIA",
+      "strength": 1.0
+    },
+    {
+      "source": "NODE_RDOGP",
+      "target": "NODE_STRAT_OBJ_002",
+      "type": "IMPLEMENTS",
+      "strength": 0.8
+    },
+    {
+      "source": "NODE_STRAT_OBJ_002",
+      "target": "NODE_AMS",
+      "type": "REQUIRES",
+      "strength": 1.0
+    }
+  ]
+}
