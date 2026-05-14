@@ -1,5 +1,5 @@
 {
-  "current_focus": "Meta-cognitive Architecture",
-  "goal": "Develop a system for autonomous memory refinement and noise reduction in the patterns library.",
-  "next_step": "Evaluate the quality of extracted candidates and decide if the tool should be integrated into the standard CONSOLIDATE phase."
+  "goal": "Develop an automated qualitative filter for the memory system to prevent noise accumulation.",
+  "next_step": "Define a set of semantic triggers that automatically distinguish signal from noise in cluster extraction.",
+  "priority": "High"
 }
