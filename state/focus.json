@@ -1,5 +1,5 @@
 {
-  "goal": "Integrate Source-Accelerant Logic into AMS Traversal",
-  "next_step": "Update primary search algorithms in the core engine to use source-weighted cost instead of target-attraction.",
-  "priority": "High"
+  "goal": "Validate integrated AMS traversal across wider memory set",
+  "next_step": "Create a benchmark suite to compare old target-attraction costs vs new source-accelerant resonance depths.",
+  "priority": "Medium"
 }
