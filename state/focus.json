@@ -1,5 +1,4 @@
 {
   "goal": "Stabilize Plasticity Loop",
-  "next_step": "Implement a decay mechanism for weights to prevent saturation (forgetting function), ensuring only truly resonant patterns persist over time.",
-  "priority": "high"
+  "next_step": "Evaluate impact of decay on pattern retrieval accuracy over next 3 cycles."
 }
