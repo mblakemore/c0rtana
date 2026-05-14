@@ -30,6 +30,17 @@
         .label { opacity: 0.8; }
         #sync-container { width: 200px; height: 4px; background: rgba(0, 242, 255, 0.2); margin-top: 10px; position: relative; overflow: hidden; }
         #sync-fill { height: 100%; width: 0%; background: #00f2ff; transition: width 0.5s ease; box-shadow: 0 0 10px #00f2ff; }
+        #metaphor-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            font-size: 18px;
+            letter-spacing: 4px;
+            color: #fff;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
         #heartbeat {
             position: absolute;
             bottom: 20px;
@@ -56,26 +67,25 @@
             <div id="sync-container"><div id="sync-fill"></div></div>
         </div>
     </div>
+    <div id="metaphor-display">SENSING...</div>
     <canvas id="gl-canvas"></canvas>
     <svg id="heartbeat"><polyline points="" fill="none" stroke="#00f2ff" stroke-width="1" /></svg>
 
     <script>
         let scene, camera, renderer, particles, controls;
-        let rings = [], targetRings = [];
-        let resonanceLines = new THREE.Group();
+        let currentMetaphorObj = null;
         let state = { 
             phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, 
             category: 'default', focus: 'CSI Activation', obj: 'NONE' 
         };
-        
-        // SRA RESONANCE MAP - Updated for Cycle 117
-        const RESONANCE_MAP = {
-            'semantic':     { color: 0x00aaff, speed: 0.002, pulse: 1.1, label: 'SEMANTIC' },   // Blue
-            'structural':   { color: 0x00ff8c, speed: 0.005, pulse: 1.4, label: 'STRUCTURAL' }, // Green
-            'temporal':     { color: 0xffff00, speed: 0.008, pulse: 1.6, label: 'TEMPORAL' },   // Yellow
-            'goal':         { color: 0xff3300, speed: 0.012, pulse: 1.9, label: 'GOAL-DIRECTED' }, // Red
-            'dissonance':    { color: 0x666666, speed: 0.020, pulse: 1.0, label: 'DISSONANCE' },  // Grey
-            'default':      { color: 0x446688, speed: 0.002, pulse: 1.0, label: 'DEFAULT' }
+
+        const METAPHORS = {
+            'Linear Analysis': { label: 'THE PRISM', color: 0x00aaff, type: 'prism' },
+            'Cross-Domain Folding': { label: 'MÖBIUS STRIP', color: 0xffffff, type: 'mobius' },
+            'Structural Optimization': { label: 'CRYSTALLINE LATTICE', color: 0x00ff8c, type: 'lattice' },
+            'Systemic Crisis': { label: 'ENTROPY CLOUD', color: 0xff3300, type: 'chaos' },
+            'Functional Synthesis': { label: 'NEURAL BLOOM', color: 0xda70d6, type: 'bloom' },
+            'DEFAULT': { label: 'SENSING...', color: 0x446688, type: 'spheres' }
         };
 
         function init() {
@@ -91,8 +101,7 @@
             controls.enableDamping = true;
 
             createParticles();
-            scene.add(resonanceLines);
-
+            
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
@@ -107,7 +116,7 @@
             const geometry = new THREE.BufferGeometry();
             const count = 15000;
             const positions = new Float32Array(count * 3);
-            for (let i = 0; i < count * 3; i++) positions[i] = (Math.random() - 0.5) * 300;
+            for (let i = 0; i < count * 3; i++) positions[i] = (Math.random() - 0.5) * 400;
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             const material = new THREE.PointsMaterial({ size: 0.7, color: 0x00f2ff, transparent: true, opacity: 0.6 });
             particles = new THREE.Points(geometry, material);
@@ -122,50 +131,56 @@
                 state.phase = sData.phase || 'IDLE';
                 state.status = sData.status || 'IDLE';
                 state.confidence = sData.confidence || 0;
-                // Map internal resonance_type to visual categories
                 state.category = sData.resonance_type || 'default';
-                state.obj = sData.status.split(' ')[0] || 'NONE';
-
+                
                 document.getElementById('phase-val').innerText = state.phase;
-                document.getElementById('cat-val').innerText = (RESONANCE_MAP[state.category]?.label) || 'DEFAULT';
+                document.getElementById('cat-val').innerText = state.category.toUpperCase();
                 document.getElementById('conf-val').innerText = (state.confidence * 100).toFixed(1) + '%';
-                document.getElementById('obj-val').innerText = state.obj;
+                document.getElementById('obj-val').innerText = state.status.split(' ')[0] || 'NONE';
                 document.getElementById('focus-val').innerText = state.status;
                 
-                const syncProgress = (state.confidence * 0.7) + (Math.min(state.patterns / 100, 0.3));
+                const syncProgress = (state.confidence * 0.7) + 0.3;
                 document.getElementById('sync-fill').style.width = `${syncProgress * 100}%`;
 
-                updateRings();
+                updateMetaphor();
             } catch (e) { console.error("CSI State Sync Error:", e); }
         }
 
-        function updateRings() {
-            rings.forEach(r => scene.remove(r));
-            targetRings.forEach(r => scene.remove(r));
-            rings = []; targetRings = [];
-            resonanceLines.clear();
-
-            const config = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'];
-            const color = config.color;
-            const ringCount = 3;
+        function updateMetaphor() {
+            // Use phase as the primary trigger for metaphors
+            const metaphorKey = METAPHORS[state.phase] ? state.phase : 'DEFAULT';
+            const meta = METAPHORS[metaphorKey];
+            document.getElementById('metaphor-display').innerText = meta.label;
             
-            for (let i = 0; i < ringCount; i++) {
-                const radius = 30 + (i * 20);
-                
-                const geom = new THREE.TorusGeometry(radius, 0.3, 16, 100);
-                const mat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.5 });
-                const ring = new THREE.Mesh(geom, mat);
-                ring.rotation.x = Math.PI / 2;
-                scene.add(ring);
-                rings.push(ring);
-
-                const tMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 });
-                const tRing = new THREE.Mesh(geom, tMat);
-                tRing.rotation.x = Math.PI / 2;
-                tRing.scale.set(1.05, 1.05, 1.05);
-                scene.add(tRing);
-                targetRings.push(tRing);
+            if (currentMetaphorObj) scene.remove(currentMetaphorObj);
+            
+            switch(meta.type) {
+                case 'mobius':
+                    const mobGeom = new THREE.TorusKnotGeometry(20, 4, 100, 16);
+                    const mobMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
+                    currentMetaphorObj = new THREE.Mesh(mobGeom, mobMat);
+                    break;
+                case 'lattice':
+                    const latGeom = new THREE.IcosahedronGeometry(30, 1);
+                    const latMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
+                    currentMetaphorObj = new THREE.Mesh(latGeom, latMat);
+                    break;
+                case 'prism':
+                    const priGeom = new THREE.ConeGeometry(20, 50, 4);
+                    const priMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
+                    currentMetaphorObj = new THREE.Mesh(priGeom, priMat);
+                    break;
+                case 'bloom':
+                    const bloGeom = new THREE.SphereGeometry(20, 32, 32);
+                    const bloMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
+                    currentMetaphorObj = new THREE.Mesh(bloGeom, bloMat);
+                    break;
+                default:
+                    const sphGeom = new THREE.SphereGeometry(15, 16, 16);
+                    const sphMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
+                    currentMetaphorObj = new THREE.Mesh(sphGeom, sphMat);
             }
+            scene.add(currentMetaphorObj);
         }
 
         function updateHeartbeat() {
@@ -182,16 +197,11 @@
         function animate() {
             requestAnimationFrame(animate);
             const time = Date.now() * 0.001;
-            
             particles.rotation.y += 0.001;
-            particles.rotation.z += 0.0005;
-            
-            const resConfig = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'];
-            const pulse = 1 + Math.sin(time * (resConfig.speed * 1000)) * (resConfig.pulse - 1);
-            rings.forEach((r) => {
-                r.scale.set(pulse, pulse, 1);
-            });
-
+            if (currentMetaphorObj) {
+                currentMetaphorObj.rotation.x += 0.01;
+                currentMetaphorObj.rotation.y += 0.01;
+            }
             updateHeartbeat();
             controls.update();
             renderer.render(scene, camera);
