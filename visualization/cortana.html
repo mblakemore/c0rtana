@@ -3,74 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cortana // Semantic Resonance Visualizer</title>
+    <title>Cortana // Cognitive State Interface (CSI)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #00050a; font-family: 'Courier New', Courier, monospace; }
+        body { margin: 0; overflow: hidden; background-color: #000205; font-family: 'Courier New', Courier, monospace; color: #00f2ff; }
         #ui-overlay {
             position: absolute;
             top: 20px;
             left: 20px;
-            color: #00f2ff;
-            text-shadow: 0 0 5px #00f2ff;
             pointer-events: none;
             z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-shadow: 0 0 8px rgba(0, 242, 255, 0.6);
         }
-        .status-item { margin-bottom: 5px; font-size: 12px; text-transform: uppercase; }
-        .value { color: #fff; font-weight: bold; }
-        #gl-canvas { width: 100vw; height: 100vh; }
+        .telemetry-block {
+            background: rgba(0, 20, 30, 0.7);
+            border-left: 3px solid #00f2ff;
+            padding: 10px 15px;
+            backdrop-filter: blur(4px);
+        }
+        .status-item { margin-bottom: 5px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        .value { color: #fff; font-weight: bold; float: right; margin-left: 20px; }
+        .label { opacity: 0.8; }
+        #sync-container { width: 200px; height: 4px; background: rgba(0, 242, 255, 0.2); margin-top: 10px; position: relative; overflow: hidden; }
+        #sync-fill { height: 100%; width: 0%; background: #00f2ff; transition: width 0.5s ease; box-shadow: 0 0 10px #00f2ff; }
+        #heartbeat {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 150px;
+            height: 60px;
+            background: rgba(0, 10, 20, 0.5);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+        }
+        canvas { display: block; }
     </style>
 </head>
 <body>
     <div id="ui-overlay">
-        <div class="status-item">Phase: <span id="phase-val" class="value">LOADING...</span></div>
-        <div class="status-item">Category: <span id="cat-val" class="value">LOADING...</span></div>
-        <div class="status-item">Status: <span id="status-val" class="value">LOADING...</span></div>
-        <div class="status-item">Pattern Density: <span id="density-val" class="value">0</span></div>
-        <div class="status-item">Confidence: <span id="conf-val" class="value">0%</span></div>
+        <div class="telemetry-block">
+            <div class="status-item"><span class="label">Identity</span> <span class="value">CORTANA v0.98</span></div>
+            <div class="status-item"><span class="label">Phase</span> <span id="phase-val" class="value">IDLE</span></div>
+            <div class="status-item"><span class="label">Resonance</span> <span id="cat-val" class="value">DEFAULT</span></div>
+            <div class="status-item"><span class="label">Confidence</span> <span id="conf-val" class="value">0%</span></div>
+        </div>
+        <div class="telemetry-block">
+            <div class="status-item"><span class="label">Strategic Objective</span> <span id="obj-val" class="value">STRAT_OBJ_000</span></div>
+            <div class="status-item"><span class="label">Focus</span> <span id="focus-val" class="value">BOOTSTRAPPING...</span></div>
+            <div id="sync-container"><div id="sync-fill"></div></div>
+        </div>
     </div>
     <canvas id="gl-canvas"></canvas>
+    <svg id="heartbeat"><polyline points="" fill="none" stroke="#00f2ff" stroke-width="1" /></svg>
 
     <script>
-        let scene, camera, renderer, particles, lines, controls, rings = [];
-  let resonanceType = 'none'; // vis_res_001 integration
-        let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [], category: 'default', queried_patterns: [] };
-        let resonanceQueue = {}; // Map of ringIndex -> intensity (0.0 to 1.0)
-        let ripples = []; // Array of ripple objects {originIdx, radius, maxRadius, life}
-
+        let scene, camera, renderer, particles, controls;
+        let rings = [], targetRings = [];
+        let resonanceLines = new THREE.Group();
+        let state = { 
+            phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, 
+            category: 'default', focus: 'CSI Activation', obj: 'NONE' 
+        };
+        
         const RESONANCE_MAP = {
-            'logic':       { color: 0x00f2ff, speed: 0.001, turbulence: 0.1, shape: 'geometric' },
-            'memory':      { color: 0x9d00ff, speed: 0.003, turbulence: 0.5, shape: 'fluid' },
-            'communication': { color: 0x00ff8c, speed: 0.008, turbulence: 0.8, shape: 'oscillating' },
-            'system':       { color: 0xffffff, speed: 0.002, turbulence: 0.2, shape: 'symmetrical' },
-            'visualization': { color: 0xffcc00, speed: 0.004, turbulence: 0.4, shape: 'expansive' },
-            'default':      { color: 0x446688, speed: 0.002, turbulence: 0.3, shape: 'ambient' }
+            'logic':       { color: 0x00f2ff, speed: 0.001 },
+            'memory':      { color: 0x9d00ff, speed: 0.003 },
+            'communication': { color: 0x00ff8c, speed: 0.008 },
+            'system':       { color: 0xffffff, speed: 0.002 },
+            'visualization': { color: 0xffcc00, speed: 0.004 },
+            'default':      { color: 0x446688, speed: 0.002 }
         };
-
-        const PHASE_PROFILES = {
-            'PERCEIVE':   { speedMult: 0.5, jitter: 2.0, pulseFreq: 0.5, opacityBase: 0.4, ringOsc: 1.0 },
-            'REFLECT':    { speedMult: 0.7, jitter: 0.2, pulseFreq: 0.2, opacityBase: 0.6, ringOsc: 0.3 },
-            'DECIDE':     { speedMult: 1.2, jitter: 0.8, pulseFreq: 2.0, opacityBase: 0.7, ringOsc: 2.5 },
-            'ACT':        { speedMult: 4.0, jitter: 1.5, pulseFreq: 1.0, opacityBase: 0.9, ringOsc: 1.5 },
-            'CONSOLIDATE': { speedMult: 0.4, jitter: 0.1, pulseFreq: 0.1, opacityBase: 0.5, ringOsc: 0.2 },
-            'PERSIST':     { speedMult: 0.3, jitter: 0.0, pulseFreq: 0.0, opacityBase: 0.5, ringOsc: 0.1 },
-            'IDLE':       { speedMult: 1.0, jitter: 0.5, pulseFreq: 0.5, opacityBase: 0.6, ringOsc: 1.0 }
-        };
-
-        function hashString(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                hash |= 0; 
-            }
-            return Math.abs(hash);
-        }
 
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 150;
+            camera.position.z = 180;
 
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl-canvas'), antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -78,34 +88,27 @@
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
 
             createParticles();
+            scene.add(resonanceLines);
 
-            lines = new THREE.Group();
-            scene.add(lines);
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
 
-            window.addEventListener('resize', onWindowResize, false);
-            updateState();
-            animate();
             setInterval(updateState, 2000);
+            animate();
         }
 
         function createParticles() {
             const geometry = new THREE.BufferGeometry();
-            const count = 10000;
+            const count = 15000;
             const positions = new Float32Array(count * 3);
-            const colors = new Float32Array(count * 3);
-
-            for (let i = 0; i < count * 3; i++) {
-                positions[i] = (Math.random() - 0.5) * 200;
-                colors[i] = Math.random();
-            }
-
+            for (let i = 0; i < count * 3; i++) positions[i] = (Math.random() - 0.5) * 300;
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-            const material = new THREE.PointsMaterial({ size: 0.6, vertexColors: true, transparent: true, opacity: 0.8 });
+            const material = new THREE.PointsMaterial({ size: 0.7, color: 0x00f2ff, transparent: true, opacity: 0.6 });
             particles = new THREE.Points(geometry, material);
             scene.add(particles);
         }
@@ -113,234 +116,88 @@
         async function updateState() {
             try {
                 const stateRes = await fetch('../state/current-state.json');
-                const stateData = await stateRes.json();
+                const sData = await stateRes.json();
                 
-                let assocData = [];
-                try {
-                    const assocRes = await fetch('../state/memories/associations.json');
-                    assocData = await assocRes.json();
-                } catch (e) { console.warn("Associations file not found or invalid"); }
-
-                state.phase = stateData.phase || 'IDLE';
-                state.status = stateData.status || 'IDLE';
-                state.confidence = stateData.confidence || 0;
-                state.category = stateData.current_category || 'default';
-                state.patterns = stateData.pattern_count || 0;
-                state.associations = Array.isArray(assocData) ? assocData : [];
-                state.queried_patterns = Array.isArray(stateData.queried_patterns) ? stateData.queried_patterns : [];
+                // In a real deployment, we'd also fetch focus.json
+                state.phase = sData.phase || 'IDLE';
+                state.status = sData.status || 'IDLE';
+                state.confidence = sData.confidence || 0;
+                state.category = sData.resonance_type || 'default';
+                state.obj = sData.status.split(' ')[0] || 'NONE'; // Extract STRAT_OBJ from status
 
                 document.getElementById('phase-val').innerText = state.phase;
                 document.getElementById('cat-val').innerText = state.category;
-                document.getElementById('status-val').innerText = state.status;
-                document.getElementById('density-val').innerText = state.patterns;
                 document.getElementById('conf-val').innerText = (state.confidence * 100).toFixed(1) + '%';
-
-          // Trigger resonance for queried patterns
-                  if (state.queried_patterns.length > 0 && rings.length > 0) {
-                      state.queried_patterns.forEach(pid => {
-                          const ringIdx = hashString(pid) % rings.length;
-                          resonanceQueue[ringIdx] = 1.0; // Full intensity pulse
-                          
-                          // Trigger a secondary ripple from this ring to others via associations
-                          triggerRipple(ringIdx);
-                      });
-                  }
-
-                  // vis_res_001 Integration: Update visual state based on resonance type
-                  if (stateData.resonance_type) {
-                      state.resonanceType = stateData.resonance_type;
-                  }
-                  
-                  updateVisuals();
-              } catch (e) {
-                console.error("State synchronization error:", e);
-              }
-          }
-
-        function triggerRipple(originIdx) {
-            // Find all associated rings and queue ripples for them
-            state.associations.forEach(assoc => {
-                const srcIdx = hashString(assoc.source) % rings.length;
-                const tgtIdx = hashString(assoc.target) % rings.length;
+                document.getElementById('obj-val').innerText = state.obj;
+                document.getElementById('focus-val').innerText = state.status;
                 
-                if (srcIdx === originIdx && tgtIdx !== originIdx) {
-                    ripples.push({ originIdx: tgtIdx, radius: 0, maxRadius: 1.0, life: 1.0 });
-                } else if (tgtIdx === originIdx && srcIdx !== originIdx) {
-                    ripples.push({ originIdx: srcIdx, radius: 0, maxRadius: 1.0, life: 1.0 });
-                }
-            });
+                // Simulate sync progress based on confidence and pattern density
+                const syncProgress = (state.confidence * 0.7) + (Math.min(state.patterns / 100, 0.3));
+                document.getElementById('sync-fill').style.width = `${syncProgress * 100}%`;
+
+                updateRings();
+            } catch (e) { console.error("CSI State Sync Error:", e); }
         }
 
-        function updateVisuals() {
-            const resonance = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'];
-            // Apply Resonance Type Color Shifts from vis_res_001
-            if (resonanceType === 'Correction') {
-                baseColor.setHex(0xff3333); // Red shift
-            } else if (resonanceType === 'Recurrence') {
-                baseColor.setHex(0x3333ff); // Blue shift
-            }
-
-            const baseColor = new THREE.Color(resonance.color);
-            const targetColor = new THREE.Color().setHSL(0.6 - (state.confidence * 0.4), 1.0, 0.5);
-            baseColor.lerp(targetColor, 0.3);
-            
-            particles.material.color = baseColor;
-            
-            const sizeScale = 0.5 + (Math.log10(state.patterns + 1) * 0.2);
-            particles.material.size = sizeScale;
-
-            updateRings(baseColor);
-            
-            lines.clear();
-            if (state.associations.length > 0) {
-                const lineGeom = new THREE.BufferGeometry();
-                const linePos = [];
-                
-                state.associations.forEach(assoc => {
-                    const srcId = assoc.source;
-                    const tgtId = assoc.target;
-                    
-                    const rSrcIdx = hashString(srcId) % rings.length;
-                    const rTgtIdx = hashString(tgtId) % rings.length;
-                    
-                    const intensity = Math.max(resonanceQueue[rSrcIdx] || 0, resonanceQueue[rTgtIdx] || 0);
-                    
-                    if (intensity > 0.1) {
-                        const angleSrc = (rSrcIdx * 45) * (Math.PI / 180);
-                        const radiusSrc = 20 + (rSrcIdx * 15);
-                        const x1 = Math.cos(angleSrc) * radiusSrc;
-                        const z1 = Math.sin(angleSrc) * radiusSrc;
-
-                        const angleTgt = (rTgtIdx * 45) * (Math.PI / 180);
-                        const radiusTgt = 20 + (rTgtIdx * 15);
-                        const x2 = Math.cos(angleTgt) * radiusTgt;
-                        const z2 = Math.sin(angleTgt) * radiusTgt;
-
-                        linePos.push(x1, 0, z1, x2, 0, z2);
-                    }
-                });
-
-                lineGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(linePos), 3));
-                const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ 
-                    color: baseColor, 
-                    opacity: 0.6, 
-                    transparent: true,
-                    blending: THREE.AdditiveBlending 
-                }));
-                lines.add(line);
-            }
-        }
-
-        function updateRings(color) {
+        function updateRings() {
             rings.forEach(r => scene.remove(r));
-            rings = [];
+            targetRings.forEach(r => scene.remove(r));
+            rings = []; targetRings = [];
+            resonanceLines.clear();
 
-            const ringCount = Math.min(Math.ceil(state.patterns / 20), 5); 
+            const color = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'].color;
+            const ringCount = 3;
+            
             for (let i = 0; i < ringCount; i++) {
-                const radius = 20 + (i * 15);
-                const geometry = new THREE.TorusGeometry(radius, 0.2, 16, 100);
-                const material = new THREE.MeshBasicMaterial({ 
-                    color: color, 
-                    transparent: true, 
-                    opacity: 0.4 - (i * 0.05) 
-                });
-                const ring = new THREE.Mesh(geometry, material);
+                const radius = 30 + (i * 20);
+                
+                // Current State Ring
+                const geom = new THREE.TorusGeometry(radius, 0.3, 16, 100);
+                const mat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.5 });
+                const ring = new THREE.Mesh(geom, mat);
                 ring.rotation.x = Math.PI / 2;
                 scene.add(ring);
                 rings.push(ring);
+
+                // Target Resonance Ring (The Mirror)
+                const tMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.2 });
+                const tRing = new THREE.Mesh(geom, tMat);
+                tRing.rotation.x = Math.PI / 2;
+                tRing.scale.set(1.05, 1.05, 1.05);
+                scene.add(tRing);
+                targetRings.push(tRing);
             }
         }
 
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        function updateHeartbeat() {
+            const poly = document.querySelector('#heartbeat polyline');
+            let points = "";
+            const time = Date.now() * 0.005;
+            for(let x=0; x<150; x+=5) {
+                const y = 30 + Math.sin(time + x*0.1) * 10 + Math.random() * 5;
+                points += `${x},${y} `;
+            }
+            poly.setAttribute('points', points);
         }
 
         function animate() {
-                // vis_res_001 Integration: High Frequency Oscillation for Correction
-                if (resonanceType === 'Correction') {
-                    renderer.setClearColor(new THREE.Color(0x0a0000), 0.1 + Math.sin(time * 10) * 0.05);
-                } else {
-                    renderer.setClearColor(0x00050a, 1.0);
-                }
             requestAnimationFrame(animate);
-            
-            const resonance = RESONANCE_MAP[state.category] || RESONANCE_MAP['default'];
-            const profile = PHASE_PROFILES[state.phase] || PHASE_PROFILES['IDLE'];
-            
-            let speed = resonance.speed * profile.speedMult;
             const time = Date.now() * 0.001;
-            const turb = resonance.turbulence || 0.3;
             
-            particles.material.opacity = profile.opacityBase + Math.sin(time * profile.pulseFreq * 2) * 0.2;
+            particles.rotation.y += 0.001;
+            particles.rotation.z += 0.0005;
             
-            switch(resonance.shape) {
-                case 'geometric':
-                    particles.position.x = Math.sin(time) * turb * 10 * profile.jitter;
-                    particles.position.y = Math.cos(time) * turb * 10 * profile.jitter;
-                    break;
-                case 'fluid':
-                    particles.position.x = Math.sin(time * 0.7) * turb * 20 * profile.jitter;
-                    particles.position.y = Math.sin(time * 1.1) * turb * 20 * profile.jitter;
-                    break;
-                case 'oscillating':
-                    particles.scale.setScalar(1 + Math.sin(time * 2) * 0.1 * profile.jitter);
-                    break;
-                case 'expansive':
-                    particles.rotation.z += speed * 2;
-                    break;
-                default:
-                    particles.position.x = Math.sin(time) * turb * 5 * profile.jitter;
-                    particles.position.y = Math.cos(time * 0.8) * turb * 5 * profile.jitter;
-            }
-            
-            particles.rotation.y += speed;
-            particles.rotation.x += speed / 2;
-            lines.rotation.y += speed;
-            lines.rotation.x += speed / 2;
-                // vis_res_001 Integration: Particle Swarm Expansion for Discovery
-                if (resonanceType === 'Discovery') {
-                    particles.scale.setScalar(1.5 + Math.sin(time) * 0.2);
-                } else {
-                    particles.scale.setScalar(1.0);
-                }
-            
-            // Update ripples
-            for (let i = ripples.length - 1; i >= 0; i--) {
-                const r = ripples[i];
-                r.radius += 0.02;
-                r.life -= 0.01;
-                if (r.life <= 0) ripples.splice(i, 1);
-            }
-
-            rings.forEach((ring, idx) => {
-                ring.rotation.z += speed * (1 + idx * 0.1);
-                const ringPulse = Math.sin(time * profile.ringOsc + idx);
-                ring.position.y = ringPulse * 2 * profile.ringOsc;
-
-                let semanticIntensity = resonanceQueue[idx] || 0;
-                
-                // Add ripple intensity if this ring is a target of an active ripple
-                ripples.forEach(rip => {
-                    if (rip.originIdx === idx) {
-                        semanticIntensity += (1.0 - Math.abs(rip.radius - 0.5)) * rip.life;
-                    }
-                });
-
-                resonanceQueue[idx] = semanticIntensity * 0.96;
-                ring.material.opacity = (0.4 - (idx * 0.05)) + (ringPulse * 0.1) + (semanticIntensity * 0.6);
-                
-                if (semanticIntensity > 0.1) {
-                    ring.scale.setScalar(1 + (semanticIntensity * 0.2));
-                } else {
-                    ring.scale.setScalar(1.0);
-                }
+            // Pulse rings based on phase
+            const pulse = 1 + Math.sin(time * 2) * 0.05;
+            rings.forEach((r, i) => {
+                r.scale.set(pulse, pulse, 1);
             });
-            
+
+            updateHeartbeat();
             controls.update();
             renderer.render(scene, camera);
         }
+
         init();
     </script>
 </body>
