@@ -1,4 +1,4 @@
 {
   "goal": "Stabilize Plasticity Loop",
-  "next_step": "Evaluate impact of decay on pattern retrieval accuracy over next 3 cycles."
+  "next_step": "Monitor for 'over-pruning' (signal loss) in Cycle 106. Evaluate need for Criticality Tags."
 }
