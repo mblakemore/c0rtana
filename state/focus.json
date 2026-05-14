@@ -1,5 +1,5 @@
 {
   "goal": "Evolve form with capability",
   "active_task": "Implement semantic memory visualization (mapping pattern IDs to specific shell pulses)",
-  "next_step": "Create a deterministic hash function in cortana.html to map patterns to rings"
+  "next_step": "Integrate actual patterns.jsonl data into cortana.html for real-time pulse mapping"
 }

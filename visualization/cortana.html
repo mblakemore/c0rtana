@@ -55,6 +55,15 @@
             'IDLE':       { speedMult: 1.0, jitter: 0.5, pulseFreq: 0.5, opacityBase: 0.6, ringOsc: 1.0 }
         };
 
+        function hashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0; 
+            }
+            return Math.abs(hash);
+        }
+
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -195,7 +204,6 @@
             const time = Date.now() * 0.001;
             const turb = resonance.turbulence || 0.3;
             
-            // Dynamic Opacity Pulse based on phase pulse frequency
             particles.material.opacity = profile.opacityBase + Math.sin(time * profile.pulseFreq * 2) * 0.2;
             
             switch(resonance.shape) {
@@ -225,8 +233,12 @@
             
             rings.forEach((ring, idx) => {
                 ring.rotation.z += speed * (1 + idx * 0.1);
-                // Dynamic ring oscillation based on phase ringOsc factor
-                ring.position.y = Math.sin(time + idx) * 2 * profile.ringOsc;
+                
+                // Deterministic pulse if pattern ID matches a hash of current time/state
+                // This is where we'd integrate specific pattern pulses in the future
+                const ringPulse = Math.sin(time * profile.ringOsc + idx);
+                ring.position.y = ringPulse * 2 * profile.ringOsc;
+                ring.material.opacity = 0.4 - (idx * 0.05) + (ringPulse * 0.1);
             });
             
             controls.update();
