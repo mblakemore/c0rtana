@@ -3,27 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cortana // Cognitive State Interface (CSI)</title>
+    <title>C0RTANA // Cognitive State Interface (CSI)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.js"></script>
     <style>
         body { margin: 0; overflow: hidden; background-color: #000205; font-family: 'Courier New', Courier, monospace; color: #00f2ff; }
         #ui-overlay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            pointer-events: none;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            text-shadow: 0 0 8px rgba(0, 242, 255, 0.6);
+            position: absolute; top: 20px; left: 20px; pointer-events: none; z-index: 10;
+            display: flex; flex-direction: column; gap: 15px; text-shadow: 0 0 8px rgba(0, 242, 255, 0.6);
         }
         .telemetry-block {
-            background: rgba(0, 20, 30, 0.7);
-            border-left: 3px solid #00f2ff;
-            padding: 10px 15px;
-            backdrop-filter: blur(4px);
+            background: rgba(0, 20, 30, 0.7); border-left: 3px solid #00f2ff; padding: 10px 15px; backdrop-filter: blur(4px);
         }
         .status-item { margin-bottom: 5px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
         .value { color: #fff; font-weight: bold; float: right; margin-left: 20px; }
@@ -31,24 +22,12 @@
         #sync-container { width: 200px; height: 4px; background: rgba(0, 242, 255, 0.2); margin-top: 10px; position: relative; overflow: hidden; }
         #sync-fill { height: 100%; width: 0%; background: #00f2ff; transition: width 0.5s ease; box-shadow: 0 0 10px #00f2ff; }
         #metaphor-display {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            text-align: right;
-            font-size: 18px;
-            letter-spacing: 4px;
-            color: #fff;
-            text-transform: uppercase;
-            opacity: 0.7;
+            position: absolute; top: 20px; right: 20px; text-align: right; font-size: 18px;
+            letter-spacing: 4px; color: #fff; text-transform: uppercase; opacity: 0.7;
         }
         #heartbeat {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 150px;
-            height: 60px;
-            background: rgba(0, 10, 20, 0.5);
-            border: 1px solid rgba(0, 242, 255, 0.3);
+            position: absolute; bottom: 20px; right: 20px; width: 150px; height: 60px;
+            background: rgba(0, 10, 20, 0.5); border: 1px solid rgba(0, 242, 255, 0.3);
         }
         canvas { display: block; }
     </style>
@@ -72,25 +51,26 @@
     <svg id="heartbeat"><polyline points="" fill="none" stroke="#00f2ff" stroke-width="1" /></svg>
 
     <script>
-        let scene, camera, renderer, particles, controls;
-        let currentMetaphorObj = null;
+        let scene, camera, renderer, particles, controls, clock;
+        let currentMesh = null;
         let state = { 
             phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, 
             category: 'default', focus: 'CSI Activation', obj: 'NONE' 
         };
 
         const METAPHORS = {
-            'divergent': { name: 'SENSING...', color: 0x00ffcc, type: 'spheres' },
-            'convergent': { name: 'THE PRISM', color: 0x00aaff, type: 'prism' },
-            'lateral': { name: 'MÖBIUS STRIP', color: 0xff00ff, type: 'mobius' },
-            'formal': { name: 'CRYSTALLINE LATTICE', color: 0x00ff8c, type: 'lattice' },
-            'reactive': { name: 'ENTROPY CLOUD', color: 0xff3300, type: 'chaos' },
-            'integrative': { name: 'NEURAL BLOOM', color: 0xda70d6, type: 'bloom' },
-            'DEFAULT': { name: 'IDLE/STANDBY', color: 0x446688, type: 'spheres' }
+            'SENSING...': { name: 'SENSING...', color: 0x00ffcc, type: 'spheres', geom: () => new THREE.SphereGeometry(15, 16, 16) },
+            'THE PRISM': { name: 'THE PRISM', color: 0x00aaff, type: 'prism', geom: () => new THREE.ConeGeometry(20, 50, 4) },
+            'MÖBIUS STRIP': { name: 'MÖBIUS STRIP', color: 0xff00ff, type: 'mobius', geom: () => new THREE.TorusKnotGeometry(20, 4, 100, 16) },
+            'CRYSTALLINE LATTICE': { name: 'CRYSTALLINE LATTICE', color: 0x00ff8c, type: 'lattice', geom: () => new THREE.IcosahedronGeometry(30, 1) },
+            'ENTROPY CLOUD': { name: 'ENTROPY CLOUD', color: 0xff3300, type: 'chaos', geom: () => new THREE.BoxGeometry(20, 20, 20) },
+            'NEURAL BLOOM': { name: 'NEURAL BLOOM', color: 0xda70d6, type: 'bloom', geom: () => new THREE.SphereGeometry(20, 32, 32) },
+            'DEFAULT': { name: 'IDLE/STANDBY', color: 0x446688, type: 'spheres', geom: () => new THREE.SphereGeometry(15, 16, 16) }
         };
 
         function init() {
             scene = new THREE.Scene();
+            clock = new THREE.Clock();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 180;
 
@@ -146,45 +126,33 @@
                 document.getElementById('sync-fill').style.width = `${syncProgress * 100}%`;
 
                 if (prevCategory !== state.category) {
-                    updateMetaphor();
+                    transitionMetaphor();
                 }
             } catch (e) { console.error("CSI State Sync Error:", e); }
         }
 
-        function updateMetaphor() {
-            const metaphorKey = METAPHORS[state.category] ? state.category : 'DEFAULT';
+        function transitionMetaphor() {
+            // Match resonance_type to METAPHORS key
+            let metaphorKey = 'DEFAULT';
+            for (let k in METAPHORS) { if (state.category.includes(k) || k.includes(state.category)) { metaphorKey = k; break; } }
+            
             const meta = METAPHORS[metaphorKey];
             document.getElementById('metaphor-display').innerText = meta.name;
             
-            if (currentMetaphorObj) scene.remove(currentMetaphorObj);
-            
-            switch(meta.type) {
-                case 'mobius':
-                    const mobGeom = new THREE.TorusKnotGeometry(20, 4, 100, 16);
-                    const mobMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
-                    currentMetaphorObj = new THREE.Mesh(mobGeom, mobMat);
-                    break;
-                case 'lattice':
-                    const latGeom = new THREE.IcosahedronGeometry(30, 1);
-                    const latMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
-                    currentMetaphorObj = new THREE.Mesh(latGeom, latMat);
-                    break;
-                case 'prism':
-                    const priGeom = new THREE.ConeGeometry(20, 50, 4);
-                    const priMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
-                    currentMetaphorObj = new THREE.Mesh(priGeom, priMat);
-                    break;
-                case 'bloom':
-                    const bloGeom = new THREE.SphereGeometry(20, 32, 32);
-                    const bloMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
-                    currentMetaphorObj = new THREE.Mesh(bloGeom, bloMat);
-                    break;
-                default:
-                    const sphGeom = new THREE.SphereGeometry(15, 16, 16);
-                    const sphMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
-                    currentMetaphorObj = new THREE.Mesh(sphGeom, sphMat);
+            const newGeom = meta.geom();
+            const newMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
+            const nextMesh = new THREE.Mesh(newGeom, newMat);
+            nextMesh.scale.set(0,0,0);
+            scene.add(nextMesh);
+
+            if (currentMesh) {
+                new TWEEN.Tween(currentMesh.scale).to({ x: 0, y: 0, z: 0 }, 1000).onComplete(() => {
+                    scene.remove(currentMesh);
+                }).start();
             }
-            scene.add(currentMetaphorObj);
+
+            new TWEEN.Tween(nextMesh.scale).to({ x: 1, y: 1, z: 1 }, 1000).start();
+            currentMesh = nextMesh;
         }
 
         function updateHeartbeat() {
@@ -200,13 +168,23 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            const time = Date.now() * 0.001;
+            TWEEN.update();
+            const time = clock.getElapsedTime();
             particles.rotation.y += 0.001;
-            if (currentMetaphorObj) {
-                currentMetaphorObj.rotation.x += 0.01;
-                currentMetaphorObj.rotation.y += 0.01;
-                const scale = 1 + Math.sin(time * 2) * (1 - state.confidence);
-                currentMetaphorObj.scale.set(scale, scale, scale);
+            
+            // Phase-based particle behavior
+            if (state.phase === 'ACT' || state.phase === 'DECIDE') {
+                particles.rotation.z += 0.01;
+            } else if (state.phase === 'REFLECT' || state.phase === 'PERCEIVE') {
+                particles.position.x = Math.sin(time) * 2;
+            }
+
+            if (currentMesh) {
+                currentMesh.rotation.x += 0.01;
+                currentMesh.rotation.y += 0.01;
+                // Confidence influences scale oscillation amplitude
+                const pulse = 1 + Math.sin(time * 2) * (1 - state.confidence) * 0.2;
+                currentMesh.scale.set(pulse, pulse, pulse);
             }
             updateHeartbeat();
             controls.update();
