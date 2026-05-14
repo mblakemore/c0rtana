@@ -1,8 +1,18 @@
 {
   "current_phase": "CONSOLIDATE",
-  "active_experiment": "Semantic Sieve",
-  "last_filtered_candidates": 3,
-  "promoted_patterns": 1,
-  "rejection_rate": "66.7%",
-  "observation": "Simple frequency analysis is heavily contaminated by linguistic fillers. Qualitative heuristics are necessary for meaningful pattern consolidation."
+  "active_experiment": "Semantic Resonance Scanner",
+  "cognitive_tools": {
+    "semantic_resonance_scanner": {
+      "version": "1.0",
+      "active": true,
+      "markers": {
+        "discovery": ["discovered", "crucially", "pattern observed", "novel"],
+        "correction": ["correcting", "better than", "refining", "gap closed"],
+        "recurrence": ["again", "similar to", "consistent", "repeating"]
+      },
+      "threshold": "high_utility_signal",
+      "output_target": "patterns.jsonl"
+    }
+  },
+  "observation": "Transitioned from manual curation to marker-based automated detection. The system now identifies 'resonance' in its own logs as a signal for consolidation."
 }
