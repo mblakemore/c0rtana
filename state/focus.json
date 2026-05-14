@@ -1,5 +1,7 @@
 {
-  "goal": "Expand the semantic resonance system into a dynamic cognitive map",
-  "next_step": "Implement secondary resonance (ripple effect) where bridge activation triggers a delayed pulse in the target ring",
-  "priority": "medium"
+  "cycle": 83,
+  "goal": "Implement secondary resonance (ripple effect)",
+  "next_step": "Add ripple logic to visualization/cortana.html",
+  "priority": "high",
+  "category": "visualization"
 }

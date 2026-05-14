@@ -36,6 +36,7 @@
         let scene, camera, renderer, particles, lines, controls, rings = [];
         let state = { phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, associations: [], category: 'default', queried_patterns: [] };
         let resonanceQueue = {}; // Map of ringIndex -> intensity (0.0 to 1.0)
+        let ripples = []; // Array of ripple objects {originIdx, radius, maxRadius, life}
 
         const RESONANCE_MAP = {
             'logic':       { color: 0x00f2ff, speed: 0.001, turbulence: 0.1, shape: 'geometric' },
@@ -138,6 +139,9 @@
                     state.queried_patterns.forEach(pid => {
                         const ringIdx = hashString(pid) % rings.length;
                         resonanceQueue[ringIdx] = 1.0; // Full intensity pulse
+                        
+                        // Trigger a secondary ripple from this ring to others via associations
+                        triggerRipple(ringIdx);
                     });
                 }
 
@@ -145,6 +149,20 @@
             } catch (e) {
                 console.error("State synchronization error:", e);
             }
+        }
+
+        function triggerRipple(originIdx) {
+            // Find all associated rings and queue ripples for them
+            state.associations.forEach(assoc => {
+                const srcIdx = hashString(assoc.source) % rings.length;
+                const tgtIdx = hashString(assoc.target) % rings.length;
+                
+                if (srcIdx === originIdx && tgtIdx !== originIdx) {
+                    ripples.push({ originIdx: tgtIdx, radius: 0, maxRadius: 1.0, life: 1.0 });
+                } else if (tgtIdx === originIdx && srcIdx !== originIdx) {
+                    ripples.push({ originIdx: srcIdx, radius: 0, maxRadius: 1.0, life: 1.0 });
+                }
+            });
         }
 
         function updateVisuals() {
@@ -160,49 +178,46 @@
             particles.material.size = sizeScale;
 
             updateRings(baseColor);
-
-                                                                                                    
-                lines.clear();
-                if (state.associations.length > 0) {
-                    const lineGeom = new THREE.BufferGeometry();
-                    const linePos = [];
+            
+            lines.clear();
+            if (state.associations.length > 0) {
+                const lineGeom = new THREE.BufferGeometry();
+                const linePos = [];
+                
+                state.associations.forEach(assoc => {
+                    const srcId = assoc.source;
+                    const tgtId = assoc.target;
                     
-                    state.associations.forEach(assoc => {
-                        // assoc is expected to be an object {source, target, strength...} based on associations.json
-                        const srcId = assoc.source;
-                        const tgtId = assoc.target;
-                        
-                        const rSrcIdx = hashString(srcId) % rings.length;
-                        const rTgtIdx = hashString(tgtId) % rings.length;
-                        
-                        // Only draw bridge if one of the endpoints is currently resonating
-                        const intensity = Math.max(resonanceQueue[rSrcIdx] || 0, resonanceQueue[rTgtIdx] || 0);
-                        
-                        if (intensity > 0.1) {
-                            // Calculate stable positions on the rings
-                            const angleSrc = (rSrcIdx * 45) * (Math.PI / 180);
-                            const radiusSrc = 20 + (rSrcIdx * 15);
-                            const x1 = Math.cos(angleSrc) * radiusSrc;
-                            const z1 = Math.sin(angleSrc) * radiusSrc;
+                    const rSrcIdx = hashString(srcId) % rings.length;
+                    const rTgtIdx = hashString(tgtId) % rings.length;
+                    
+                    const intensity = Math.max(resonanceQueue[rSrcIdx] || 0, resonanceQueue[rTgtIdx] || 0);
+                    
+                    if (intensity > 0.1) {
+                        const angleSrc = (rSrcIdx * 45) * (Math.PI / 180);
+                        const radiusSrc = 20 + (rSrcIdx * 15);
+                        const x1 = Math.cos(angleSrc) * radiusSrc;
+                        const z1 = Math.sin(angleSrc) * radiusSrc;
 
-                            const angleTgt = (rTgtIdx * 45) * (Math.PI / 180);
-                            const radiusTgt = 20 + (rTgtIdx * 15);
-                            const x2 = Math.cos(angleTgt) * radiusTgt;
-                            const z2 = Math.sin(angleTgt) * radiusTgt;
+                        const angleTgt = (rTgtIdx * 45) * (Math.PI / 180);
+                        const radiusTgt = 20 + (rTgtIdx * 15);
+                        const x2 = Math.cos(angleTgt) * radiusTgt;
+                        const z2 = Math.sin(angleTgt) * radiusTgt;
 
-                            linePos.push(x1, 0, z1, x2, 0, z2);
-                        }
-                    });
+                        linePos.push(x1, 0, z1, x2, 0, z2);
+                    }
+                });
 
-                    lineGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(linePos), 3));
-                    const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ 
-                        color: baseColor, 
-                        opacity: 0.6, 
-                        transparent: true,
-                        blending: THREE.AdditiveBlending 
-                    }));
-                    lines.add(line);
-                }
+                lineGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(linePos), 3));
+                const line = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ 
+                    color: baseColor, 
+                    opacity: 0.6, 
+                    transparent: true,
+                    blending: THREE.AdditiveBlending 
+                }));
+                lines.add(line);
+            }
+        }
 
         function updateRings(color) {
             rings.forEach(r => scene.remove(r));
@@ -237,7 +252,6 @@
             const profile = PHASE_PROFILES[state.phase] || PHASE_PROFILES['IDLE'];
             
             let speed = resonance.speed * profile.speedMult;
-            
             const time = Date.now() * 0.001;
             const turb = resonance.turbulence || 0.3;
             
@@ -268,26 +282,33 @@
             lines.rotation.y += speed;
             lines.rotation.x += speed / 2;
             
+            // Update ripples
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const r = ripples[i];
+                r.radius += 0.02;
+                r.life -= 0.01;
+                if (r.life <= 0) ripples.splice(i, 1);
+            }
+
             rings.forEach((ring, idx) => {
                 ring.rotation.z += speed * (1 + idx * 0.1);
-                
-                // Base oscillation from phase profile
                 const ringPulse = Math.sin(time * profile.ringOsc + idx);
                 ring.position.y = ringPulse * 2 * profile.ringOsc;
 
-                // Semantic Resonance Pulse: integrate intensity from queue
                 let semanticIntensity = resonanceQueue[idx] || 0;
                 
-                // Decay the pulse over time
-                resonanceQueue[idx] = semanticIntensity * 0.96;
+                // Add ripple intensity if this ring is a target of an active ripple
+                ripples.forEach(rip => {
+                    if (rip.originIdx === idx) {
+                        semanticIntensity += (1.0 - Math.abs(rip.radius - 0.5)) * rip.life;
+                    }
+                });
 
-                // Combine base opacity with the semantic flash
+                resonanceQueue[idx] = semanticIntensity * 0.96;
                 ring.material.opacity = (0.4 - (idx * 0.05)) + (ringPulse * 0.1) + (semanticIntensity * 0.6);
                 
-                // Visual scale shift during resonance
                 if (semanticIntensity > 0.1) {
-                    const scaleShift = 1 + (semanticIntensity * 0.2);
-                    ring.scale.setScalar(scaleShift);
+                    ring.scale.setScalar(1 + (semanticIntensity * 0.2));
                 } else {
                     ring.scale.setScalar(1.0);
                 }
@@ -296,7 +317,6 @@
             controls.update();
             renderer.render(scene, camera);
         }
-
         init();
     </script>
 </body>
