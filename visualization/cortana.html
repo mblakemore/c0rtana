@@ -58,7 +58,7 @@
         <div class="telemetry-block">
             <div class="status-item"><span class="label">Identity</span> <span class="value">CORTANA v0.98</span></div>
             <div class="status-item"><span class="label">Phase</span> <span id="phase-val" class="value">IDLE</span></div>
-            <div class="status-item"><span class="label">Resonance Type</span> <span id="cat-val" class="value">DEFAULT</span></div>
+            <div class="status-item"><span class="label">Resonance</span> <span id="cat-val" class="value">DEFAULT</span></div>
             <div class="status-item"><span class="label">Confidence</span> <span id="conf-val" class="value">0%</span></div>
         </div>
         <div class="telemetry-block">
@@ -80,12 +80,13 @@
         };
 
         const METAPHORS = {
-            'Linear Analysis': { label: 'THE PRISM', color: 0x00aaff, type: 'prism' },
-            'Cross-Domain Folding': { label: 'MÖBIUS STRIP', color: 0xffffff, type: 'mobius' },
-            'Structural Optimization': { label: 'CRYSTALLINE LATTICE', color: 0x00ff8c, type: 'lattice' },
-            'Systemic Crisis': { label: 'ENTROPY CLOUD', color: 0xff3300, type: 'chaos' },
-            'Functional Synthesis': { label: 'NEURAL BLOOM', color: 0xda70d6, type: 'bloom' },
-            'DEFAULT': { label: 'SENSING...', color: 0x446688, type: 'spheres' }
+            'divergent': { name: 'SENSING...', color: 0x00ffcc, type: 'spheres' },
+            'convergent': { name: 'THE PRISM', color: 0x00aaff, type: 'prism' },
+            'lateral': { name: 'MÖBIUS STRIP', color: 0xff00ff, type: 'mobius' },
+            'formal': { name: 'CRYSTALLINE LATTICE', color: 0x00ff8c, type: 'lattice' },
+            'reactive': { name: 'ENTROPY CLOUD', color: 0xff3300, type: 'chaos' },
+            'integrative': { name: 'NEURAL BLOOM', color: 0xda70d6, type: 'bloom' },
+            'DEFAULT': { name: 'IDLE/STANDBY', color: 0x446688, type: 'spheres' }
         };
 
         function init() {
@@ -147,10 +148,9 @@
         }
 
         function updateMetaphor() {
-            // Use phase as the primary trigger for metaphors
-            const metaphorKey = METAPHORS[state.phase] ? state.phase : 'DEFAULT';
+            const metaphorKey = METAPHORS[state.category] ? state.category : 'DEFAULT';
             const meta = METAPHORS[metaphorKey];
-            document.getElementById('metaphor-display').innerText = meta.label;
+            document.getElementById('metaphor-display').innerText = meta.name;
             
             if (currentMetaphorObj) scene.remove(currentMetaphorObj);
             
