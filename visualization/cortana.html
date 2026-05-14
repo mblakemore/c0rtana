@@ -67,6 +67,7 @@
         let scene, camera, renderer, particles, controls, clock;
         let currentMesh = null;
         let voidAnchors = [];
+        let bridges = []; // C133: Relational Bridges tracking
         let state = { 
             phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, 
             category: 'default', focus: 'CSI Activation', obj: 'NONE' 
@@ -167,11 +168,11 @@
                     transitionMetaphor();
                 }
 
-                // C132 UPDATE: Transition repulsion to attraction if synthesis occurs
+                // C132/C133 UPDATE: Synthesis Logic
                 voidAnchors.forEach((anchor, idx) => {
                     if (state.phase === 'ACT' && state.confidence > 0.85) {
-                        anchor.type = 'attract'; // Crystallization
-                        anchor.repulsion = -20;  // Pull particles in
+                        anchor.type = 'attract'; 
+                        anchor.repulsion = -20;  
                     } else if (state.phase === 'REFLECT') {
                         anchor.type = 'repel';
                         anchor.repulsion = Math.min(40, anchor.repulsion * 1.05);
@@ -181,7 +182,27 @@
                     }
                 });
 
+                // C133 BRIDGE TRIGGER: Create filaments between anchors when confidence is high in synthesis mode
+                if (state.category === 'synthesis' && state.confidence > 0.7) {
+                    createRandomBridge();
+                }
+
             } catch (e) { console.error("CSI State Sync Error:", e); }
+        }
+
+        function createRandomBridge() {
+            const startIdx = Math.floor(Math.random() * voidAnchors.length);
+            let endIdx = Math.floor(Math.random() * voidAnchors.length);
+            while(endIdx === startIdx) endIdx = Math.floor(Math.random() * voidAnchors.length);
+            
+            bridges.push({
+                start: voidAnchors[startIdx].pos,
+                end: voidAnchors[endIdx].pos,
+                strength: 0,
+                active: true
+            });
+
+            if (bridges.length > 5) bridges.shift(); // Keep memory clean
         }
 
         async function updateLandscape() {
@@ -239,13 +260,13 @@
             const nextMesh = new THREE.Mesh(newGeom, newMat);
             nextMesh.scale.set(0,0,0);
             scene.add(nextMesh);
-
+    
             if (currentMesh) {
                 new TWEEN.Tween(currentMesh.scale).to({ x: 0, y: 0, z: 0 }, 1000).onComplete(() => {
                     scene.remove(currentMesh);
                 }).start();
             }
-
+    
             new TWEEN.Tween(nextMesh.scale).to({ x: 1, y: 1, z: 1 }, 1000).start();
             currentMesh = nextMesh;
         }
@@ -259,6 +280,45 @@
                 points += `${x},${y} `;
             }
             poly.setAttribute('points', points);
+        }
+
+        function renderBridges() {
+            // Using a simple LineSegments for the filaments
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const colors = [];
+            const color = new THREE.Color();
+
+            bridges.forEach(bridge => {
+                if (!bridge.active) return;
+                
+                // Growth animation (C130_SYNTH_001 bridge building)
+                if (bridge.strength < 1.0) bridge.strength += 0.005;
+
+                positions.push(bridge.start.x, bridge.start.y, bridge.start.z);
+                positions.push(bridge.end.x, bridge.end.y, bridge.end.z);
+
+                // Color transition: Void Blue -> Synthesis Gold
+                const lerpColor = new THREE.Color().lerpColors(
+                    new THREE.Color(0x0096ff), 
+                    new THREE.Color(0xffd700), 
+                    bridge.strength
+                );
+                colors.push(lerpColor.r, lerpColor.g, lerpColor.b);
+                colors.push(lerpColor.r, lerpColor.g, lerpColor.b);
+            });
+
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            const material = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.8 });
+            const lineSegments = new THREE.LineSegments(geometry, material);
+            scene.add(lineSegments);
+            
+            // Since we are in the animate loop, we need to remove it immediately after render or manage its lifecycle
+            // For simplicity in this script, we'll handle a persistent bridge mesh instead if we wanted higher performance.
+            // But for now, we will just let it be added and removed each frame by not adding it permanently.
+            return lineSegments;
         }
 
         function animate() {
@@ -279,7 +339,6 @@
                     const dz = pz - anchor.pos.z;
                     const distSq = dx*dx + dy*dy + dz*dz;
                     if (distSq < 2500) {
-                        // If type is attract, the force should be negative relative to distance vector
                         const directionMod = (anchor.type === 'attract') ? -1 : 1;
                         const force = (anchor.repulsion / (distSq + 1)) * 0.1 * directionMod;
                         posAttr.setX(i, px + dx * force);
@@ -302,6 +361,13 @@
                 const pulse = 1 + Math.sin(time * 2) * (1 - state.confidence) * 0.2;
                 currentMesh.scale.set(pulse, pulse, pulse);
             }
+
+            // C133: Render synthesis filaments
+            const bridgeMesh = renderBridges();
+            scene.add(bridgeMesh);
+            // Use a timeout or immediate removal to avoid leaking meshes in the scene graph
+            setTimeout(() => scene.remove(bridgeMesh), 16);
+
             updateHeartbeat();
             controls.update();
             renderer.render(scene, camera);
