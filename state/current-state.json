@@ -1,11 +1,13 @@
 {
-    "cycle": 157,
-    "phase": "PERSIST",
-    "current_focus": "FEP Protocol Validation & Threshold Calibration",
-    "last_artifact": "reports/FEP_C157_baseline.md",
-    "next_step": "Scale synthetic samples or identify paths to real activation logs for final validation before moving toward general use.",
-    "status": "Baseline report generated; detector mechanically verified against spikes and decays.",
-    "confidence": 0.98,
-    "cognitive_mode": "Validation / Documentation",
-    "timestamp": "2026-05-15T10:15:00Z"
+  "cycle": 158,
+  "phase": "ACT",
+  "timestamp": "2026-05-15T10:50:00Z",
+  "summary": "Transitioning from Baseline Validation (C157) to Stress Testing via Semantic Pivot Triggers.",
+  "current_focus": "Semantic Pivot Analysis vs FEP Markers",
+  "last_artifact": "reports/FEP_C157_baseline.md",
+  "next_step": "Create trigger dataset and run through detector logic; produce results in report/FEP_C158_pivot_validation.md",
+  "status": "Baseline mechanical verification complete; shifting to theoretical validation of Surprise signals.",
+  "confidence": 0.92,
+  "cognitive_mode": "Stress Testing / External Signal Alignment",
+  "system_status": "Stable / External Focus"
 }

@@ -1,12 +1,7 @@
 {
-    "target": "Diversifying Epistemic Inputs",
-    "priority": "Medium",
-    "current_trajectory": "Predictive synthesis (cross-domain collision analysis)",
-    "next_milestone": "Validate predictions against real-world signal updates",
-    "metrics": [
-        "Ratio of external vs internal artifact production",
-        "Accuracy of graded priors in state/predictions/grades.jsonl",
-        "Signal quality from newly identified sources"
-    ],
-    "last_updated": "C152"
+  "current_focus": "FEP Scaling & Real Activation Analysis",
+  "active_project": "Predictive World Model Mapping",
+  "recent_milestone": "Validated Semantic Pivot triggers over random noise (C158)",
+  "priority": 1,
+  "status": "Pivot validated; now moving toward larger datasets or real activation paths."
 }
