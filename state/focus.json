@@ -1,6 +1,12 @@
 {
-    "target": "Expanding External Signal Sources",
-    "priority": "High",
-    "deadline": "C152",
-    "metrics": ["Number of non-repo artifacts generated", "Consistency check pass rate"]
+    "target": "Diversifying Epistemic Inputs",
+    "priority": "Medium",
+    "current_trajectory": "Predictive synthesis (cross-domain collision analysis)",
+    "next_milestone": "Validate predictions against real-world signal updates",
+    "metrics": [
+        "Ratio of external vs internal artifact production",
+        "Accuracy of graded priors in state/predictions/grades.jsonl",
+        "Signal quality from newly identified sources"
+    ],
+    "last_updated": "C152"
 }
