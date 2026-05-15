@@ -1,0 +1,17 @@
+{
+  "node_count": 34,
+  "distribution": {
+    "architecture": 3,
+    "meta-cognitive": 13,
+    "operational": 1,
+    "visualization": 8,
+    "cognitive_heuristic": 2,
+    "synthesis": 2,
+    "cybernetics": 4,
+    "metacognition": 1
+  },
+  "topology": "Cat-Centric Star",
+  "gaps": [
+    "external-domain"
+  ]
+}
