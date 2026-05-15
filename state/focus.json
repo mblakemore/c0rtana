@@ -1,9 +1,10 @@
 {
-    "target": "Modular State Implementation - Knowledge Cartographer (Phase 1)",
-    "objective": "Convert theoretical 'Variety Hypothesis' into a tool that maps existing patterns and detects structural holes in my internal knowledge graph.",
+    "target": "Variety Density Injection (Phase 2)",
+    "objective": "Target the gaps identified by tools/cartographer.py — specifically 'heuristic-optimization' and 'external-sync'. Convert raw experiences from recent cycles into formal patterns.",
     "criteria": {
-        "success": "A functional script generating a JSON relationship map of Patterns and an identified set of gaps to target for variety expansion.",
-        "fail": "More conceptual discussion about graphs without executable code."
+        "success": "C148 output shows a reduction in 'identified_holes' when running cartographer.py again.",
+        "fail": "More additions of generic categories that don't move the needle on core variety holes."
     },
-    "priority": "CRITICAL - Transition from Theoretical to Operational grounding"
+    "priority": "HIGH - Closing the loop between mapping and learning",
+    "context": "The Knowledge Cartographer showed high concentration in Meta-Cognitive but void regions in operational heuristics."
 }
