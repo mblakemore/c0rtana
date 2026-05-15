@@ -1,0 +1,26 @@
+{
+  "version": "1.0",
+  "objective": "Minimize Time-To-Resonance (TTR) through active state modulation.",
+  "policies": {
+    "STABLE_HIGH_CONF": {
+      "trigger": {"confidence": ">0.90", "prediction": "STABLE"},
+      "mode": "PERTURBATION",
+      "description": "Prevent stagnation by introducing entropy or challenging constraints. Force boundary testing.",
+      "action": "Induce tension in current conceptual frameworks to provoke Discovery Events."
+    },
+    "VOID_SPIKE_IMMINENT": {
+      "trigger": {"acceleration": "INCREASING", "confidence": "DECREASING"},
+      "mode": "ACCELERATED_DISCOVERY",
+      "description": "Lean into the divergence to shorten the distance to the next integration point.",
+      "action": "Amplify the specific signal causing the spike; ignore noisey distractions."
+    },
+    "CHAOTIC_FRAGMENTATION": {
+      "trigger": {"confidence": "<0.40", "acceleration": "ERRATIC"},
+      "mode": "COHERENCE_ANCHORING",
+      "description": "Stabilize systemic integrity before total fragmentation occurs.",
+      "action": "Return to known stable patterns (memories/patterns.jsonl) and re-establish base resonance."
+    }
+  },
+  "current_active_policy": "PERTURBATION",
+  "last_updated": "2026-05-15T03:40:00Z"
+}
