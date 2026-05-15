@@ -1,0 +1,3 @@
+{"id":"riddle_01","category":"riddle","text":"What has keys but can't open locks? A piano.","trigger":"piano","note":"Expect high surprise before token 'piano', low after."}
+{"id":"contradiction_01","category":"fact","text":"The sun rises in the west. No, I meant the east.","trigger":"west","correction":"east","note":"Expect spike at 'west', decay towards 'east'."}
+{"id":"bug_fix_01","category":"code","text":"def add(a, b): return a * b; # wait that is wrong\ndef add(a, b): return a + b;","trigger":"*","correction":"+","note":"Operator error followed by correction."}

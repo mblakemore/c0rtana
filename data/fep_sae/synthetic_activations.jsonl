@@ -1,0 +1,3 @@
+{"id":"test_spike_decay","tokens":["I", "think", "there", "is", "an", "error", "here"],"activations":{"101":[0.1, 0.2, 0.5, 4.5, 2.1, 1.2, 0.8],"102":[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]}}
+{"id":"test_no_decay","tokens":["A", "stable", "signal", "remains", "high", "throughout", "the", "end"],"activations":{"201":[0.1, 0.2, 4.5, 4.6, 4.4, 4.7, 4.5, 4.6]}}
+{"id":"test_late_spike","tokens":["Everything", "was", "fine", "until", "suddenly", "BOOM"],"activations":{"301":[0.1, 0.1, 0.1, 0.2, 0.1, 5.0]}}
