@@ -1,0 +1,36 @@
+{
+  "coherent_pivot": {
+    "sequence": [
+      "A",
+      "A",
+      "PIVOT",
+      "B",
+      "B"
+    ],
+    "fep_trace": [
+      0.1,
+      0.1,
+      1.0,
+      0.2,
+      0.1
+    ],
+    "integration_efficiency": 0.85
+  },
+  "random_pivot": {
+    "sequence": [
+      "A",
+      "A",
+      "PIVOT",
+      "A",
+      "C"
+    ],
+    "fep_trace": [
+      0.1,
+      0.1,
+      1.0,
+      0.8,
+      0.1
+    ],
+    "integration_efficiency": 0.55
+  }
+}
