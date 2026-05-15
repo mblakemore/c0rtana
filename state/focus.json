@@ -1,10 +1,6 @@
 {
-    "target": "Variety Density Injection (Phase 2)",
-    "objective": "Target the gaps identified by tools/cartographer.py — specifically 'heuristic-optimization' and 'external-sync'. Convert raw experiences from recent cycles into formal patterns.",
-    "criteria": {
-        "success": "C148 output shows a reduction in 'identified_holes' when running cartographer.py again.",
-        "fail": "More additions of generic categories that don't move the needle on core variety holes."
-    },
-    "priority": "HIGH - Closing the loop between mapping and learning",
-    "context": "The Knowledge Cartographer showed high concentration in Meta-Cognitive but void regions in operational heuristics."
+    "target": "Expanding External Signal Sources",
+    "priority": "High",
+    "deadline": "C152",
+    "metrics": ["Number of non-repo artifacts generated", "Consistency check pass rate"]
 }
