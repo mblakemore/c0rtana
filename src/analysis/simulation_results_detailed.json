@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-05-15T19:21:40.495301",
+  "results": {
+    "STABLE": {
+      "alert_count": 0,
+      "first_alert": null,
+      "uptime": 1.0
+    },
+    "GRADUAL_SLIDE": {
+      "alert_count": 41,
+      "first_alert": 159,
+      "uptime": 0.795
+    },
+    "FLICKER": {
+      "alert_count": 0,
+      "first_alert": null,
+      "uptime": 1.0
+    },
+    "HARD_BREAK": {
+      "alert_count": 98,
+      "first_alert": 102,
+      "uptime": 0.51
+    }
+  }
+}

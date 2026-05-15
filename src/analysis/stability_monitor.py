@@ -25,7 +25,13 @@ class StabilityMonitor:
             self.state_log.pop(0)
 
         avg_energy = np.mean([x['energy'] for x in self.state_log])
-        status = "STABLE" if avg_energy < self.energy_threshold else "ALERT: DRIFT DETECTED"
+        
+        # BURNING-IN PROTECTION: Prohibit alerts until the first full window is populated.
+        # This prevents False Positives during initial noise calibration.
+        if len(self.state_log) < self.window_size:
+            status = "WARMING UP"
+        else:
+            status = "STABLE" if avg_energy < self.energy_threshold else "ALERT: DRIFT DETECTED"
         
         return {
             'token': token_idx, 
@@ -55,7 +61,7 @@ if __name__ == "__main__":
         [{'feature_id':4, 'peak_activation':5.1, 'confidence_score':0.8}], # 4.08
         [{'feature_id':5, 'peak_activation':4.9, 'confidence_score':0.7}], # 3.43
     ]
-
+    
     print("Testing Stable Stream:")
     for i, events in enumerate(stable_stream):
         res = monitor.monitor_step(i, events)

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-05-15T18:46:59.530429",
+  "metrics": {
+    "Baseline Stable": {
+      "detected_at": null,
+      "actual_drift": null,
+      "lag": null,
+      "final_avg_energy": 0.1983653525467841
+    },
+    "Rapid Shift": {
+      "detected_at": 24,
+      "actual_drift": 20,
+      "lag": 4,
+      "final_avg_energy": 12.590089004746101
+    },
+    "Late Decay": {
+      "detected_at": 74,
+      "actual_drift": 70,
+      "lag": 4,
+      "final_avg_energy": 11.882001682680746
+    }
+  }
+}

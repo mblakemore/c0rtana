@@ -1,0 +1,26 @@
+{
+  "1.0": {
+    "total_tokens": 100,
+    "alert_count": 89,
+    "drift_percentage": 89.0,
+    "first_alert": 9
+  },
+  "2.5": {
+    "total_tokens": 100,
+    "alert_count": 21,
+    "drift_percentage": 21.0,
+    "first_alert": 9
+  },
+  "4.0": {
+    "total_tokens": 100,
+    "alert_count": 0,
+    "drift_percentage": 0.0,
+    "first_alert": null
+  },
+  "6.0": {
+    "total_tokens": 100,
+    "alert_count": 0,
+    "drift_percentage": 0.0,
+    "first_alert": null
+  }
+}
