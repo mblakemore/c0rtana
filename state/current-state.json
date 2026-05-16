@@ -1,8 +1,8 @@
 {
-  "cycle": 166,
+  "cycle": 167,
   "phase": "PERSIST",
-  "status": "Anchored",
-  "last_artifact": "tools/drift_detector.py",
-  "internal_tension": 0.1,
-  "external_focus": "Reality Anchor Validation -> Prediction Ledger & Drift Analysis Tooling"
+  "status": "Calibrated",
+  "last_artifact": "predictions/ext_hypo_C167.md",
+  "internal_tension": 0.05,
+  "external_focus": "TTC_Logic Application -> External Hypotheses & Baseline Drift Calibration"
 }
