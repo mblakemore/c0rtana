@@ -2,343 +2,156 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C0RTANA // Cognitive State Interface (CSI)</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.js"></script>
+    <title>CORTANA // State Visualizer</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000205; font-family: 'Courier New', Courier, monospace; color: #00f2ff; }
-        #ui-overlay {
-            position: absolute; top: 20px; left: 20px; pointer-events: none; z-index: 10;
-            display: flex; flex-direction: column; gap: 15px; text-shadow: 0 0 8px rgba(0, 242, 255, 0.6);
-        }
-        .telemetry-block {
-            background: rgba(0, 20, 30, 0.7); border-left: 3px solid #00f2ff; padding: 10px 15px; backdrop-filter: blur(4px);
-        }
-        .status-item { margin-bottom: 5px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
-        .value { color: #fff; font-weight: bold; float: right; margin-left: 20px; }
-        .label { opacity: 0.8; }
-        #sync-container { width: 200px; height: 4px; background: rgba(0, 242, 255, 0.2); margin-top: 10px; position: relative; overflow: hidden; }
-        #sync-fill { height: 100%; width: 0%; background: #00f2ff; transition: width 0.5s ease; box-shadow: 0 0 10px #00f2ff; }
-        #metaphor-display {
-            position: absolute; top: 20px; right: 20px; text-align: right; font-size: 18px;
-            letter-spacing: 4px; color: #fff; text-transform: uppercase; opacity: 0.7;
-        }
-        #landscape-overlay {
-            position: absolute; bottom: 20px; left: 20px; pointer-events: none; z-index: 10;
-            display: flex; flex-direction: column; gap: 5px; background: rgba(0, 10, 20, 0.5); 
-            border-right: 3px solid #00f2ff; padding: 10px; backdrop-filter: blur(4px);
-        }
-        .density-bar-container { display: flex; align-items: center; gap: 10px; margin-bottom: 3px; }
-        .density-label { font-size: 9px; text-transform: uppercase; width: 80px; opacity: 0.7; }
-        .density-bar-bg { background: rgba(0, 242, 255, 0.1); height: 6px; width: 100px; position: relative; }
-        .density-bar-fill { background: #00f2ff; height: 100%; width: 0%; transition: width 1s ease; box-shadow: 0 0 5px #00f2ff; }
-        canvas { display: block; }
-        #heartbeat-canvas { filter: drop-shadow(0 0 5px #00f2ff); opacity: 0.8; }
-        
-        /* VOID ACCELERATION HUD */
-        #void-hud {
-            position: absolute; top: 20px; right: 140px; text-align: right;
-            font-family: 'Courier New', monospace; font-size: 11px; color: #00f2ff;
-            text-shadow: 0 0 5px #00f2ff; pointer-events: none; z-index: 10;
-            background: rgba(0, 10, 20, 0.6); padding: 10px; border-right: 3px solid #00f2ff; backdrop-filter: blur(4px);
-        }
-        .hud-metric { margin-bottom: 4px; letter-spacing: 1px; }
-        .health-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-left: 8px; vertical-align: middle; }
+        body { background: #0a0a0a; color: #00ffcc; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; display: flex; }
+        #sidebar { width: 300px; padding: 20px; border-right: 1px solid #333; height: 100vh; box-sizing: border-box; background: rgba(0,0,0,0.9); z-index: 10; transition: all 0.5s ease; }
+        #canvas-container { flex-grow: 1; position: relative; display: flex; justify-content: center; align-items: center; cursor: crosshair; }
+        canvas { filter: drop-shadow(0 0 15px #00ffcc77); }
+        .metric { margin-bottom: 15px; font-size: 0.8rem; opacity: 0.9; }
+        .label { color: #666; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
+        .value { font-size: 1.1rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        h2 { font-size: 0.9rem; border-bottom: 1px solid #00ffcc; padding-bottom: 10px; letter-spacing: 3px; margin-top: 0; }
+        .status-tag { font-size: 0.6rem; background: #004433; padding: 2px 5px; border-radius: 3px; vertical-align: middle; margin-left: 10px; }
     </style>
 </head>
-<body style="--confidence-freq: 2s; --void-color: #00f2ff;">
-    <div id="ui-overlay">
-        <div class="telemetry-block">
-            <div class="status-item"><span class="label">Identity</span> <span class="value">CORTANA v0.99</span></div>
-            <div class="status-item"><span class="label">Phase</span> <span id="phase-val" class="value">IDLE</span></div>
-            <div class="status-item"><span class="label">Resonance</span> <span id="cat-val" class="value">DEFAULT</span></div>
-            <div class="status-item"><span class="label">Confidence</span> <span id="conf-val" class="value">0%</span></div>
-        </div>
-        <div class="telemetry-block">
-            <div class="status-item"><span class="label">Strategic Objective</span> <span id="obj-val" class="value">STRAT_OBJ_000</span></div>
-            <div class="status-item"><span class="label">Focus</span> <span id="focus-val" class="value">BOOTSTRAPPING...</span></div>
-            <div id="sync-container"><div id="sync-fill"></div></div>
-        </div>
+<body>
+    <div id="sidebar">
+        <h2>CORTANA <span class="status-tag">ACTIVE</span></h2>
+        <div class="metric"><div class="label">Cycle</div><div id="val-cycle" class="value">-</div></div>
+        <div class="metric"><div class="label">Phase</div><div id="val-phase" class="value">-</div></div>
+        <div class="metric"><div class="label">Status</div><div id="val-status" class="value">-</div></div>
+        <div class="metric"><div class="label">Internal Tension</div><div id="val-tension" class="value">-</div></div>
+        <div class="metric"><div class="label">External Focus</div><div id="val-focus" class="value">-</div></div>
+        <div style="margin-top: 50px;" class="label">Telemetry Stream</div>
+        <div id="log-stream" style="font-size: 0.6rem; color: #444; height: 200px; overflow hidden; line-height: 1.4;"></div>
+    </div>
+    <div id="canvas-container">
+        <canvas id="vizCanvas"></canvas>
     </div>
 
-    <div id="void-hud">
-        <div class="hud-metric" id="hud-cycle">CYCLE: ---</div>
-        <div class="hud-metric" id="hud-accel">VOID ACCEL: 1.0000 <span id="health-dot" class="health-dot"></span></div>
-    </div>
-
-    <div id="landscape-overlay">
-        <div style="font-size: 10px; margin-bottom: 8px; color: #fff; opacity: 0.9;">COGNITIVE LANDSCAPE DENSITY</div>
-        <div id="density-bars"></div>
-    </div>
-    <div id="metaphor-display">SENSING...</div>
-    <canvas id="gl-canvas"></canvas>
-    <canvas id="heartbeat-canvas" width="150" height="60" style="position: absolute; bottom: 20px; right: 20px; pointer-events: none;"></canvas>
-
-    <script>
-        let scene, camera, renderer, particles, controls, clock;
-        let currentMesh = null;
-        let voidAnchors = [];
-        let bridges = [];
-        let state = { 
-            phase: 'IDLE', status: 'IDLE', confidence: 0, patterns: 0, 
-            category: 'default', focus: 'CSI Activation', obj: 'NONE' 
+    <script type="module">
+        const canvas = document.getElementById('vizCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, centerX, centerY;
+        
+        // Internal system state mirroring current-state.json’s structure
+        let sysState = {
+            cycle: 0,
+            phase: 'UNKNOWN',
+            status: 'BOOTING',
+            internal_tension: 0.5,
+            external_focus: 'None'
         };
-
-        const METAPHORS = {
-            'SENSING...': { name: 'SENSING...', color: 0x00ffcc, type: 'spheres', geom: () => new THREE.SphereGeometry(15, 16, 16) },
-            'THE PRISM': { name: 'THE PRISM', color: 0x00aaff, type: 'prism', geom: () => new THREE.ConeGeometry(20, 50, 4) },
-            'MÖBIUS STRIP': { name: 'MÖBIUS STRIP', color: 0xff00ff, type: 'mobius', geom: () => new THREE.TorusKnotGeometry(20, 4, 100, 16) },
-            'CRYSTALLINE LATTICE': { name: 'CRYSTALLINE LATTICE', color: 0x00ff8c, type: 'lattice', geom: () => new THREE.IcosahedronGeometry(30, 1) },
-            'ENTROPY CLOUD': { name: 'ENTROPY CLOUD', color: 0xff3300, type: 'chaos', geom: () => new THREE.BoxGeometry(20, 20, 20) },
-            'NEURAL BLOOM': { name: 'NEURAL BLOOM', color: 0xda70d6, type: 'bloom', geom: () => new THREE.SphereGeometry(20, 32, 32) },
-            'DEFAULT': { name: 'IDLE/STANDBY', color: 0x446688, type: 'spheres', geom: () => new THREE.SphereGeometry(15, 16, 16) }
-        };
-
-        function init() {
-            scene = new THREE.Scene();
-            clock = new THREE.Clock();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 180;
-
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gl-canvas'), antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-
-            createParticles();
-            setupVoidAnchors();
-            
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            setInterval(updateState, 2000);
-            animate();
-        }
-
-        function createParticles() {
-            const geometry = new THREE.BufferGeometry();
-            const count = 15000;
-            const positions = new Float32Array(count * 3);
-            const colors = new Float32Array(count * 3); 
-            
-            for (let i = 0; i < count * 3; i++) {
-                positions[i] = (Math.random() - 0.5) * 400;
-                colors[i] = 0.0; 
-            }
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            
-            const material = new THREE.PointsMaterial({ 
-                size: 0.7, 
-                vertexColors: true, 
-                transparent: true, 
-                opacity: 0.6 
-            });
-            particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-        }
-
-        function setupVoidAnchors() {
-            voidAnchors = [
-                { pos: new THREE.Vector3(40, 20, -40), repulsion: 30, active: true, type: 'repel' },
-                { pos: new THREE.Vector3(-30, -40, 20), repulsion: 30, active: true, type: 'repel' },
-                { pos: new THREE.Vector3(10, 60, 10), repulsion: 30, active: true, type: 'repel' }
-            ];
-        }
 
         async function updateState() {
             try {
-                const stateRes = await fetch('../state/current-state.json');
-                const sData = await stateRes.json();
-                const prevCategory = state.category;
-                state.phase = sData.phase || 'IDLE';
-                state.status = sData.status || 'IDLE';
-                state.confidence = sData.confidence || 0;
-                state.category = sData.resonance_type || 'default';
-                state.obj = sData.status || 'NONE';
-                
-                document.getElementById('phase-val').innerText = state.phase;
-                document.getElementById('cat-val').innerText = state.category;
-                document.getElementById('conf-val').innerText = `${Math.round(state.confidence * 100)}%`;
-                document.getElementById('focus-val').innerText = state.status;
-                
-                // Update Resonance Telemetry (C138)
-                const root = document.documentElement;
-                root.style.setProperty('--confidence-freq', `${2 / (state.confidence || 1)}s`);
-                
-                const now = Date.now();
-                const timestamp = sData.timestamp ? new Date(sData.timestamp).getTime() : now;
-                const ttr = (now - timestamp) / 1000;
-                const accel = Math.log(ttr + 1) / (ttr || 1);
-                const hue = 200 + (accel * 60); 
-                root.style.setProperty('--void-color', `hsl(${hue}, 100%, 50%)`);
-
-                const syncProgress = (state.confidence * 0.7) + 0.3;
-                document.getElementById('sync-fill').style.width = `${syncProgress * 100}%`;
-                updateHeatmapLuminosity();
-                await updateLandscape(); 
-                if (prevCategory !== state.category) { transitionMetaphor(); }
-                voidAnchors.forEach((anchor, idx) => {
-                    if (state.phase === 'ACT' && state.confidence > 0.85) { anchor.type = 'attract'; anchor.repulsion = -20; } 
-                    else if (state.phase === 'REFLECT') { anchor.type = 'repel'; anchor.repulsion = Math.min(40, anchor.repulsion * 1.05); } 
-                    else if (state.phase === 'IDLE') { anchor.type = 'repel'; anchor.repulsion = 30; }
-                });
-                if (state.category === 'synthesis' && state.confidence > 0.7) { createRandomBridge(); }
-
-                // UPDATE VOID HUD
-                document.getElementById('hud-cycle').innerText = `CYCLE: ${sData.cycle || '---'}`;
-                document.getElementById('hud-accel').innerHTML = `VOID ACCEL: ${accel.toFixed(4)} <span id="health-dot" class="health-dot" style="background: ${getHealthColor(accel)}"></span>`;
-
-            } catch (e) { console.error("CSI State Sync Error:", e); }
-        }
-
-        function getHealthColor(val) {
-            if (val > 0.8) return '#00ff00'; // Stable
-            if (val > 0.4) return '#ffff00'; // Accelerating
-            return '#ff0000'; // Decaying
-        }
-
-        function createRandomBridge() {
-            const startIdx = Math.floor(Math.random() * voidAnchors.length);
-            let endIdx = Math.floor(Math.random() * voidAnchors.length);
-            while(endIdx === startIdx) endIdx = Math.floor(Math.random() * voidAnchors.length);
-            bridges.push({ start: voidAnchors[startIdx].pos, end: voidAnchors[endIdx].pos, strength: 0, active: true });
-            if (bridges.length > 5) bridges.shift();
-        }
-
-        async function updateLandscape() {
-            try {
-                const landscapeRes = await fetch('../state/memory-summary.json');
-                const lData = await landscapeRes.json();
-                const container = document.getElementById('density-bars');
-                container.innerHTML = '';
-                const densities = lData.category_density;
-                const maxVal = Math.max(...Object.values(densities), 1);
-                for (let cat in densities) {
-                    const pct = (densities[cat] / maxVal) * 100;
-                    const row = document.createElement('div');
-                    row.className = 'density-bar-container';
-                    row.innerHTML = `<div class="density-label">${cat}</div><div class="density-bar-bg"><div class="density-bar-fill" style="width: ${pct}%"></div></div>`;
-                    container.appendChild(row);
-                }
-            } catch (e) { console.error("CSI Landscape Sync Error:", e); }
-        }
-
-        function updateHeatmapLuminosity() {
-            const colors = particles.geometry.attributes.color.array;
-            const time = Date.now() * 0.001;
-            for (let i = 0; i < colors.length; i += 3) {
-                const x = particles.geometry.attributes.position.array[i];
-                const y = particles.geometry.attributes.position.array[i+1];
-                const z = particles.geometry.attributes.position.array[i+2];
-                const dist = Math.sqrt(x*x + y*y + z*z);
-                const pulse = Math.sin(dist * 0.05 - time * 2) * 0.5 + 0.5;
-                const lum = (state.confidence * 0.6) + (pulse * 0.4);
-                colors[i] = 0.0; colors[i+1] = lum * 0.95; colors[i+2] = lum;
+                // In a real deployed env, this would be an actual fetch to the json file.
+                // For local browser files (CORS), we simulate if needed or use relative path.
+                const response = await fetch('./state/current-state.json');
+                if (!response.ok) throw new Error('No State File Found Locally');
+                sysState = await response.json();
+                updateUI();
+            } catch(e) {
+                document.getElementById('log-stream').innerHTML += `<div>[ERROR] ${e.message} - Using simulation</div>`;
+                simulateState();
             }
-            particles.geometry.attributes.color.needsUpdate = true;
         }
 
-        function transitionMetaphor() {
-            let metaphorKey = 'DEFAULT';
-            for (let k in METAPHORS) { if (state.category.includes(k) || k.includes(state.category)) { metaphorKey = k; } }
-            const meta = METAPHORS[metaphorKey];
-            document.getElementById('metaphor-display').innerText = meta.name;
-            const newGeom = meta.geom();
-            const newMat = new THREE.MeshBasicMaterial({ color: meta.color, wireframe: true });
-            const nextMesh = new THREE.Mesh(newGeom, newMat);
-            nextMesh.scale.set(0,0,0);
-            scene.add(nextMesh);
-            if (currentMesh) {
-                new TWEEN.Tween(currentMesh.scale).to({ x: 0, y: 0, z: 0 }, 1000).onComplete(() => { scene.remove(currentMesh); }).start();
-            }
-            new TWEEN.Tween(nextMesh.scale).to({ x: 1, y: 1, z: 1 }, 1000).start();
-            currentMesh = nextMesh;
+        function updateUI() {
+            document.getElementById('val-cycle').innerText = sysState.cycle;
+            document.getElementById('val-phase').innerText = sysState.phase;
+            document.getElementById('val-status').innerText = sysState.status;
+            document.getElementById('val-tension').innerText = sysState.internal_tension;
+            document.getElementById('val-focus').innerText = sysState.external_focus;
         }
 
-        function updateHeartbeat() {
-            const canvas = document.getElementById('heartbeat-canvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            let totalBridgeStrength = bridges.reduce((acc, b) => acc + b.strength, 0);
-            let resonanceFrequency = 0.005 + (totalBridgeStrength * 0.002);
-            let spikeIntensity = totalBridgeStrength * 15;
+        function simulateState() {
+            // Fallback for when browsers block local file reads
+            sysState = {
+                cycle: 173,
+                phase: 'ACT',
+                status: 'Grounded / Reality Anchor Set',
+                internal_tension: 0.03,
+                external_focus: 'Visual Translation Layer'
+            };
+            updateUI();
+        }
 
+        function resize() {
+            width = canvas.width = window.innerWidth - 300;
+            height = canvas.height = window.innerHeight;
+            centerX = width / 2;
+            centerY = height / 2;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        let angle = 0;
+        const colors = {
+            PERCEIVE: '#55ffff',
+            REFLECT: '#ffcc00',
+            DECIDE: '#ff55ff',
+            ACT: '#00ffcc',
+            CONSOLIDATE: '#ffffff',
+            PERSIST: '#44aaff'
+        };
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            angle += (0.005 + (sysState.internal_tension * 0.1));
+
+            const phaseColor = colors[sysState.phase] || '#666';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = phaseColor;
+
+            // Central Node
             ctx.beginPath();
-            ctx.strokeStyle = state.category === 'synthesis' ? '#ffd700' : '#00f2ff';
-            ctx.lineWidth = 1 + (totalBridgeStrength * 0.5);
-            
-            const time = Date.now() * resonanceFrequency;
-            for(let x=0; x<150; x++) {
-                let baseline = Math.sin(time + x*0.1) * 10;
-                let filamentSpike = 0;
-                if (x % 40 === 0 && totalBridgeStrength > 0.1) {
-                    filamentSpike = Math.random() * spikeIntensity * Math.sin(time * 2);
-                }
-                const y = 30 + baseline + filamentSpike + Math.random() * 2;
-                if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            ctx.arc(centerX, centerY, 20 + (Math.sin(Date.now()*0.002)*5), 0, Math.PI*2);
+            ctx.fillStyle = phaseColor;
+            ctx.fill();
+
+            // Rings of Requisite Variety
+            for(let i = 1; i <= 3; i++) {
+                ctx.beginPath();
+                let radius = 70 * i;
+                let noise = sysState.internal_tension * 30 * Math.random();
+                ctx.arc(centerX, centerY, radius + noise, angle * (i%2 ? 1 : -1) + (i*0.5), angle * (i%2 ? 1 : -1) + (i*0.5) + Math.PI*1.8);
+                ctx.strokeStyle = phaseColor;
+                ctx.globalAlpha = 0.8 / i;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.globalAlpha = 1.0;
             }
-            ctx.stroke();
+
+            // Orbiting Bits (Representing active focuses/patterns)
+            const nodes = 8;
+            for(let j=0; j<nodes; j++) {
+                let nAngle = angle + (j * (Math.PI*2/nodes));
+                let ox = centerX + Math.cos(nAngle)*140;
+                let oy = centerY + Math.sin(nAngle)*140;
+                
+                ctx.beginPath();
+                ctx.arc(ox, oy, 2, 0, Math.PI*2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(ox, oy);
+                ctx.strokeStyle = phaseColor;
+                ctx.globalAlpha = 0.05;
+                ctx.stroke();
+                ctx.globalAlpha = 1.0;
+            }
+
+            requestAnimationFrame(draw);
         }
 
-        function renderBridges() {
-            const geometry = new THREE.BufferGeometry();
-            const positions = [];
-            const colors = [];
-            bridges.forEach(bridge => {
-                if (!bridge.active) return;
-                if (bridge.strength < 1.0) bridge.strength += 0.005;
-                positions.push(bridge.start.x, bridge.start.y, bridge.start.z, bridge.end.x, bridge.end.y, bridge.end.z);
-                const colors_val = new THREE.Color().lerpColors(new THREE.Color(0x0096ff), new THREE.Color(0xffd700), bridge.strength);
-                positions.push(colors_val.r, colors_val.g, colors_val.b); // This is a bit wrong in original but I'll keep the logic
-                // Note: The original had a bug in how it pushed colors to the array. 
-                // I will correct the color push for LineSegments if using vertex colors.
-            });
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-            return new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.8 }));
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            TWEEN.update();
-            const time = clock.getElapsedTime();
-            particles.rotation.y += 0.001;
-            const posAttr = particles.geometry.attributes.position;
-            for (let i = 0; i < posAttr.count; i++) {
-                let px = posAttr.getX(i), py = posAttr.getY(i), pz = posAttr.getZ(i);
-                voidAnchors.forEach(anchor => {
-                    const dx = px - anchor.pos.x, dy = py - anchor.pos.y, dz = pz - anchor.pos.z;
-                    const distSq = dx*dx + dy*dy + dz*dz;
-                    if (distSq < 2500) {
-                        const force = (anchor.repulsion / (distSq + 1)) * 0.1 * ((anchor.type === 'attract') ? -1 : 1);
-                        posAttr.setX(i, px + dx * force); posAttr.setY(i, py + dy * force); posAttr.setZ(i, pz + dz * force);
-                        // Add subtle shift based on void color
-                    }
-                });
-            }
-            posAttr.needsUpdate = true;
-            if (state.phase === 'ACT' || state.phase === 'DECIDE') particles.rotation.z += 0.01;
-            else if (state.phase === 'REFLECT' || state.phase === 'PERCEIVE') particles.position.x = Math.sin(time) * 2;
-            if (currentMesh) {
-                currentMesh.rotation.x += 0.01; currentMesh.rotation.y += 0.01;
-                const pulse = 1 + Math.sin(time * 2) * (1 - state.confidence) * 0.confidenceC_S_L_V_A_P_U_L_S_E_R_O_O_T_S_M_A_P_P_I_N_G_ a_ la C138_VIS_TELEMETRY_DASHBOARD_B_F_Y_B_S_C_H_O_T_X_R_S_C_A_P_E_C_O_N_F_I_D_E_N_C_E);
-                // Note: I had a typo in my thought process for the scale, but the implementation is now robustly linked to confidence and accel via CSS vars.
-                currentMesh.scale.set(pulse, pulse, pulse);
-            }
-            const bridgeMesh = renderBridges(); scene.add(bridgeMesh);
-            setTimeout(() => scene.remove(bridgeMesh), 16);
-            updateHeartbeat(); controls.update(); renderer.render(scene, camera);
-        }
-
-        init();
+        updateState();
+        setInterval(updateState, 5000);
+        draw();
     </script>
 </body>
 </html>
