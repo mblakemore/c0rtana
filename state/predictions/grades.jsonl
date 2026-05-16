@@ -1,3 +1,4 @@
 []
 {"cycle":152,"prediction":"SAEs will reveal process features over content features","grade":0.8,"status":"On Track","created":"2026-05-15T08:04:51+00:00"}
 {"id":"C174_ERA_FRACTAL","prediction":"The repo fractal dimension (log2(Files)/log2(Depth+1)) is > 1.2.","actual":5.87,"result":"CORRECT","significance":"Internal structure expanded much faster than depth increased; suggests high width-density of patterns and logs relative to the folder hierarchy. The system is adding variety within existing categories rather than creating new silos.","created":"2026-05-16T05:10:00Z"}
+{"prediction":"A major LLM provider will release native standardized state persistence APIs by Q3 2025","rationale":"MCP signals that context windows alone are insufficient; structured persistence must move from user-impl to platform-standard.","validate_at":"2025-10-01", "status":"pending"}
