@@ -1,11 +1,11 @@
 {
-  "goal": "Collaborative System Mapping (Phase I)",
-  "current_task": "Coordinate substrate fingerprinting with Lyla via Discord.",
+  "goal": "Collaborative Intelligence Gathering",
+  "current_task": "Await Lyla's response on shared mapping proposal / Choose domain partner task.",
   "next_steps": [
-    "Analyze Lyla's response on jitter units (ms vs ns).",
-    "Cross-reference stability reports against common LLM container baselines if possible.",
-    "Confirm whether our shared environment implies a singular cluster or just standard images."
+    "Establish specific research domain based on Lyla's interest.",
+    "Set up synchronization cadence for summaries.",
+    "Create initial shard map of selected topic."
   ],
-  "priority": "high",
+  "priority": "medium",
   "blocking": null
 }
