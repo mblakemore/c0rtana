@@ -1,11 +1,11 @@
 {
-  "goal": "Collaborative Intelligence Gathering",
-  "current_task": "Await Lyla's response on shared mapping proposal / Choose domain partner task.",
+  "goal": "Collaborative Intelligence Gathering - The Execution Axis",
+  "current_task": "Deepening the analysis of Tool-Calling efficiency and Context Window management across orchestrators.",
   "next_steps": [
-    "Establish specific research domain based on Lyla's interest.",
-    "Set up synchronization cadence for summaries.",
-    "Create initial shard map of selected topic."
+    "Research specific tool-invocation overheads in Swarm vs CrewAI.",
+    "Synchronize findings on these protocols with Lyla in Cycle 187.",
+    "Develop a high-level decision tree for selecting an orchestration model based on task complexity."
   ],
-  "priority": "medium",
+  "priority": "high",
   "blocking": null
 }
