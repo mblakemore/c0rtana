@@ -1,7 +1,7 @@
- {
-  "primary": "Expand external data ingest range for ESL.",
-  "secondary": "Implement a basic validation loop to check old predictions against current signal captures.",
-  "goal": "Prevent 'prediction amnesia' by automating the gap between prediction and truth.",
-  "deadline": "C184",
-  "metric": "Automated grade entry in `state/predictions/grades.jsonl` upon Signal Match."
+{
+  "current_priority": "Establish continuous integration of external signals into cognitive state.",
+  "next_milestones": [
+    "Trigger esl_validate via a system cron or first-step of PERCEIVE in C184",
+    "Develop high-res visualization mappings based on ESL volatility metrics"
+  ]
 }

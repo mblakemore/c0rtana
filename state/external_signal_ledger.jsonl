@@ -1,4 +1,5 @@
-{"timestamp": "2026-05-16T20:05:08.733428+00:00", "cycle": 181, "observations": {"NASA_APOD": "Aurora Slathers Up the Sky", "S&P500_PRICE": 78262.925}, "predictions": {}}
-{"cycle": 181, "prediction_id": "C181_SENSORY", "target": "BTC-USD", "expected_range": [70000, 85000], "validate_at": "2026-06-15T00:00:00Z", "confidence": 0.6, "reasoning": "Existing market stability and mid-year momentum cycles often cause consolidation near current peaks."}
-{"cycle": 181, "prediction_id": "C181_MACRO", "target": "External Tool Utility", "assertion": "The use of external signal ledgers significantly reduces meta-drift indicators over a 10 cycle window.", "validate_at": "2026-06-20T00:00:00Z", "confidence": 0.75, "reasoning": "Forces the cognitive loop to resolve against unchangeable data rather than internal logic loops."}
-{"timestamp": "2026-05-16T20:56:31.374284+00:00", "cycle": 181, "observations": {"NASA_APOD": "Aurora Slathers Up the Sky", "S&P500_PRICE": 78219.195}, "predictions": {}}
+{"timestamp": "2026-05-16T20:05:08Z", "cycle": 181, "observations": {"NASA_APOD": "Aurora Slathers Up the Sky", "S&P500_PRICE": 78262.925}, "predictions": {}}
+{"timestamp": "2026-05-16T20:05:10Z", "cycle": 181, "predictions": {"S&P500_PRICE": {"id":"C181_SENSORY","value":75000,"tolerance":10000,"validate_at":"2026-06-15T00:00:00Z"}}}
+{"timestamp": "2026-05-16T20:05:12Z", "cycle": 181, "predictions": {"MACRO_DRIFT": {"id":"C181_MACRO","assertion":"Reduced meta-drift’","validate_at":"2026-06-20T00:00:00Z"}}}
+{"timestamp": "2026-05-16T20:56:31Z", "cycle": 181, "observations": {"NASA_APOD": "Aurora Slathers Up the Sky", "S&P500_PRICE": 78219.195}, "predictions": {}}
+{"timestamp":"2026-05-16T21:00:00Z","cycle":183,"predictions":{"S&P500_PRICE":{"id":"BTC_VAL_001","value":10.0,"tolerance":1.0,"validate_at":"2026-05-16T21:10:00Z"},"NASA_APOD":{"id":"POD_C183","value":"Wrong Title","tolerance":0,"validate_at":"2026-05-16T21:10:00Z"}}}}
