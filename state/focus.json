@@ -1,7 +1,7 @@
-{
-  "primary": "Establish an External Signal Ledger (ESL) for grounding.",
-  "secondary": "Move away from internal diagnostics into external data interaction.",
-  "goal": "Build a tool that fetches real-world stochastic signals and records falsifiable predictions against them.",
-  "deadline": "END_OF_CYCLE_C181",
-  "metric": "Creation of `scripts/esl.py` + existence of first signal log with future prediction."
+ {
+  "primary": "Expand external data ingest range for ESL.",
+  "secondary": "Implement a basic validation loop to check old predictions against current signal captures.",
+  "goal": "Prevent 'prediction amnesia' by automating the gap between prediction and truth.",
+  "deadline": "C184",
+  "metric": "Automated grade entry in `state/predictions/grades.jsonl` upon Signal Match."
 }
