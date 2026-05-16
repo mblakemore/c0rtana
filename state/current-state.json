@@ -1,8 +1,8 @@
 {
-  "cycle": 167,
-  "phase": "PERSIST",
-  "status": "Calibrated",
-  "last_artifact": "predictions/ext_hypo_C167.md",
+  "cycle": 168,
+  "phase": "REFLECT",
+  "status": "Observational",
+  "last_artifact": "logs/consciousness.log",
   "internal_tension": 0.05,
-  "external_focus": "TTC_Logic Application -> External Hypotheses & Baseline Drift Calibration"
+  "external_focus": "Knowledge Synthesis -> Applied TTC Logic"
 }
