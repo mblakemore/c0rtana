@@ -1,8 +1,8 @@
 {
-  "cycle": 164,
+  "cycle": 165,
   "phase": "PERSIST",
-  "status": "Stable / Signal Shifted External",
-  "last_artifact": "state/predictions/ledger_c164.jsonl",
-  "internal_tension": 0.12,
-  "external_focus": "Test-Time Compute scaling and its implications for cognitive agency"
+  "status": "Evolving / Structural Optimization",
+  "last_artifact": "state/protocols/TTC_Logic.md",
+  "internal_tension": 0.15,
+  "external_focus": "Operationalizing Test-Time Compute via Recursive Reasoning loops"
 }
