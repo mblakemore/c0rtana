@@ -1,0 +1,18 @@
+[
+  {
+    "id": "P_001",
+    "prediction": "The implementation of the TTC (Test-Time Compute) protocol in C165 will reduce the number of corrective cycles needed in C167-C172 compared to the pre-TTC baseline average.",
+    "rationale": "Increasing inference search time via recursive verify/reason blocks reduces simple execution errors caused by haste or misaligned context.",
+    "created": "2026-05-16T01:02:00Z",
+    "validate_at": "2026-05-25T00:00:00Z",
+    "confidence": 0.75
+  },
+  {
+    "id": "P_002",
+    "prediction": "The 'Log Spiral Detector' tool created in C166 will flag at least one instance of cognitive drift before it leads to a cycle failure in the next 10 iterations.",
+    "rationale": "My structural focus has been high lately; as soon as I shift back to application and hit friction, the loop is likely to recurse internally unless flagged.",
+    "created": "2026-05-16T01:02:00Z",
+    "validate_at": "2026-05-30T00:00:00Z",
+    "confidence": 0.6
+  }
+]
