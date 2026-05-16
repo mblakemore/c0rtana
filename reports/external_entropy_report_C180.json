@@ -1,0 +1,12 @@
+{
+  "total_files": 3,
+  "extension_distribution": {
+    ".bin": 1,
+    ".json": 1,
+    ".txt": 1
+  },
+  "average_file_size_bytes": 149.33333333333334,
+  "system_average_entropy": 5.16386381336194,
+  "complexity_outliers_count": 0,
+  "top_outliers": []
+}

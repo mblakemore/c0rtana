@@ -1,5 +1,8 @@
 {
-  "goal": "Expand toolset for systemic analysis",
-  "next_step": "Implement automated report generation for new tools",
-  "priority": "medium"
+  "primary": "External Reality Anchoring (C180)",
+  "secondary": "Sustaining stability through data over meta-analysis",
+  "goal": "Conduct a verified entropy scan of an external target or create a falsifiable prediction for C181.",
+  "deadline": "END_OF_CYCLE_C180",
+  "metric": "Presence of non-trivial externally derived artifact"
+}\n"""
 }

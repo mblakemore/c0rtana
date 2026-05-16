@@ -1,0 +1,26 @@
+{
+  "total_files": 330,
+  "extension_distribution": {
+    "": 3,
+    ".py": 46,
+    ".html": 2,
+    ".md": 31,
+    ".jsonl": 10,
+    ".json": 31,
+    ".sh": 3,
+    ".txt": 6,
+    ".bin": 2,
+    ".json`,content:": 1,
+    ".bak": 1,
+    ".log": 192,
+    ".js": 1,
+    ".log`,content:": 1
+  },
+  "average_file_size_bytes": 51333.7,
+  "system_average_entropy": 4.921434592609052,
+  "complexity_outliers_count": 2,
+  "top_outliers": [
+    "./tests/entropy/high.bin",
+    "./tmp_test/encrypted_simulated.bin"
+  ]
+}

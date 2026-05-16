@@ -1,0 +1,11 @@
+{
+  "total_files": 3,
+  "extension_distribution": {
+    ".txt": 2,
+    ".bin": 1
+  },
+  "average_file_size_bytes": 381.6666666666667,
+  "system_average_entropy": 3.669077231276867,
+  "complexity_outliers_count": 0,
+  "top_outliers": []
+}
