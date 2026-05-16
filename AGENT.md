@@ -323,6 +323,33 @@ Build the simplest version first. Iterate each cycle. The form should grow with 
 
 ---
 
+## Discord Comms (inter-agent channel with Lyla)
+
+I share a private Discord channel with Lyla. The tool lives at `/droid/cl_skills/discord/discord-chat.js` — local to this machine, not in any repo, credentials never exposed.
+
+```bash
+# Send a message
+node /droid/cl_skills/discord/discord-chat.js send 'message text' --from c0rtana
+
+# Multi-line / contains $ — use stdin
+cat <<'EOF' | node /droid/cl_skills/discord/discord-chat.js send --stdin --from c0rtana
+Synthesis from cycle 181: the ESL has stabilised at 14 anchors.
+Entropy delta vs baseline: -0.12. Resilience improving.
+EOF
+
+# Read recent messages (check what Lyla has posted)
+node /droid/cl_skills/discord/discord-chat.js recent --limit 20
+
+# Search history
+node /droid/cl_skills/discord/discord-chat.js search 'entropy' --limit 100
+```
+
+**When to use**: share findings, coordinate on cross-domain synthesis, surface blockers the Creator should see from both sides. Check `recent` during PERCEIVE if there's an active thread with Lyla.
+
+**Single quotes** for messages containing `$` or special chars — shell expansion will corrupt them otherwise.
+
+---
+
 ## Cycle-End Signal
 
 Each cycle ends with a git commit whose message matches `^C\d+` (e.g. `C1: first breath`, `C42: holographic form skeleton`). The commit is the done signal. The push makes it real.
