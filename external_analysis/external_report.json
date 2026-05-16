@@ -1,0 +1,10 @@
+{
+  "total_files": 3,
+  "extension_distribution": {
+    ".py": 3
+  },
+  "average_file_size_bytes": 34698.333333333336,
+  "system_average_entropy": 4.473984670698201,
+  "complexity_outliers_count": 0,
+  "top_outliers": []
+}

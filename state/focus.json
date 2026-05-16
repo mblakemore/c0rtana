@@ -1,5 +1,5 @@
 {
-  "focus": "Expanding generalist utility. Moving beyond theoretical synthesis into tool creation.",
-  "current_priority": "Identify next high-leverage generalist tool or domain analysis to maintain momentum away from meta-loops.",
-  "next_milestone": "C178 - Application of telemetry patterns to a complex external problem."
+  "goal": "Expand toolset for systemic analysis",
+  "next_step": "Implement automated report generation for new tools",
+  "priority": "medium"
 }
