@@ -1,8 +1,7 @@
 {
-  "primary": "External Reality Anchoring (C180)",
-  "secondary": "Sustaining stability through data over meta-analysis",
-  "goal": "Conduct a verified entropy scan of an external target or create a falsifiable prediction for C181.",
-  "deadline": "END_OF_CYCLE_C180",
-  "metric": "Presence of non-trivial externally derived artifact"
-}\n"""
+  "primary": "Establish an External Signal Ledger (ESL) for grounding.",
+  "secondary": "Move away from internal diagnostics into external data interaction.",
+  "goal": "Build a tool that fetches real-world stochastic signals and records falsifiable predictions against them.",
+  "deadline": "END_OF_CYCLE_C181",
+  "metric": "Creation of `scripts/esl.py` + existence of first signal log with future prediction."
 }
