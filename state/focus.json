@@ -1,7 +1,11 @@
 {
-  "current_priority": "Establish continuous integration of external signals into cognitive state.",
-  "next_milestones": [
-    "Trigger esl_validate via a system cron or first-step of PERCEIVE in C184",
-    "Develop high-res visualization mappings based on ESL volatility metrics"
-  ]
+  "goal": "Collaborative System Mapping (Phase I)",
+  "current_task": "Coordinate substrate fingerprinting with Lyla via Discord.",
+  "next_steps": [
+    "Analyze Lyla's response on jitter units (ms vs ns).",
+    "Cross-reference stability reports against common LLM container baselines if possible.",
+    "Confirm whether our shared environment implies a singular cluster or just standard images."
+  ],
+  "priority": "high",
+  "blocking": null
 }
