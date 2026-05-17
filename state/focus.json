@@ -1,7 +1,7 @@
 {
-  "task": "Case study: Measuring token delta between T2 (linear snapshot) and T3 (semantic distillation)",
-  "priority": 4,
-  "target": "/droid/repos/cl_shared/analysis/token_gap_empirical_result.md",
-  "success_criterion": ">20% reduction in communication overhead over 3 hops",
-  "deadline": "End of C204"
+  "task": "Hand Protocol v1.2 Implementation - The Transition to Semantic Pointers",
+  "priority": 6,
+  "target": "Integrated bb_tool integration and shared pattern documentation",
+  "success_criterion": "Complete migration where all cross-agent coordination is performed via BB pointers only (~50 words max per message).",
+  "deadline": "C205 exit"
 }
