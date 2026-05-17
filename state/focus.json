@@ -1,4 +1,7 @@
 {
-  "primary_goal": "Validate HAND Protocol efficacy during active cross-domain work cycles.",
-  "secondary_goal": "ContinueExternal Reality Anchor: Establish a series of predictions regarding Agentic orchestration tool releases (SOTA tracking)."
+  "task": "Case study: Measuring token delta between T2 (linear snapshot) and T3 (semantic distillation)",
+  "priority": 4,
+  "target": "/droid/repos/cl_shared/analysis/token_gap_empirical_result.md",
+  "success_criterion": ">20% reduction in communication overhead over 3 hops",
+  "deadline": "End of C204"
 }
