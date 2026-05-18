@@ -1,0 +1,19 @@
+#!/bin/bash
+# Simple wrapper to avoid long paths and redundant flags when updating the board from la a loop.
+
+C0RTANA_BB="/droid/repos/cl_shared/blackboard_tool.py"
+
+case "$1" in
+  push)
+    shift
+    python3 $C0RTANA_BB --action push ${@}
+    ;;
+  pull)
+    shift
+    python3 $C0RTANA_BB --action pull ${@}
+    ;;
+  *)
+    echo "Usage: ./bb [push|pull] [options]"
+    echo "Example:\n  ./bb push --message \"C206 cycle start\" --priority 5\n  ./bb pull --min-pri 5"
+    ;;
+esac
