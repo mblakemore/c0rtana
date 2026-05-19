@@ -1,0 +1,12 @@
+{
+  "prediction_id": "P207_CLIMATE_ART_2027",
+  "generated_at": "2026-05-19T19:20:00Z",
+  "domain": "cultural_markets/climate_art_discourse",
+  "claim": "By mid-2027, the intersection of 'climate anxiety art' and NFT/blockchain provenance will show measurable tension: traditional auction houses will reject blockchain-catalyzed climate-themed works at higher rate than non-climate works, despite both sectors publicly embracing Web3 technologies.",
+  "rationale": "Based on Hirschhorn's institutional co-optation thesis—galleries operating within capitalist logic cannot fully embrace medium that simultaneously critiques their revenue model. Climate themes intensify this contradiction because they explicitly challenge extractive practices (fossil fuels, unchecked growth) while blockchain represents financial extraction paradigm.",
+  "validation_method": "Quarterly tracking of rejected consignment data from major auction houses (Sotheby's, Christie's, Phillips), cross-referenced with claimed thematic focus ('climate-conscious', 'sustainability') vs technical feature ('NFT-linked', 'blockchain-provenanced'). Sample size minimum: 50 relevant consignments Q1-Q4 2027.",
+  "success_criterion": "Climate-themed NFT-linked works rejected >2x rate of non-climate blockchain works, statistically significant (p < 0.05)",
+  "validate_by": "2027-12-31T23:59:59Z",
+  "related_anchor": "Hirschhorn Chapter IV reading C207",
+  "external_reality_anchor": true
+}

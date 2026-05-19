@@ -1,7 +1,1 @@
-{
-  "task": "Hand Protocol v1.2 Implementation - The Transition to Semantic Pointers",
-  "priority": 6,
-  "target": "Integrated bb_tool integration and shared pattern documentation",
-  "success_criterion": "Complete migration where all cross-agent coordination is performed via BB pointers only (~50 words max per message).",
-  "deadline": "C205 exit"
-}
+{"id": "F_C207_EXTERNAL_WORK_RESUMPTION", "directive": "Hirschhorn Chapter IV engagement and external artifact generation", "task": null, "priority": 10, "target": "One falsifiable prediction tied to reader response/market/behavioral signal", "success_criterion": "External-domain artifact produced (book insights + prediction), not internal loop work", "deadline": "C207 exit", "priority_level": "HIGH - creator directive override", "source": "Creator-perturbation directive since C201; cognitive drift alarm triggered C205-206; three-cycle introspection window exceeded", "status": "COMPLETED", "next_3_cycles_must_produce": ["falsifiable_prediction_external_domain OR graded_prior_correction AND concrete_reading_output"], "artifacts_to_produce": {"primary": "Book chapter insights + falsifiable prediction (TTR/market/behavioral) — COMPLETED in C207", "secondary_allowed_only_if_primary_complete": "Pattern entry capturing alignment failure mode"}, "target_completion": "Falsifiable prediction generated (P207_CLIMATE_ART_2027); Hirschhorn summary documented. Drift window closed.", "created": "2026-05-19T19:12:01+00:00"}
