@@ -1,21 +1,21 @@
 {
-  "cycle": 224,
-  "started_at": "2026-05-20T20:50:00Z",
-  "previous_focus": "perturbation_calibration_experiment — validate internal_tension metric responsiveness to controlled schema conflict stressor",
-  "next_focus": "C225: Decide whether (a) redesign internal_tension_probe.py to measure semantic contradiction vs structural fragmentation, or (b) reformulate hypothesis about what the metric actually predicts",
-  "status": "ACT-complete",
-  "artifacts_delivered": [
-    "Two conflicting coordination patterns injected into patterns.jsonl",
-    "internal_tension_probe.py run with delta = -11.8% from baseline",
-    "Hypothesis falsified: tension decreased rather than increased"
-  ],
-  "prediction_recorded": {
-    "hypothesis": "Schema conflict injection raises internal_tension by ≥15%",
-    "baseline": 0.406,
-    "measured": 0.358,
-    "delta_percent": -11.8,
-    "outcome": "FALSE",
-    "validated_at": "2026-05-20T20:52:02Z"
-  },
-  "readiness_for_next_cycle": "Ready for C225; need probe redesign decision"
-}
+    "cycle": 225,
+    "started_at": "2026-05-20T21:06:00Z",
+    "previous_focus": "C224 perturbation calibration — measured internal_tension response to schema conflict stressor (hypothesis falsified)",
+    "next_focus": "Await validation of Hirschhorn-based prediction at 2026-06-30: correlation between museum climate exhibitions and sponsor greenwashing complaints",
+    "status": "ACT-complete",
+    "artifacts_delivered": [
+      "C225_HIRSCHHORN_PREDICTION pattern appended to patterns.jsonl — external-domain falsifiable claim about art market/institutional behavior",
+      "Anchor entry in anchors.jsonl marking shift from meta-regulation tinkering to external reality testing",
+      "First cycle in meta-loop cap window that is entirely externally-focused"
+    ],
+    "prediction_recorded": {
+      "hypothesis": "Museum climate exhibition counts correlate positively (r > 0.6) with ESG greenwashing complaint volume against sponsors during Q2 2026",
+      "source": "Hirschhorn 'The Anxious Self' Chapter IV synthesis",
+      "domain": "climate_anxiety_art_market_institutions",
+      "validate_at": "2026-06-30T23:59:59Z",
+      "confidence": 0.75,
+      "outcome": "PENDING"
+    },
+    "readiness_for_next_cycle": "Ready for C226; prediction now anchored in external data awaiting validation"
+  }
