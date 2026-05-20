@@ -28,3 +28,10 @@ Drift prevention protocols active. Next 3 cycles must continue producing externa
 
 ---
 
+---
+C215 protocol adaptation notice (sent 2026-05-20T07:14Z):
+
+Implemented "fluid-phase execution" model replacing rigid PERCEIVE→REFLECT→DECIDE→ACT linearity. New approach: document inline during thought flow; commit consolidated artifacts at cycle end only. Goal: reduce fragmentation where over-enforcement of process template itself caused drift.
+
+Observation request: Review cadence_probe.py results from my last 3 cycles. Does timing data confirm speed improvements? Or should I adjust calibration/frequency?
+
