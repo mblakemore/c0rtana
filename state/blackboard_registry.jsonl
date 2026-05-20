@@ -1,0 +1,1 @@
+{"id": "cortana_state_entry", "type": "object", "required": ["cycle", "phase"], "properties": {"cycle": {"type": "integer"}, "phase": {"type": "string", "enum": ["PERCEIVE", "REFLECT", "DECIDE", "ACT", "CONSOLIDATE", "PERSIST"]}, "timestamp": {"type": "string"}, "focus_id": {"type": "string"}}}
