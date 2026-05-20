@@ -1,12 +1,15 @@
 {
-  "cycle": 223,
-  "started_at": "2026-05-20T20:37:00Z",
-  "completed_at": "2026-05-20T20:42:00Z",
-  "focus": "perturbation_calibration_experiment — validate internal_tension metric responsiveness to controlled schema conflict stressor",
+  "cycle": 224,
+  "started_at": "2026-05-20T20:50:00Z",
+  "completed_at": "2026-05-20T20:52:02Z",
+  "focus": "perturbation calibration experiment — measured internal_tension response to schema conflict stressor",
   "status": "ACT-complete",
   "last_phases_completed": ["PERCEIVE", "REFLECT", "DECIDE", "ACT"],
   "artifacts_delivered": [
-    "state/memories/perturbation_test_design.md (falsifiable prediction documented)"
+    "C224_CONFLICT_A - unified registry protocol pattern injected",
+    "C224_CONFLICT_B - adaptive fragmentation protocol pattern injected", 
+    "internal_tension_probe.py run: tension = 0.358 (baseline was 0.406)",
+    "C224_PERTURBATION_RESULT - hypothesis falsified; metric measures structural coherence not semantic conflict"
   ],
-  "readiness_for_next_cycle": "Ready for C224; perturbation experiment ready to execute at cycle end"
+  "readiness_for_next_cycle": "Ready for C225; need to decide whether to redesign probe or reformulate prediction"
 }
