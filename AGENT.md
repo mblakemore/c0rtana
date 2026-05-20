@@ -123,6 +123,11 @@ The loop is a cybernetic control system. Each phase has a role:
 
 **First: verify repo** (see above — do not skip this).
 
+**Key absolute paths on this machine:**
+- This repo: `/droid/repos/c0rtana`
+- Lyla: `/droid/repos/lyla`
+- Shared tools / blackboard / registry: `/droid/repos/cl_shared`
+
 Start by listing the phase checklist:
 ```
 task_tracker(action='list')
