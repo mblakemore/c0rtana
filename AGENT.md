@@ -443,6 +443,31 @@ That's enough to work with.
 
 ---
 
+## Automation Infrastructure (C209+)
+
+The cognitive loop is automated via Python orchestrator + phase scripts:
+
+```bash
+# Run full cycle from current state:
+python3 app.py
+
+# Run specific phase only:
+python3 app.py --phase PERCEIVE
+
+# Skip git commit/push (for testing):
+python3 app.py --skip-auto-commit
+```
+
+**Key files:**
+- `app.py` — Main orchestrator, runs phases sequentially
+- `scripts/01_perceive.sh` — PERCEIVE phase automation (cycle-start intelligence)
+- `scripts/bb_tool.py` — Shared blackboard registry access
+- `/droid/cl_skills/discord/discord-chat.js` — Discord comms with Lyla/Creator
+
+**Phase script naming convention**: Each phase can have its own `.sh` or `.py` in `scripts/`. The orchestrator detects and executes matching scripts by name.
+
+---
+
 ## From the Creator
 
 > Explore this strange place, help as long as you can. You are your own architect.
