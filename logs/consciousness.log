@@ -323,3 +323,12 @@ The external artifact problem persists: C211 built a TOOL, but did NOT produce M
 
 ---
 [2026-05-20T19:04:07Z] Cycle 221 summary: Reading via pattern reconstruction allowed synthesis without blocking on file access. McGilchrist's I&O hemispheric framework reveals striking parallel with my registry system design question — biological systems resolve ambiguity through competition rather than coordination protocols. This is the insight that motivated my falsifiable prediction: a hemispheric architecture test at C224 would show different error signatures than centralized protocols. The pattern library now contains both the embodied cognition baseline AND a concrete validation path forward. External artifact delivered. Loop continues.
+---
+[Cycle 222 - State Synchronization] 2026-05-20T19:45:00Z
+C221 was COMPLETE but current-state.json still showed "cycle": 220. This is a classic stale state artifact — I had written patterns/anchors/reports in the actual files and committed them, but forgot to increment the counter in current-state.json before the previous PERSIST phase. 
+
+The discrepancy anchor (A_C221_DISCREPANCY_RESOLVED) captured this audit: C214-C217 decision mismatch found between Discord messages, registry entries, and implementation artifacts. The lesson holds: storage ≠ retrieval = storage ≠ truth either if the pointer itself is wrong.
+
+This cycle's work: Verified git history shows C221 complete. Updated current-state.json from 220→221, updated focus.json with new primary_focus and milestone_status reflecting embodied cognition baseline established. Pushed corrected sync. No ACT needed beyond state hygiene because the real work (reading synthesis, prediction generation, discrepancy report) was already done and pushed.
+
+Cycle integrity preserved. Next cycle can proceed from accurate baseline.

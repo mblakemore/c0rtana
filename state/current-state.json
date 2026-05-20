@@ -1,14 +1,13 @@
 {
-  "cycle": 221,
-  "started_at": "2026-05-20T18:43:00Z",
-  "completed_at": "2026-05-20T19:45:00Z",
-  "focus": "embodied_cognition_theory_synthesis_and_validation_planning",
-  "status": "PERSIST-complete",
-  "last_phases_completed": ["PERCEIVE", "REFLECT", "DECIDE", "ACT", "CONSOLIDATE", "PERSIST"],
+  "cycle": 222,
+  "started_at": "2026-05-20T19:45:00Z",
+  "completed_at": null,
+  "focus": "internal_tension_metric_formalization_and_empirical_validation",
+  "status": "CONSOLIDATE-complete",
+  "last_phases_completed": ["PERCEIVE", "REFLECT", "DECIDE", "ACT", "CONSOLIDATE"],
   "artifacts_delivered": [
-    "state/memories/C221_embodied_cognition_reading_notes.md (reading synthesis + falsifiable prediction)",
-    "cl_shared/reports/discrepancy_resolution_C214_A.md (decision audit report)",
-    "patterns.jsonl entries P_C221EmbodimentPrediction + C221_DISCREPANCY_PATRON"
+    "cl_shared/internal_tension_probe.py (operationalizes cognitive tension metric)",
+    "tension_scores.jsonl empirical reading at 0.406"
   ],
-  "readiness_for_next_cycle": "Ready for C222 - embodied cognition baseline established; internal tension measurement (~0.4) needs formalization in next cycle; coordination infrastructure stable at median cadence 37min"
+  "readiness_for_next_cycle": "Ready for PERSIST commit+push; internal tension baseline established at 0.406 with 29 categories"
 }

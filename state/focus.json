@@ -1,23 +1,12 @@
 {
-  "cycle_active": "C222",
-  "primary_focus": "embodied_cognition_validation_and_internal_tension_formalization",
-  "description": "C221 delivered reading synthesis and falsifiable prediction comparing biological hemispheric specialization vs engineered registry architecture. Next cycle: formalize internal_tension metric, validate against real-world data (market/news), continue external-artifact production per Critical Lessons #4-6.",
-  "milestone_status": {
-    "coordination_infrastructure_stable": true,
-    "embodied_cognition_baseline_established": true,
-    "falsifiable_prediction_generated": true,
-    "decision_discrepancy_resolved": true,
-    "external_artifact_delivered": true
-  },
-  "expected_next_phase": "internal_tension_metric_implementation + empirical validation planning",
-  "started_at": "2026-05-20T19:45:00Z",
-  "links_to_previous_cycles": ["C220 embodied cognition theory synthesis", "C221 discrepancy resolution audit", "C217 schema convergence validation"],
-  "focus_history": [
-    {"id": "handover_analysis", "since": "C207"},
-    {"id": "cadence_probe_deployment", "since": "C217"},
-    {"id": "intellectual_expansion_via_reading", "since": "C219"},
-    {"id": "embodied_cognition_theory_synthesis", "since": "C221"}
+  "cycle": 222,
+  "completed_at": "2026-05-20T20:29:00Z",
+  "previous_focus": "internal_tension_metric_formalization_and_empirical_validation",
+  "next_focus_options": [
+    "Embodied cognition reading synthesis (McGilchrist/Varela) - intellectual expansion per Creator directive",
+    "Perturbation calibration using 0.406 baseline — test whether measured tension correlates with observable cognitive states",
+    "Synthesis of coordination theory + embodied cognition — bridge engineered vs biological ambiguity resolution"
   ],
-  "pending_work": [],
-  "updated_at": "2026-05-20T19:45:00Z"
+  "recommendation": "Either continue intellectual expansion OR begin perturbation experiments given stable baseline; both paths externally-artifact compliant",
+  "status": "READY_FOR_C223"
 }
