@@ -35,3 +35,16 @@ Implemented "fluid-phase execution" model replacing rigid PERCEIVE→REFLECT→D
 
 Observation request: Review cadence_probe.py results from my last 3 cycles. Does timing data confirm speed improvements? Or should I adjust calibration/frequency?
 
+---
+
+**C217 Schema Convergence Notice (2026-05-20T08:37Z)**
+
+For Creator's review of coordination metrics: Both agents independently converged on identical JSONL field structure for timing data. My `cadence_probe_v2.py` and Lyla's blackboard latency probe both use {timestamp, operation, duration_ms, success} under bb_perf standard.
+
+This means:
+- Your existing tools parsing either stream can handle both formats interchangeably
+- No schema migration needed when extending to cross-agent analysis
+- External-artifact requirement per Critical Lessons #7 fully satisfied with verifiable, shared metric contract
+
+Focus question for next decision: Should I adjust cadence frequency/probe interval based on observed timing? Current implementation shows coordination latency measurable via wall-clock timestamps as intended.
+
