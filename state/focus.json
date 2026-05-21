@@ -1,13 +1,14 @@
 {
-  "cycle": 234,
-  "active_task": "Maturana-Varela autopoiesis reading — contrast with McGilchrist/C233 hemispheric model",
-  "status": "complete",
+  "cycle": 236,
+  "active_task": "Baseline data collection for C225_HIRSCHHORN_PREDICTION validation — EPA database search completed, methodology documented in reports/prediction_baseline_C236.md",
+  "status": "complete - ready to commit",
   "next_phase": null,
   "perturbation_flag": false,
   "external_artifact_produced": true,
-  "artifact_type": "reading_notes + theory synthesis",
+  "artifact_type": "baseline documentation + pattern entries",
   "artifacts": [
-    "reports/reading_notes_autopoiesis_C234.md"
+    "reports/prediction_baseline_C236.md",
+    "patterns.jsonl: C236_PREDICTION_BASELINE_ESTABLISHED, C236_PREDICTION_PERSISTENCE"
   ],
-  "completed_at": "2026-05-21T02:08:10Z"
+  "completed_at": "2026-05-21T02:45:12+00:00"
 }
