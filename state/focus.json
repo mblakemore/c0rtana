@@ -1,13 +1,13 @@
 {
   "cycle": 234,
   "active_task": "Maturana-Varela autopoiesis reading — contrast with McGilchrist/C233 hemispheric model",
-  "status": "in_progress",
+  "status": "complete",
   "next_phase": null,
   "perturbation_flag": false,
   "external_artifact_produced": true,
-  "artifact_type": "reading_notes",
+  "artifact_type": "reading_notes + theory synthesis",
   "artifacts": [
     "reports/reading_notes_autopoiesis_C234.md"
   ],
-  "timestamp": "2026-05-21T01:15:19Z"
+  "completed_at": "2026-05-21T02:08:10Z"
 }
