@@ -1,0 +1,2 @@
+{"timestamp": "2026-05-21T01:33:33.276419", "cycle": 232, "ps": 0.85, "pc": 0.9, "gamma": 0.77, "coupling_ratio": 0.71, "boundary_efficiency": 1.0, "variance": 0.0, "activity_flux": 0.0, "structural_changes": 0.0}
+{"cycle": 233, "timestamp": "2026-05-21T01:34:48+00:00", "activity_flux": 15, "structural_changes": 2, "patterns_added": 0, "anchors_added": 0, "context_updated": 1, "perturbations_received": 1, "perturbations_rejected": 0}

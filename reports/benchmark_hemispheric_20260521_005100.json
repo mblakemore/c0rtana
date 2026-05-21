@@ -1,0 +1,25 @@
+{
+  "prediction_id": "C233_EMBODIED_PREDICTION",
+  "validation_deadline": "2026-06-21T23:59:59Z",
+  "benchmark_timestamp": "20260521_005100",
+  "novelty_benchmark": {
+    "benchmark_type": "novelty",
+    "num_tasks": 100,
+    "hemispheric_avg_accuracy": 0.9191231957191838,
+    "unified_avg_accuracy": 0.8391729687830586,
+    "accuracy_advantage_percent": 9.527264331698674,
+    "hemispheric_throughput": 1130540.1617250673,
+    "unified_throughput": 1542023.5294117648,
+    "prediction_threshold_met": false
+  },
+  "repetitive_benchmark": {
+    "benchmark_type": "repetitive",
+    "num_sequences": 50,
+    "hemispheric_throughput": 1473546.9364811692,
+    "unified_throughput": 1313017.7811169547,
+    "throughput_advantage_percent": -10.894064613072873,
+    "prediction_threshold_met": false
+  },
+  "overall_prediction_status": "FAIL",
+  "notes": "Hemispheric specialization shows accuracy advantage on novel tasks; unified registry shows throughput advantage on repetitive work."
+}

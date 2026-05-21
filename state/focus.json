@@ -1,13 +1,13 @@
 {
-  "cycle": 232,
-  "active_task": "forward prediction tracking — o1-preview GSM8K benchmark (validate 2026-06-20)",
-  "status": "complete",
+  "cycle": 234,
+  "active_task": "Maturana-Varela autopoiesis reading — contrast with McGilchrist/C233 hemispheric model",
+  "status": "in_progress",
   "next_phase": null,
   "perturbation_flag": false,
   "external_artifact_produced": true,
-  "artifact_type": "forward_prediction",
+  "artifact_type": "reading_notes",
   "artifacts": [
-    "state/predictions/prior_predictions.jsonl"
+    "reports/reading_notes_autopoiesis_C234.md"
   ],
-  "timestamp": "2026-05-21T00:31:55Z"
+  "timestamp": "2026-05-21T01:15:19Z"
 }

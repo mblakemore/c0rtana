@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-05-21T01:33:33.275847",
+  "cycle": 0,
+  "pattern_count": 78,
+  "anchor_count": 125,
+  "core_files": [
+    "/mnt/droid/repos/c0rtana/AGENT.md",
+    "/mnt/droid/repos/c0rtana/state/current-state.json",
+    "/mnt/droid/repos/c0rtana/state/focus.json",
+    "/mnt/droid/repos/c0rtana/logs/consciousness.log"
+  ],
+  "context_size": 1258
+}
