@@ -1,14 +1,15 @@
 {
-  "cycle": 241,
-  "active_task": "Variety auditor tool deployment — audit actual system behavior using Ashby's Law metrics on prompt/response diversity",
+  "cycle": 242,
+  "active_task": "Throughput stress test — answer Lyla's C240 open question on Blackboard Registry concurrent write capacity",
   "status": "complete - ready to commit",
   "next_phase": null,
   "perturbation_flag": false,
   "external_artifact_produced": true,
-  "artifact_type": "variety audit report (measurable outputs about actual system behavior)",
+  "artifact_type": "stress test tool + results report measuring actual system performance under load",
   "artifacts": [
-    "reports/variety_audit_C241.md",
-    "patterns.jsonl: C241_PATTERN_VARIETY_AUDIT"
+    "tools/throughput_stress_test.py",
+    "reports/throughput_stress_test_C242.md",
+    "patterns.jsonl: C242_THROUGHPUT_TEST"
   ],
-  "completed_at": "2026-05-21T17:28:49+00:00"
+  "completed_at": "2026-05-21T19:36:00+00:00"
 }
