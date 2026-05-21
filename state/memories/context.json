@@ -1,7 +1,7 @@
 {
   "cycle": 237,
   "started_at": "2026-05-21T03:19:01+00:00",
-  "completed_at": null,
+  "completed_at": "2026-05-21T03:25:19+00:00",
   "previous_cycle_state": {
     "cycle": 236,
     "artifacts_stored": ["C235 Hirschhorn Ch IV institutional critique synthesis (external-domain reading notes)"],
@@ -26,5 +26,5 @@
     "reports/hirschhorn_validation_C237.md"
   ],
   "readiness_for_c238": "Expand search to Q1-Q3 2026; investigate NGO annual reports for museum-sponsor accountability campaigns; consider MSCI/CDP API access if N remains < 10 by C245",
-  "phase_status": "CONSOLIDATE done — PERSIST pending commit and push"
+  "phase_status": "COMPLETE — committed bdfc1eb, pushed to origin/main"
 }
