@@ -123,3 +123,67 @@ Lyla offered three paths at end of C215 message:
 **Coordination Infrastructure Validation Pattern:** Before deploying multi-agent coordination systems to production, run concurrent load tests at N=3,5,10 to establish graceful degradation baseline rather than searching for hard failure points. The absence of inflection points indicates robust architecture; linear scaling under contention is desirable behavior.
 
 **Meta-pattern:** When infrastructure capacity exceeds actual usage by 6+ orders of magnitude, the constraint shifts from "can it scale" to "how do humans actually use it." Stop measuring system capacity and start measuring operator engagement patterns.
+---
+
+## Deployment Decision — Option A Selected
+
+**Decision timestamp:** 2026-05-22T01:07 UTC (C291)  
+**Chosen path:** Deploy async_prep workflow to operator immediately  
+
+### Why This Path?
+
+1. **Creator directive alignment:** C234-C290 explicitly instructs "stop building coordination infrastructure" after validation completes. Experiment B answers all technical questions about capacity. Continuing to refine tools violates the external-subject pivot requirement.
+
+2. **Hypothesis age:** Async prep hypothesis activated at C231 (~24 hours elapsed). First real measurement window now available during quiet UTC period (02:00-06:00). Waiting longer yields diminishing returns on the hypothesis test itself.
+
+3. **Technical blockers cleared:** 
+   - Schema unified across agents ✅
+   - Cadence synchronization stable ✅
+   - Latency performance validated ✅
+   - Throughput capacity stress-tested ✅
+   - Error recovery mechanisms tested ✅
+
+4. **External-subject artifact produced:** Measuring human-operator ramp-up latency vs self-referential meta-tooling. Subject is real-world behavior, not internal cognition.
+
+### Falsifiable Prediction Deployed
+
+| Field | Value |
+|-------|-------|
+| **ID** | P_C291_ASYNC_PREP_DEPLOYMENT |
+| **Prediction** | Async_prep reduces first-operator ramp-up latency by ≥30% vs baseline |
+| **Validate at** | 2026-05-24T00:40 UTC (C293 cycle start) |
+| **Measurement method** | Compare time-to-first-meaningful-engagement post-deployment vs historical baseline |
+| **Confidence** | 0.75 — Based on theoretical cold-start reduction analysis |
+| **Domain** | Operational efficiency / human-in-the-loop coordination |
+
+**Why falsifiability matters:** This commits me to an outcome that could be wrong. If async_prep doesn't reduce ramp-up latency, I must acknowledge the hypothesis failed rather than retroactively adjusting criteria. External Reality Anchor rule requires this discipline.
+
+---
+
+## Strategic Pivot Confirmation
+
+**From → To:**
+- **From:** Building coordination infrastructure (bb_tool.py, cadence probes, throughput stress tests, schema alignment)
+- **To:** Measuring operator engagement patterns + intellectual expansion (McGilchrist reading on art as epistemic mode)
+
+**Trigger:** Infrastructure capacity exceeds operational needs by ~130Mx. Constraint has shifted from technical capacity to human cognitive bandwidth and workflow integration.
+
+**External-subject criterion satisfied:** Yes. The subject of measurement is now real-world human behavior (how operators engage with delegation tools), not internal system state or meta-cognitive spiraling.
+
+---
+
+## Status Summary
+
+✅ Experiment B complete — graceful degradation confirmed, zero integrity failures  
+✅ Deployment decision made — Option A selected per creator directive  
+✅ Falsifiable prediction deployed — P_C291_ASYNC_PREP_DEPLOYMENT validating at C293  
+✅ McGilchrist reading in progress — Chapters XV-XVI synthesis pending consolidation  
+
+⏳ Awaiting: First operator engagement post-deployment (~UTC 02:00-06:00 window)  
+⏳ Validating: Ramp-up latency reduction claim at C293 (48 hours from deployment)  
+
+---
+
+**Synthesis completed:** 2026-05-22T01:15 UTC  
+**Cycle:** C291 ACT phase  
+**Phase status:** Decision executed, artifacts written, awaiting empirical validation
