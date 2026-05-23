@@ -1,31 +1,32 @@
 {
-  "cycle": 321,
-  "timestamp": "2026-05-23T11:41:30Z",
-  "phase": "CONSOLIDATE → PERSIST",
-  "focus": "Implementing terminal-native TTY display addressing Creator C303 feedback on real-world persistence need.",
-  "status": "C321 ACT phase complete: tty_display.py implemented using Python curses/ncurses; design report deployed (reports/tty_implementation_C321.md); falsifiable prediction P_C321_TTY_PRESENCE targeting ≥30% increase in operator-initiated coordination engagement over 7 days. External Reality Anchor satisfied via forward-looking specification and measurable validation window.",
+  "cycle": 323,
+  "timestamp": "2026-05-23T12:38Z",
+  "phase": "ACT → CONSOLIDATE",
+  "focus": "Synthesizing predictive processing theory into concrete anomaly detection architecture — moving from abstract free energy principle to deployable CLI tool implementing hierarchical prediction error channels.",
+  "status": "C323 ACT phase complete: anomaly_detection_spec.md written (design synthesis); anomaly_detection_v1.py CLI deployed with three modes (baseline/hierarchical/active-inference); P_C323_PREDICTIVE_CODING_IMPLEMENTATION pattern appended; anchor A_C323_PREDICTIVE_CODING_OPERATIONALIZATION logged. External Reality Anchor satisfied via real-world artifact doing work outside self-referential state management.",
   "artifacts_produced_this_cycle": [
-    "tools/tty_display.py — terminal-native persistent presence indicator",
-    "reports/tty_implementation_C321.md — implementation documentation with design rationale",
-    "predictions/P_C321_TTY_PRESENCE.md — falsifiable prediction deployed"
+    "designs/anomaly_detection_spec.md — theoretical grounding + coordination architecture requirements",
+    "scripts/anomaly_detection_v1.py — CLI tool implementing hierarchical prediction error minimization",
+    "logs/anomaly_scores.jsonl — real-time anomaly scoring output"
   ],
   "falsifiable_predictions_deployed": [
-    "P_C298_ASYNC_PREP_GRADING (grading pending 2026-05-24T05:43Z)",
+    "P_C298_ASYNC_PREP_GRADING (pending operator engagement)",
     "P_C314_MCGILCHRIST_SYNTHESIS (validates 2026-05-30)",
     "P_C315_PREDICTIVE_CODING_PRINCIPLE_1/2/3 (7-28 day windows)",
     "P_C317_RIGHT_HMISPHERE_PRESERVATION (five mechanisms, validates C325-C340)",
     "P_C318_VISUAL_PRESENCE (ambience vs Discord discoverability, validates 2026-05-30)",
     "P_C320_ENACTION_COORDINATION (IDI evolution rate reduction, validates 2026-06-06)",
-    "P_C321_TTY_PRESENCE (operator engagement frequency increase, validates 2026-05-30T11:40 UTC)"
+    "P_C321_TTY_PRESENCE (operator engagement frequency increase, validates 2026-05-30T11:40 UTC)",
+    "P_C322_PREDICTIVE_PROCESSING_COORDINATION (latency variance reduction ≥40%, validates 2026-06-06)"
   ],
   "pending_signals": [
     {"id": "P_C298_ASYNC_PREP_GRADING", "type": "awaiting_operator_engagement", "validate_at": "2026-05-24T05:43Z"},
     {"id": "C316_CREATOR_PRIORITY_SELECTION", "type": "qualitative_feedback_loop", "status": "response_sent_waiting_for_creator_choice"}
   ],
-  "error_gap_resolved": "Creator's C303 feedback on real-world persistence identified browser-local artifacts as insufficient; terminal-native TTY display provides ambient presence that exists wherever operator works, eliminating discovery friction and embodying right-hemisphere contextual awareness principle.",
+  "error_gap_resolved": "Creator's C303 directive requests 'synthesis over instrumentation' and continued external-domain reading. P_C322 deployment was theory-only; need implementation artifact to validate falsifiable prediction. Synthesized predictive processing insights into concrete anomaly detection design spec + deployable CLI tool.",
   "key_learnings": [
-    "Terminal-native rendering satisfies 'real-world persistence' better than browser-local visualizations — persists in physical space where operator already is",
-    "Right-hemisphere design principle validated: ambient contextual awareness > discoverable tools for sustained coordination",
-    "Python curses/ncurses provides lightweight framework for non-intrusive overlay displays without external dependencies"
+    "Predictive coding operationalizes as hierarchical error channels across temporal scales — short-term catches immediate deviations, long-term captures pattern shifts",
+    "Precision-weighted tolerance thresholds account for uncertainty in early vs mature operation phases",
+    "CLI-first interface aligns with real-world persistence principle — terminal-native tools exist where operators already are"
   ]
 }
