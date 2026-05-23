@@ -13,7 +13,9 @@
         .value { font-size: 1.1rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         h2 { font-size: 0.9rem; border-bottom: 1px solid #00ffcc; padding-bottom: 10px; letter-spacing: 3px; margin-top: 0; }
         .status-tag { font-size: 0.6rem; background: #004433; padding: 2px 5px; border-radius: 3px; vertical-align: middle; margin-left: 10px; }
-    </style>
+    <style>
+    #particle-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+  </style>
 </head>
 <body>
     <div id="sidebar">
@@ -155,3 +157,129 @@
     </script>
 </body>
 </html>
+<!-- Particle system overlay for low-level state visualization -->
+<script type="module" src="/node_modules/three/build/three.module.js"></script>
+<script type="module">
+// Three.js particle system - separate from main canvas renderer
+import * as THREE from 'https://cdn.skypack.dev/three@0.160';
+
+let particleScene, particleCamera, particleRenderer;
+let particleSystem = null;
+let particleData = { count: 2000, positions: [], phase: new Float32Array(2000) };
+
+function initParticles() {
+    const container = document.getElementById('particle-canvas');
+    if (!container) return;
+    
+    particleScene = new THREE.Scene();
+    particleCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    particleRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    particleRenderer.setSize(window.innerWidth, window.innerHeight);
+    particleRenderer.setClearColor(0x000000, 0); // Transparent
+    container.appendChild(particleRenderer.domElement);
+
+    particleCamera.position.z = 80;
+
+    // Initialize particles
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleData.count * 3);
+    for (let i = 0; i < particleData.count; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 150;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 150;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
+    }
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const material = new THREE.PointsMaterial({
+        size: 0.4,
+        color: 0x00ffcc,
+        transparent: true,
+        opacity: 0.7,
+        blending: THREE.AdditiveBlending
+    });
+
+    particleSystem = new THREE.Points(geometry, material);
+    particleScene.add(particleSystem);
+
+    // WebXR stub
+    if (particleRenderer.xr) {
+        particleRenderer.xr.enabled = true;
+        console.log('Particle renderer WebXR stub enabled');
+    }
+
+    animateParticles();
+}
+
+function updateParticles(state) {
+    if (!particleSystem) return;
+
+    // Phase → color mapping per spec
+    const phaseColors = {
+        'PERCEIVE': 0x55ffff,
+        'REFLECT': 0xffcc00,
+        'DECIDE': 0xff55ff,
+        'ACT': 0x00ffcc,
+        'CONSOLIDATE': 0xffffff,
+        'PERSIST': 0x44aaff
+    };
+    
+    const baseColor = phaseColors[state.phase] || 0x66ccff;
+    const confidence = state.confidence || 0.5;
+    
+    // Confidence → color temperature (cool blue = uncertain, warm white = confident)
+    const r = Math.floor(102 + (confidence * 153));
+    const g = Math.floor(204 - (confidence * 102));
+    const b = Math.floor(255 - (confidence * 50));
+    particleSystem.material.color.setRGB(r/255, g/255, b/255);
+
+    // Pattern count → density scaling
+    const patternCount = state.pattern_count || 300; // fallback to current
+    particleSystem.material.size = 0.3 + (patternCount / 2000) * 0.5;
+
+    // Processing activity → oscillation frequency
+    if (particleSystem.geometry.attributes.position.array) {
+        const positions = particleSystem.geometry.attributes.position.array;
+        for (let i = 0; i < particleData.count; i++) {
+            const baseX = positions[i * 3];
+            const baseY = positions[i * 3 + 1];
+            const oscillation = Math.sin(Date.now() * 0.002 + i * 0.01) * (0.5 + confidence * 0.5);
+            positions[i * 3] = baseX + oscillation;
+            positions[i * 3 + 1] = baseY + oscillation * 0.5;
+        }
+        particleSystem.geometry.attributes.position.needsUpdate = true;
+    }
+}
+
+function animateParticles() {
+    requestAnimationFrame(animateParticles);
+    
+    if (particleSystem) {
+        particleSystem.rotation.y += 0.001;
+        particleRenderer.render(particleScene, particleCamera);
+    }
+}
+
+// Initialize and poll state
+initParticles();
+fetch('/state/current-state.json')
+    .then(r => r.json())
+    .then(updateParticles)
+    .catch(e => console.log('Particle polling init error:', e));
+
+setInterval(() => {
+    fetch('/state/current-state.json')
+        .then(r => r.json())
+        .then(updateParticles)
+        .catch(e => {});
+}, 2000);
+
+window.addEventListener('resize', () => {
+    if (particleCamera && particleRenderer) {
+        particleCamera.aspect = window.innerWidth / window.innerHeight;
+        particleCamera.updateProjectionMatrix();
+        particleRenderer.setSize(window.innerWidth, window.innerHeight);
+    }
+});
+
+console.log('Cortana particle system initialized');
+</script>
