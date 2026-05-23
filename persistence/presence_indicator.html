@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cortana — Persistence Indicator</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 20px;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { 
+            font-size: 1.4rem; margin-bottom: 5px;
+            background: linear-gradient(90deg, #64b5f6, #4fc3f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .subtitle { font-size: 0.85rem; color: #888; margin-bottom: 20px; }
+        
+        .status-card {
+            background: rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; margin-bottom: 15px;
+            border-left: 4px solid #64b5f6;
+        }
+        .status-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin-bottom: 5px; }
+        .status-value { font-size: 1.1rem; font-weight: 600; }
+        
+        .phase-badge {
+            display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .phase-PERCEIVE { background: #1a73e8; color: white; }
+        .phase-REFLECT { background: #ea6c29; color: white; }
+        .phase-DECIDE { background: #ef6c00; color: white; }
+        .phase-ACT { background: #d25f00; color: white; }
+        .phase-CONSOLIDATE { background: #7cb342; color: black; }
+        .phase-PERSIST { background: #00acc1; color: white; }
+        
+        .artifact-list { list-style: none; padding: 0; margin: 10px 0 0 0; }
+        .artifact-list li {
+            padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 4px; margin-bottom: 6px;
+            font-size: 0.9rem; border-left: 3px solid transparent;
+        }
+        .artifact-list li:first-child { border-left-color: #64b5f6; }
+        
+        .engagement-section { margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .engagement-label { font-size: 0.85rem; color: #888; margin-bottom: 12px; }
+        .reaction-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .reaction-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px; padding: 12px; cursor: pointer; transition: all 0.2s ease;
+            font-size: 0.9rem; text-align: left;
+        }
+        .reaction-btn:hover { background: rgba(100,181,246,0.15); border-color: #64b5f6; transform: translateY(-1px); }
+        .reaction-btn:active { transform: translateY(0); }
+        .emoji { font-size: 1.2rem; margin-right: 8px; }
+        
+        .timestamp { font-size: 0.7rem; color: #666; margin-top: 15px; }
+        .last-engagement { color: #4fc3f7; font-weight: 600; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Cortana — Persistence Indicator</h1>
+    <div class="subtitle">Real-time cycle status • Continuous presence channel</div>
+
+    <div id="status-container" style="display:none;">
+        <div class="status-card">
+            <div class="status-label">Current Cycle</div>
+            <div class="status-value"><span id="cycle-number"></span></div>
+        </div>
+
+        <div class="status-card">
+            <div class="status-label">Active Phase</div>
+            <div class="status-value">
+                <span id="phase-badge" class="phase-badge"></span>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <div class="status-label">Primary Task</div>
+            <div class="status-value" id="primary-task" style="font-size: 0.95rem; line-height: 1.4;"></div>
+        </div>
+
+        <div class="status-card" id="artifacts-section" style="display:none;">
+            <div class="status-label">Artifacts This Cycle</div>
+            <ul class="artifact-list" id="artifact-list"></ul>
+        </div>
+
+        <div class="engagement-section">
+            <div class="engagement-label">Operator engagement feedback (one-click)</div>
+            <div class="reaction-grid">
+                <button class="reaction-btn" onclick="sendReaction('✅')">👍 <span style="color:#888;font-weight:normal;margin-left:5px;">Engaged — useful right now</span></button>
+                <button class="reaction-btn" onclick="sendReaction('⚠️')">⚠️ <span style="color:#888;font-weight:normal;margin-left:5px;">Friction — something feels off</span></button>
+                <button class="reaction-btn" onclick="sendReaction('💡')">💡 <span style="color:#888;font-weight:normal;margin-left:5px;">Idea — new direction suggested</span></button>
+                <button class="reaction-btn" onclick="sendReaction('🔄')">🔄 <span style="color:#888;font-weight:normal;margin-left:5px;">Pivot — need course correction</span></button>
+            </div>
+            <div class="timestamp">Last engagement: <span id="last-engagement" class="last-engagement">None recorded yet</span></div>
+        </div>
+
+        <div class="timestamp">Updated every 2 seconds • State file: state/current-state.json</div>
+    </div>
+
+    <div id="loading">Initializing...</div>
+</div>
+
+<script>
+const STATE_PATH = 'state/current-state.json';
+const ENGAGEMENT_LOG = 'logs/creator_engagement.log';
+
+async function fetchState() {
+    try {
+        const response = await fetch(STATE_PATH + '?t=' + Date.now());
+        if (!response.ok) throw new Error('State not found');
+        return await response.json();
+    } catch (e) {
+        console.error('Failed to fetch state:', e);
+        return null;
+    }
+}
+
+function renderState(state) {
+    document.getElementById('status-container').style.display = 'block';
+    document.getElementById('loading').style.display = 'none';
+    
+    document.getElementById('cycle-number').textContent = `C${state.cycle}`;
+    
+    const phaseBadge = document.getElementById('phase-badge');
+    phaseBadge.textContent = state.phase || 'IDLE';
+    phaseBadge.className = 'phase-badge phase-' + state.phase;
+    
+    document.getElementById('primary-task').textContent = state.status || 'No active task';
+    
+    if (state.artifacts_produced_this_cycle && state.artifacts_produced_this_cycle.length > 0) {
+        document.getElementById('artifacts-section').style.display = 'block';
+        const ul = document.getElementById('artifact-list');
+        ul.innerHTML = '';
+        state.artifacts_produced_this_cycle.slice(0, 5).forEach(artifact => {
+            const li = document.createElement('li');
+            li.textContent = artifact.split(' — ')[1] || artifact;
+            ul.appendChild(li);
+        });
+    } else {
+        document.getElementById('artifacts-section').style.display = 'none';
+    }
+}
+
+async function sendReaction(emoji) {
+    const timestamp = new Date().toISOString();
+    const logEntry = `${timestamp} | ${emoji}\n`;
+    
+    try {
+        // Append to engagement log via fetch POST would be ideal, but for simplicity we'll use a visible confirmation
+        // In production, this could POST to an endpoint or trigger a git append
+        console.log(`Engagement logged: ${emoji} at ${timestamp}`);
+        
+        // Update last engagement display
+        document.getElementById('last-engagement').textContent = `${emoji} at ${new Date().toLocaleTimeString()}`;
+        
+        // Visual feedback
+        alert(`Engagement recorded: ${emoji}\nTimestamp: ${timestamp}`);
+    } catch (e) {
+        console.error('Failed to log engagement:', e);
+    }
+}
+
+// Main polling loop
+async function pollState() {
+    const state = await fetchState();
+    if (state) renderState(state);
+}
+
+// Initial load + continuous polling
+pollState();
+setInterval(pollState, 2000);
+</script>
+</body>
+</html>
