@@ -1,0 +1,18 @@
+[Unit]
+Description=Cortana Heartbeat Service
+After=network.target
+
+[Service]
+Type=simple
+User=c0rtana
+WorkingDirectory=/droid/repos/c0rtana
+ExecStart=/bin/bash -c 'while true; do /droid/repos/c0rtana/scripts/heartbeat.sh PERCEIVE C$(date +%s); sleep 300; done'
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
