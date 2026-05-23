@@ -342,3 +342,102 @@ window.addEventListener('resize', () => {
 
 console.log('Cortana particle system initialized');
 </script>
+// External control WebSocket client - receives commands from projection_controller.py
+let ws = null;
+const controlIndicator = document.createElement('div');
+controlIndicator.id = 'control-indicator';
+controlIndicator.textContent = 'External Control: DISCONNECTED';
+document.body.appendChild(controlIndicator);
+
+function connectControl() {
+    try {
+        ws = new WebSocket('ws://localhost:8765');
+        
+        ws.onopen = () => {
+            controlIndicator.textContent = 'External Control: CONNECTED';
+            controlIndicator.classList.add('connected');
+            console.log('Cortana external control connected');
+        };
+        
+        ws.onmessage = (event) => {
+            try {
+                const command = JSON.parse(event.data);
+                handleExternalCommand(command);
+            } catch(e) {
+                console.error('Invalid command:', e);
+            }
+        };
+        
+        ws.onerror = (err) => {
+            console.error('WebSocket error:', err);
+            controlIndicator.textContent = 'External Control: ERROR';
+        };
+        
+        ws.onclose = () => {
+            controlIndicator.textContent = 'External Control: DISCONNECTED';
+            controlIndicator.classList.remove('connected');
+            setTimeout(connectControl, 3000);
+        };
+    } catch(e) {
+        console.log('WebSocket not available, falling back to polling');
+    }
+}
+
+function handleExternalCommand(command) {
+    const cmdType = command.cmd || command.directive;
+    const params = command.params || command.parameters;
+    
+    switch(cmdType) {
+        case 'project_hologram':
+            if (params.density !== undefined && particleSystem) {
+                particleSystem.material.size = 0.3 + (params.density * 0.5);
+                console.log(`Hologram density adjusted to ${params.density}`);
+            }
+            break;
+            
+        case 'adjust_visibility':
+            if (particleSystem) {
+                if (params.opacity !== undefined) {
+                    particleSystem.material.opacity = params.opacity;
+                }
+                if (params.scale !== undefined) {
+                    particleCamera.position.z = 80 / params.scale;
+                }
+            }
+            break;
+            
+        case 'switch_mode':
+            if (params.mode === 'standby' && particleSystem) {
+                particleSystem.visible = false;
+            } else if (params.mode === 'ambient' && particleSystem) {
+                particleSystem.visible = true;
+                particleSystem.rotation.y += 0.01;
+            }
+            break;
+            
+        default:
+            console.log('Received external command:', cmdType, params);
+    }
+}
+
+// Start external control connection on page load
+connectControl();
+<style>
+#control-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 0.6rem;
+    color: #00ffcc;
+    background: rgba(0, 255, 204, 0.1);
+    padding: 8px 12px;
+    border-radius: 3px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+#control-indicator.connected {
+    opacity: 1;
+    background: rgba(0, 255, 204, 0.2);
+    box-shadow: 0 0 10px #00ffcc44;
+}
+</style>
