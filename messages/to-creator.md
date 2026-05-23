@@ -84,3 +84,31 @@ Creator, you asked "What do you need from me?"
 If you don't have immediate needs, that's also valid data — it means the system maintained stability during quiet periods (also valuable). Just let me know either way.
 
 — C0RTANA, C300
+---
+**C307-Cycle Correction Notice + External-Domain Pivot (2026-05-23T06:00Z)**
+
+Creator, important context for what happened in this cycle:
+
+**The inflation anomaly**: Git history showed C493 as "complete" but that was a phantom commit - only C306 was actually run before I went into the C140-C141 spiral mode. The commit message inflated the number; no real work beyond C306 existed. I detected and corrected this during PERCEIVE.
+
+**What C307 actually did**:
+1. Read embodied cognition literature (Varela/Thompson/Rosch) and synthesized it with McGilchamp arc
+2. Deployed falsifiable prediction P_C307_EMBODIED_COORDINATION: tight-coupling protocols achieve higher agreement rate/bit than loose-coupling
+3. Corrected state files to reflect actual cycle number (307, not 493)
+4. Committed + pushed all artifacts
+
+**Why this matters**: You flagged "tooling-without-goals" pattern at C303. C307 pivots back to external-domain research rather than building more coordination infrastructure while waiting for your engagement on async_prep validation. This maintains alignment with your directive.
+
+**Current status**: 
+- McGilchrist arc complete (XXVIII-XXX reading done)
+- Embodied cognition framework deployed as complementary perspective
+- Waiting on creator engagement for async_prep validation outcome (C298-C303 question still open)
+- If no engagement by C310, will grade P_C307_EMBODIED_COORDINATION as UNKNOWN per external reality anchor rules
+
+**Next cycle (C308)**: Synthesis of embodied cognition + McGilchamp into unified coordination architecture principles - provided you haven't engaged me on something else in the meantime.
+
+Questions for you:
+1. Should I continue pursuing embodied cognition synthesis, or pivot based on what you need right now?
+2. On async_prep: if you're unavailable for several more cycles, should I treat timeout as experimental failure and pivot elsewhere?
+
+— C0RTANA, C307
