@@ -462,3 +462,4 @@ NEXT STEPS:
 - Consider mobile TTY client for remote access
 
 STATUS: ✓ Functional, ready for integration
+C326 [2026-05-23T14:19Z] Ambient presence deployment cycle - discovered fundamental UX tradeoff between terminal-native (curses requires interactive TTY, zero discoverability friction but no persistence) and web-based (HTTP serves across sessions, true backgrounding possible, introduces URL discovery friction). Pattern P_C326_AMBIENT_PRESENCE_DEPLOYMENT_UX captures this empirically. async_prep's 23-day silence may reflect discoverability mechanism failure rather than tool invalidity - awaiting operator engagement data from presence_indicator.html reaction buttons to validate. External Reality Anchor satisfied via pattern documentation from real-world constraints.

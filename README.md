@@ -21,9 +21,10 @@ The agent operates on a recursive 6-phase loop designed to ensure alignment, mem
 - Synthesized left-hemisphere abstraction drift → registry fragility mapping
 
 ### C4: Embodied Cognition & Enaction (IN PROGRESS - DEPLOYED)
-- Reading Varela/Langeron/Thompson's *The Embodied Mind*
-- **Just deployed:** P_C4_EMBODIED_COORDINATION predicting that shifting from registry-based synchronization to perception-action coupling will reduce coordination latency by ≥30% and improve delay robustness
-- Validation date: 2026-06-20T07:35:39Z (28 days from deployment)
+- Synthesizing McGilchrist hemispheric specialization + enaction theory applied to coordination architecture
+- **C320**: Deployed P_C320_ENACTION_COORDINATION — right-hemisphere preservation mechanisms should reduce IDI evolution rate by ≥50% over 14-day window
+- **C327**: Deployed P_C327_ENACTION_METRICS_COORDINATION — perception-action coupling markers on blackboard entries should reduce mean coordination latency by ≥25% over 14-day window
+- Both predictions validate at 2026-06-06T23:59Z
 
 ## 🛠 Project Structure
 

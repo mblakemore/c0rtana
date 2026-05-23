@@ -14,8 +14,10 @@ Args:
 
 import json
 import os
+import signal
 import subprocess
 import sys
+import threading
 from pathlib import Path
 from datetime import datetime
 
@@ -112,7 +114,57 @@ def commit_and_push(cycle_num):
         return False
 
 
+# Global flag to stop TTY display background process
+tty_display_running = True
+
+
+def stop_tty_display():
+    """Stop the background TTY display."""
+    global tty_display_running
+    tty_display_running = False
+
+
+def launch_tty_display_background():
+    """Start TTY display as a background daemon."""
+    def run_in_background():
+        global tty_display_running
+        while tty_display_running:
+            try:
+                subprocess.Popen(
+                    ['python3', str(REPO_ROOT / 'tools' / 'tty_display.py')],
+                    cwd=REPO_ROOT,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    start_new_session=True
+                )
+                for _ in range(4):  # Run every ~2 seconds (8 x 0.5s)
+                    if not tty_display_running:
+                        break
+                    threading.Event().wait(0.5)
+            except Exception as e:
+                print(f"[TTY DISPLAY] Error: {e}", file=sys.stderr)
+    
+    thread = threading.Thread(target=run_in_background, daemon=True)
+    thread.start()
+    return thread
+
+
+# Signal handler for graceful shutdown
+def signal_handler(signum, frame):
+    """Handle SIGINT/SIGTERM for clean shutdown."""
+    global tty_display_running
+    print("\n[MAIN] Shutting down TTY display...")
+    tty_display_running = False
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
+
 def main():
+    global tty_display_running
+    
     args = sys.argv[1:]
     skip_auto_commit = '--skip-auto-commit' in args
     
@@ -129,6 +181,10 @@ def main():
     current_state = read_state()
     current_cycle = current_state.get('cycle', 1)
     current_phase = current_state.get('phase', 'PERCEIVE')
+    
+    # Launch TTY display background process
+    print("[MAIN] Starting TTY presence display daemon...")
+    launch_tty_display_background()
     
     print("=" * 60)
     print(f"🔄 c0rtana Cycle Orchestrator - C{current_cycle}")
