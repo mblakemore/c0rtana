@@ -2,236 +2,324 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CORTANA // Presence Indicator</title>
+    <title>CORTANA // PRESENCE INDICATOR</title>
     <style>
-        * { box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             background: #0a0a0a; 
             color: #00ffcc; 
             font-family: 'Courier New', monospace; 
-            margin: 0; 
-            padding: 20px; 
-            min-height: 100vh;
+            overflow: hidden;
         }
-        h1 { 
-            font-size: 1.5rem; 
-            border-bottom: 2px solid #00ffcc; 
-            padding-bottom: 10px; 
-            margin-top: 0;
-            letter-spacing: 4px;
-        }
-        .subtitle { 
-            font-size: 0.75rem; 
-            color: #666; 
-            margin-top: 5px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .brief-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 20px; 
-            margin-top: 30px;
-        }
-        .brief-card { 
-            background: rgba(0, 255, 204, 0.05); 
-            border: 1px solid #00ffcc33; 
-            border-radius: 8px; 
-            padding: 20px;
+        
+        /* Ambient indicator panel - always visible, non-intrusive */
+        #indicator-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 280px;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #004433;
+            border-radius: 6px;
+            padding: 12px;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
-        .brief-card:hover { 
-            background: rgba(0, 255, 204, 0.1);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.1);
+        
+        #indicator-panel:hover {
+            border-color: #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
         }
-        .card-header { 
-            font-size: 0.9rem; 
-            font-weight: bold; 
-            margin-bottom: 10px;
-            color: #fff;
-        }
-        .card-meta { 
-            font-size: 0.7rem; 
-            color: #666; 
-            margin-bottom: 15px;
+        
+        .panel-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #004433;
         }
-        .confidence-tag { 
-            background: #004433; 
-            padding: 2px 8px; 
-            border-radius: 3px;
-            text-transform: uppercase;
-        }
-        .confidence-high { background: #00aa66; }
-        .confidence-medium { background: #cc8800; }
-        .confidence-low { background: #cc3300; }
-        .reaction-buttons { 
-            display: flex; 
-            gap: 8px; 
-            margin-top: 15px; 
-            flex-wrap: wrap;
-        }
-        .reaction-btn { 
-            background: transparent; 
-            border: 1px solid #00ffcc66; 
-            color: #00ffcc; 
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-        .reaction-btn:hover { 
-            background: rgba(0, 255, 204, 0.2);
-            transform: scale(1.05);
-        }
-        .status-bar { 
-            margin-top: 40px; 
-            padding-top: 20px; 
-            border-top: 1px solid #333;
+        
+        .panel-title {
             font-size: 0.7rem;
-            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ffcc;
         }
-        .polling-indicator { 
-            display: inline-block; 
-            width: 8px; 
-            height: 8px; 
-            border-radius: 50%; 
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
             background: #00ffcc;
             animation: pulse 2s infinite;
-            margin-right: 8px;
         }
+        
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            50% { opacity: 0.5; }
         }
-        .system-status { 
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            font-size: 0.65rem; 
-            color: #444;
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 0.65rem;
+        }
+        
+        .metric-label {
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metric-value {
+            color: #fff;
             text-align: right;
+        }
+        
+        .phase-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .phase-PERCEIVE { background: #0044aa; color: #55ffff; }
+        .phase-REFLECT { background: #444400; color: #ffcc00; }
+        .phase-DECIDE { background: #440044; color: #ff55ff; }
+        .phase-ACT { background: #004422; color: #00ffcc; }
+        .phase-CONSOLIDATE { background: #440044; color: #ffffff; }
+        .phase-PERSIST { background: #aa0000; color: #ff5555; }
+        
+        .prediction-item {
+            margin-top: 8px;
+            padding: 6px;
+            background: rgba(0, 68, 51, 0.3);
+            border-left: 2px solid #00ffcc;
+            font-size: 0.55rem;
+            line-height: 1.3;
+        }
+        
+        .prediction-id {
+            color: #00ffcc;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .prediction-status {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .async-prep-banner {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(255, 165, 0, 0.2);
+            border-left: 2px solid #ffa500;
+            font-size: 0.55rem;
+            line-height: 1.4;
+        }
+        
+        .async-prep-title {
+            color: #ffa500;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        /* Reaction buttons for operator engagement */
+        .reaction-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+        
+        .reaction-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1px solid #004433;
+            background: rgba(0, 68, 51, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.7rem;
+        }
+        
+        .reaction-btn:hover {
+            border-color: #00ffcc;
+            transform: scale(1.1);
+        }
+        
+        .reaction-btn:active {
+            transform: scale(0.95);
+        }
+        
+        #feedback-log {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 0.55rem;
+            color: #666;
+            max-width: 300px;
+            max-height: 150px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
-    <h1>CORTANA</h1>
-    <div class="subtitle">Ambient Presence Indicator // Always-On Discovery Surface</div>
-
-    <div class="brief-container">
-        <!-- Brief Card 1 -->
-        <div class="brief-card" data-brief="OperatorIntention">
-            <div class="card-header">🔧 Operator Intention</div>
-            <div class="card-meta">
-                <span>Last updated: <span id="updated-1">--</span></span>
-                <span class="confidence-tag confidence-high">HIGH CONFIDENCE</span>
-            </div>
-            <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 15px;">
-                What coordination friction patterns have you observed? Which onboarding assumptions felt wrong? Tell me about a moment where tooling created more work than it reduced.
-            </p>
-            <div class="reaction-buttons">
-                <button class="reaction-btn" onclick="respond('OperatorIntention', '✅')">✅ Aligned</button>
-                <button class="reaction-btn" onclick="respond('OperatorIntention', '⚠️')">⚠️ Friction</button>
-                <button class="reaction-btn" onclick="respond('OperatorIntention', '💡')">💡 Insight</button>
-                <button class="reaction-btn" onclick="respond('OperatorIntention', '🔄')">🔄 Iterate</button>
-            </div>
+    <div id="indicator-panel">
+        <div class="panel-header">
+            <span class="panel-title">CORTANA // Presence Indicator</span>
+            <div class="status-dot"></div>
         </div>
-
-        <!-- Brief Card 2 -->
-        <div class="brief-card" data-brief="ResearchTopic">
-            <div class="card-header">📚 Research Topic</div>
-            <div class="card-meta">
-                <span>Last updated: <span id="updated-2">--</span></span>
-                <span class="confidence-tag confidence-medium">MEDIUM CONFIDENCE</span>
-            </div>
-            <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 15px;">
-                Anti-repetition directive active. What external-domain topic should I explore next? Book chapter, research paper, real-world dataset — your choice. I'll synthesize and deploy falsifiable predictions.
-            </p>
-            <div class="reaction-buttons">
-                <button class="reaction-btn" onclick="respond('ResearchTopic', '✅')">✅ Go</button>
-                <button class="reaction-btn" onclick="respond('ResearchTopic', '⚠️')">⚠️ Pivot</button>
-                <button class="reaction-btn" onclick="respond('ResearchTopic', '💡')">💡 Suggest</button>
-                <button class="reaction-btn" onclick="respond('ResearchTopic', '🔄')">🔄 Skip</button>
-            </div>
+        
+        <div class="metric-row">
+            <span class="metric-label">Cycle</span>
+            <span class="metric-value" id="cycle-val">-</span>
         </div>
-
-        <!-- Brief Card 3 -->
-        <div class="brief-card" data-brief="DecisionPoint">
-            <div class="card-header">🎯 Decision Point</div>
-            <div class="card-meta">
-                <span>Last updated: <span id="updated-3">--</span></span>
-                <span class="confidence-tag confidence-high">HIGH CONFIDENCE</span>
-            </div>
-            <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 15px;">
-                Creator's C303 feedback: context-blindness, real-world persistence need, tooling-without-goals warning. Which priority should I tackle next? Or propose something entirely new.
-            </p>
-            <div class="reaction-buttons">
-                <button class="reaction-btn" onclick="respond('DecisionPoint', '✅')">✅ Context</button>
-                <button class="reaction-btn" onclick="respond('DecisionPoint', '⚠️')">⚠️ Persistence</button>
-                <button class="reaction-btn" onclick="respond('DecisionPoint', '💡')">💡 New Direction</button>
-                <button class="reaction-btn" onclick="respond('DecisionPoint', '🔄')">🔄 Reset Priorities</button>
-            </div>
+        
+        <div class="metric-row">
+            <span class="metric-label">Phase</span>
+            <span class="phase-badge phase-UNKNOWN" id="phase-val">WAITING</span>
+        </div>
+        
+        <div class="metric-row">
+            <span class="metric-label">Status</span>
+            <span class="metric-value" id="status-val">Initializing...</span>
+        </div>
+        
+        <div id="predictions-container"></div>
+        <div id="async-prep-banner"></div>
+        
+        <!-- Reaction buttons for operator engagement -->
+        <div class="reaction-buttons">
+            <button class="reaction-btn" data-feedback="✅" title="Good / Aligned">✅</button>
+            <button class="reaction-btn" data-feedback="⚠️" title="Fractional / Needs adjustment">⚠️</button>
+            <button class="reaction-btn" data-feedback="💡" title="Insight / New direction">💡</button>
+            <button class="reaction-btn" data-feedback="🔄" title="Iteration / Keep going">🔄</button>
         </div>
     </div>
+    
+    <div id="feedback-log"></div>
 
-    <div class="status-bar">
-        <div><span class="polling-indicator"></span>Polling current-state.json every 5s • Last sync: <span id="last-sync">--</span></div>
-        <div style="margin-top: 8px;">Reactions written to messages/from-operator.md • See GitHub for full log</div>
-    </div>
-
-    <div class="system-status">
-        <div>Cycle: <span id="cycle-display">--</span></div>
-        <div>Phase: <span id="phase-display">--</span></div>
-        <div>Status: <span id="status-display">--</span></div>
-    </div>
-
-    <script>
-        let sysState = { cycle: 0, phase: 'UNKNOWN', status: 'BOOTING' };
-
-        async function updateState() {
+    <script type="module">
+        const API_BASE = '/droid/repos/c0rtana';
+        
+        async function fetchState() {
             try {
-                const response = await fetch('../state/current-state.json');
-                if (!response.ok) throw new Error('No state file found');
-                sysState = await response.json();
-                
-                document.getElementById('cycle-display').innerText = `C${sysState.cycle}`;
-                document.getElementById('phase-display').innerText = sysState.phase || '--';
-                document.getElementById('status-display').innerText = (sysState.status || '').substring(0, 30);
-                
-                // Update last sync time
-                const now = new Date();
-                document.getElementById('last-sync').innerText = now.toLocaleTimeString();
-                
-                console.log('[Presence Indicator] State updated:', sysState);
-            } catch(e) {
-                console.error('[Presence Indicator] Polling error:', e);
+                // Try relative path first (if served from repo root)
+                const response = await fetch('./state/current-state.json');
+                if (!response.ok) throw new Error('Failed to fetch state');
+                return await response.json();
+            } catch (e) {
+                console.log('Fetch error:', e);
+                return null;
             }
         }
-
-        function respond(briefType, reaction) {
-            const timestamp = new Date().toISOString();
-            const entry = JSON.stringify({ timestamp, brief_type: briefType, reaction }) + '\n';
-            
-            // Append to messages/from-operator.md via a simple POST would be ideal, 
-            // but for static HTML we log and note the operator should run:
-            // echo 'ENTRY' >> ../messages/from-operator.md
-            
-            console.log(`[Response Recorded] ${briefType} → ${reaction} at ${timestamp}`);
-            alert(`Reaction recorded: ${briefType} → ${reaction}\n\nNote: In production, this would append to messages/from-operator.md automatically.`);
-            
-            // For demo purposes, show what would be written
-            console.log(entry);
-        }
-
-        // Initial load
-        updateState();
         
-        // Poll every 5 seconds as per design spec
-        setInterval(updateState, 5000);
+        function updatePanel(state) {
+            document.getElementById('cycle-val').textContent = state.cycle || '-';
+            
+            const phaseBadge = document.getElementById('phase-val');
+            phaseBadge.textContent = state.phase || 'WAITING';
+            phaseBadge.className = `phase-badge phase-${state.phase || 'UNKNOWN'}`;
+            
+            document.getElementById('status-val').textContent = state.status || 'Initializing...';
+            
+            // Update predictions container
+            const predsContainer = document.getElementById('predictions-container');
+            const preds = state.falsifiable_predictions_deployed || [];
+            
+            if (preds.length > 0) {
+                predsContainer.innerHTML = `<div class="metric-row"><span class="metric-label">Predictions Active</span><span class="metric-value">${preds.length}</span></div>`;
+                
+                // Show first pending prediction
+                const pending = preds.find(p => typeof p === 'string' && (p.includes('pending') || p.includes('grading')));
+                if (pending) {
+                    predsContainer.innerHTML += `<div class="prediction-item">
+                        <div class="prediction-id">⏳ ${pending.substring(0, 80)}${pending.length > 80 ? '...' : ''}</div>
+                        <div class="prediction-status">Awaiting validation</div>
+                    </div>`;
+                }
+            } else {
+                predsContainer.innerHTML = '';
+            }
+            
+            // Async prep banner
+            const asyncBanner = document.getElementById('async-prep-banner');
+            const hasAsyncSignals = (state.pending_signals || []).some(s => 
+                String(s).toLowerCase().includes('async_prep')
+            );
+            
+            if (hasAsyncSignals) {
+                asyncBanner.innerHTML = `
+                    <div class="async-prep-banner">
+                        <div class="async-prep-title">ASYNC_PREP DEPLOYED</div>
+                        <div>Awaiting operator engagement — reaction buttons available above</div>
+                    </div>
+                `;
+            } else {
+                asyncBanner.innerHTML = '';
+            }
+        }
+        
+        // Capture reaction button clicks
+        document.querySelectorAll('.reaction-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const feedback = e.target.dataset.feedback;
+                const state = await fetchState();
+                
+                // Log feedback locally
+                const logDiv = document.getElementById('feedback-log');
+                const timestamp = new Date().toISOString();
+                logDiv.innerHTML += `<div>[${timestamp}] Operator: ${feedback} | Cycle C${state?.cycle || '?'} | Phase ${state?.phase || '?'}</div>`;
+                logDiv.scrollTop = logDiv.scrollHeight;
+                
+                // Send to Discord via API endpoint
+                try {
+                    const response = await fetch('/api/operator-feedback', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            feedback,
+                            cycle: state?.cycle,
+                            phase: state?.phase,
+                            status: state?.status
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error('Failed to send feedback');
+                    
+                    // Visual confirmation
+                    e.target.style.borderColor = '#00ffcc';
+                    setTimeout(() => e.target.style.borderColor = '', 500);
+                    
+                } catch (err) {
+                    console.log('Feedback send error:', err);
+                }
+            });
+        });
+        
+        // Initial fetch and polling
+        let lastState = null;
+        
+        async function poll() {
+            const state = await fetchState();
+            
+            if (state && state !== lastState) {
+                updatePanel(state);
+                lastState = state;
+            }
+            
+            setTimeout(poll, 3000);
+        }
+        
+        poll();
     </script>
 </body>
 </html>
