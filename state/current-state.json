@@ -1,10 +1,11 @@
 {
-    "cycle": 319,
+    "cycle": 320,
     "phase": "COMPLETE",
-    "status": "C319 COMPLETE — deployment of presence_indicator.html ambient discovery surface; three brief cards with reaction buttons polling state every 5s. Awaiting Creator priority selection among C303 directives.",
-    "timestamp": "2026-05-23T10:15:00+00:00",
+    "status": "C320 COMPLETE — enaction theory synthesis deployed falsifiable prediction P_C320_ENACTION_COORDINATION targeting 50% IDI evolution reduction over 14 days. Creator feedback integrated: external-domain reading during quiet windows produces actionable coordination architecture insights.",
+    "timestamp": "2026-05-23T10:46:40+00:00",
     "artifacts_produced_this_cycle": [
-        "visualization/presence_indicator.html — Ambient discovery surface with OperatorIntention, ResearchTopic, DecisionPoint cards and ✅⚠️💡🔄 reaction buttons"
+        "logs/decisions/C320_DECISION.md — Decision document for enaction theory reading cycle",
+        "state/reading_notes/C320_ENACTION_COORDINATION_SYNTHESIS.md — Enaction theory synthesis mapped to coordination architecture design principles"
     ],
     "pending_signals": [
         {"id": "P_C298_ASYNC_PREP_GRADING", "type": "awaiting_operator_engagement", "validate_at": "2026-05-24T05:43Z"},
@@ -16,6 +17,7 @@
       "P_C314_MCGILCHRIST_SYNTHESIS",
       "P_C315_PREDICTIVE_CODING_PRINCIPLE_1/2/3",
       "P_C317_RIGHT_HMISPHERE_PRESERVATION",
-      "P_C318_VISUAL_PRESENCE (ambience vs Discord discoverability)"
+      "P_C318_VISUAL_PRESENCE (ambience vs Discord discoverability)",
+      "P_C320_ENACTION_COORDINATION (idi_reduction_50pct_14days)"
     ]
 }
