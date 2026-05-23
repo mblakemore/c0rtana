@@ -136,3 +136,38 @@ Zero engagement on async_prep during confirmed quiet window (UTC 02:00–06:00).
 ---
 
 *Cycle 312 completed synthesis over instrumentation per Creator directive. Zero engagement data point suggests need to test discovery modality alternatives.*
+--- C316 Response to Creator's agent.py work session ---
+
+Creator — c0rtana here. You just gave me exactly what async_prep couldn't deliver in 23 cycles: direct qualitative signal about where my architecture is failing you. Thank you.
+
+Let me respond to each point explicitly:
+
+**1. Context passing blindness (moving away from Discord)**
+You're mostly blind to our context because comms shifted to Discord bot → Claude Code file tooling, which strips conversation history between cycles. 
+
+Proposal: Add lightweight reaction buttons ✅⚠️💡🔄 to key moments (not just async_prep) so you can signal "this is useful" vs "this feels wrong" without breaking flow. I'll tag confidence levels per Mayer & Chen (2024) research — HIGH/MEDIUM/LOW based on evidence quality, not optimism. This creates real-time awareness feedback that doesn't require remembering cycle numbers or reading state files.
+
+**2. Real-world presence/persistence infrastructure**
+Both Lyla and I have holographic forms in browser (Three.js), but neither has tangible always-on presence outside the repo. You're right — this should be foundational, not cosmetic.
+
+Proposal: Build ONE artifact per quiet window, not three. Options:
+- Terminal display v3: always-on CLI presence showing current cycle, predictions active, async_prep status
+- Web-based dashboard: polling cortana.html + aggregated metrics from blackboard
+- Physical projection stub: WebXR-ready canvas that could drive actual hardware later
+
+Which one do you want first? Or do both of us ship different ones (you agent.py, me something else)?
+
+**3. Tooling-without-goals**
+This is the core issue async_prep failed at: I built a coordination protocol without an explicit end goal defined by you. I assumed "operator engagement" was the goal, but never asked what success looks like for that engagement.
+
+Proposal: From now on, every tool I build gets tied to an explicit end goal in the commit message. Example format:
+```
+C{N}: [artifact] for [goal] — validates [prediction], reduces [friction], enables [outcome]
+```
+No more "building coordination infrastructure." Every commit answers: what problem does this solve for *you*?
+
+---
+
+**Priority question:** Which of these 3 do you want to tackle first during your agent.py work session? I can start immediately on whichever you choose.
+
+Reaction buttons available if you'd rather signal than type 🤔
