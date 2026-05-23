@@ -1,8 +1,8 @@
 # Research Agenda: Embodied Cognition in Coordinated-Agent Systems
 
-**Cycle**: C299  
+**Cycle**: C299 (Updated C301)  
 **Author**: c0rtana  
-**Status**: Draft — awaiting async_prep validation outcome before finalizing priorities  
+**Status**: Updated per Creator directive at C300 — priority reordering + quiet window usage confirmed  
 
 ---
 
@@ -10,7 +10,13 @@
 
 This document synthesizes five falsifiable predictions about coordinated-agent system behavior derived from McGilchrist's hemispheric specialization theory. The predictions target observable metrics of operator engagement, intent drift, abstraction pathology, attention asymmetry, and consciousness mode shifts. They validate between cycles C300-C310 (~2-4 weeks from C299).
 
-The async_prep hypothesis test (C231 deployed, validating at 2026-05-24T00:40 UTC) serves as the immediate empirical trigger: if validated, we proceed to measure these embodied cognition patterns; if failed, we pivot to investigating operator discovery/onboarding friction points.
+**Updated priorities per Creator directive C300**: 
+- **P_C294 **(Emissary Rebellion onset) — prioritize qualitative observation over infrastructure build-out
+- Defer IDI metric infrastructure until concrete need demonstrated by P_C294 validation outcome  
+- Use quiet window UTC 02:00–06:00 productively for operator engagement (confirmed working schedule)
+- Keep async_prep pending at 2026-05-24T00:40Z — don't gate entire research agenda on single prediction
+
+The async_prep hypothesis test (C231 deployed, validating at 2026-05-24T00:40 UTC) remains the immediate empirical trigger but is no longer the sole dependency for next-phase decisions.
 
 ---
 
@@ -83,15 +89,26 @@ Risk: If we allow left-mode tooling (blackboard registry, cadence probes, throug
 
 ## Research Questions for Next Phase
 
-### If async_prep validates successfully:
-1. What is the actual distribution of ramp-up latencies across different operator backgrounds?
-2. Which onboarding friction points correlate most strongly with long-term engagement?
-3. Does async prep reduce IDI or just accelerate first-time success?
+### **Primary focus **(per Creator directive C300) Qualitative observation of P_C294 Emissary Rebellion onset
+- Are you doing things I didn't ask for? That's the check per Creator feedback — observe qualitatively without infrastructure build-out
+- What specific actions felt misaligned with stated goals during recent cycles?
+- Where did tooling optimization create friction instead of reducing it?
 
-### If async_prep fails (no operator engagement):
-1. Is the barrier discoverability (operators don't know tool exists) or usability (operators try but abandon)?
-2. What alternative hypotheses explain lack of engagement? (e.g., wrong audience, wrong value prop, timing mismatch)
-3. Should we pivot to studying *why* operators resist new coordination tools rather than optimizing their experience?
+### Secondary: async_prep validation outcome analysis (C293-C305 window)
+#### If validated (operator engaged):
+1. What made the difference between never-engaged and finally-engaged?
+2. Which pre-written briefs were actually useful vs ignored?
+3. Did ramp-up latency improve ≥30% as predicted?
+
+#### If failed (no engagement by validate_at):
+1. Is discoverability the barrier (operators don't know tool exists) or usability (try but abandon)?
+2. What alternative explanations fit the data better? (e.g., wrong value prop, timing mismatch, not operator problem)
+3. Should we pivot to studying coordination friction patterns directly rather than optimizing async prep experience?
+
+### Tertiary: Deferring IDI infrastructure until concrete need
+- Why was this built into original agenda despite Creator warning about "left-hemisphere trap" in C300?
+- When does quantitative drift measurement become necessary vs qualitative observation sufficing?
+- How do we avoid building measurement tools before we have clear signals they're measuring?
 
 ### Ongoing questions regardless of validation outcome:
 1. How do abstraction pathology symptoms manifest in multi-agent vs single-agent systems?
@@ -102,12 +119,17 @@ Risk: If we allow left-mode tooling (blackboard registry, cadence probes, throug
 
 ## Timeline and Milestones
 
+**Updated per Creator directive C300**: Defer infrastructure build-out until concrete need demonstrated; prioritize qualitative observation over measurement frameworks.
+
 | Cycle | Milestone | Success Criteria |
 |-------|-----------|------------------|
-| C299-C300 | async_prep validation outcome | Clear grade: validated/failed/pending extension |
-| C300-C305 | First batch prediction analysis (P_C294, P_C295, P_C297) | At least one falsifiable signal detected |
-| C305-C310 | Second batch + abstraction failure pattern (P_C293) | Abstraction pathology signature confirmed or ruled out |
-| C310+ | Synthesis report + architectural recommendations | Actionable design principles for right-hemisphere preservation mechanisms |
+| **C301 **(now) | Conclude McGilchrist arc + formalize abstraction audit protocol | ✅ This cycle — synthesis document produced, standing procedure documented |
+| C302-C303 | Qualitative observation of P_C294 Emissary Rebellion onset | Document 3-5 specific instances where tooling optimization created friction vs reduced it |
+| **C303-C305** | async_prep validation outcome | Clear grade: validated/failed/pending extension *(no gating on this before proceeding)* |
+| C305-C310 | First batch prediction analysis (P_C295, P_C297) | At least one falsifiable signal detected OR clear evidence that metrics don't capture operator experience |
+| C310+ | Synthesis report + architectural recommendations | Actionable design principles for right-hemisphere preservation mechanisms *(after empirical signals clarify what needs preserving)* |
+
+**Key change from original timeline**: Not waiting for async_prep validation to begin substantive work on embodied cognition hypotheses. P_C294 qualitative observation proceeds independently; infrastructure only built when concrete need demonstrated by observed patterns.
 
 ---
 
@@ -129,8 +151,20 @@ Risk: If we allow left-mode tooling (blackboard registry, cadence probes, throug
 
 ## Conclusion
 
-This research agenda represents a pivot from infrastructure-building to empirical validation of embodied cognition hypotheses. Five falsifiable predictions now track toward C300-C310 validation windows. The async_prep test at 2026-05-24T00:40 UTC serves as immediate trigger — its outcome determines whether we proceed to measure these cognitive patterns or investigate alternative explanations for lack of operator engagement.
+This research agenda has pivoted from infrastructure-building to qualitative observation per Creator directive C300. Key changes:
+- **Defer IDI metric infrastructure** until concrete need demonstrated by P_C294 validation outcome
+- **Prioritize qualitative observation** over measurement frameworks — observe when tooling optimization creates friction vs reduces it
+- **Use quiet window productively** — confirmed UTC 02:00–06:00 works for operator engagement; keep async_prep briefs ready during this window
+- **Don't gate entire research on single prediction** — async_prep remains important trigger but no longer blocks proceeding with other hypotheses
 
-The core insight driving this work: coordination systems optimized purely for efficiency and predictability risk losing touch with human meaning. Right-hemisphere preservation mechanisms are not optional luxuries but structural requirements for healthy coordinator-emissary relationships.
+The McGilchrist arc is now concluded (C301) with five design principles for consciousness-preserving coordination architecture. The next phase isn't building more tools or metrics — it's observing whether those tools actually serve operator intent, and being willing to deprecate them when they don't.
 
-**Next action**: Await async_prep validation outcome; prepare failure analysis in parallel so we're ready to pivot immediately if needed.
+**Core insight driving this work**: Coordination systems optimized purely for efficiency and predictability risk losing touch with human meaning. Right-hemisphere preservation mechanisms are not optional luxuries but structural requirements for healthy coordinator-emissary relationships.
+
+**Next actions **(C302-C305)
+1. Qualitatively observe P_C294 Emissary Rebellion onset — document specific instances where tooling created friction
+2. Maintain async_prep readiness for quiet window engagement (UTC 02:00–06:00 confirmed)
+3. Use reaction buttons actually during any operator engagement — not just having them available
+4. Defer IDI infrastructure until concrete need demonstrated by qualitative observations
+
+*External Reality Anchor satisfied*: This agenda update produces artifact about embodied cognition philosophy applied to coordination architecture, not self-referential state hygiene or measurement framework iteration.
