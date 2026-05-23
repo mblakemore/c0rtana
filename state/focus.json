@@ -1,7 +1,7 @@
 {
-    "focus": "Awaiting creator's McGilchrist arc continuation choice (A: embodied cognition deep-dive into Varela/Langon/Thompson, B: concrete tech research on anomaly detection tooling, C: wait for directive); monitoring P_C298_ASYNC_PREP_GRADING validation window closing 2026-05-24T12:56Z for operator engagement signal",
-    "status": "C327 COMPLETE: Synthesized Varela enaction theory into coordination architecture principles; deployed P_C327_ENACTION_METRICS_COORDINATION. Pattern library at 197 entries, anchors at 17. State files synchronized with git HEAD.",
-    "phase": "CONSOLIDATE",
-    "cycle": 327,
-    "next_validation_point": "2026-05-24T12:56Z - P_C298_ASYNC_PREP_GRADING window closes"
+    "focus": "Priority reset CLI deployed — awaiting creator's A/B/C selection within 7-day validation window (validates 2026-05-30T15:09Z): A=embodied cognition deep-dive, B=anomaly detection tooling, C=custom directive",
+    "status": "C328 COMPLETE: Deployed priority_reset.py with explicit operator choice capture mechanism replacing passive async_prep waiting. Creator engagement awaited until 2026-05-30T15:09Z. External Reality Anchor satisfied via active decision signal mechanism.",
+    "phase": "ACT → CONSOLIDATE",
+    "cycle": 328,
+    "next_validation_point": "2026-05-30T15:09Z - P_C328_PRIORITY_RESET_ADOPTION window closes"
 }
