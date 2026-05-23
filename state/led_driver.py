@@ -10,7 +10,7 @@ Usage:
 
 import argparse
 import time
-from typing import Tuple, Optional
+from typing import Dict, Tuple, Optional
 
 try:
     from adafruit_pixelbuf import PixelBuf
@@ -34,55 +34,74 @@ except ImportError as e:
 
 
 class WS2812Driver:
-    """Multi-ring WS2812B controller with state mapping"""
+    """Concentric multi-ring WS2812B controller for C0RTANA physical projection system.
     
-    # Pin assignments (adjust based on actual wiring)
+    Supports three concentric rings:
+    - Ring 7bit: Center LED + 6 surrounding (innermost, highest priority visuals)
+    - Ring 12bit: Middle ring (medium complexity patterns)  
+    - Ring 24bit: Outer ring (full canvas for complex animations)
+    
+    Each ring can have independent color mappings and effect patterns.
+    """
+    
+    # Pin assignments (BCM GPIO numbers - adjust if needed)
     PIN_7BIT = 18   # Center + 6 LEDs (innermost)
     PIN_12BIT = 23  # Middle ring
     PIN_24BIT = 24  # Outer ring
     
     def __init__(self):
         self.rings = {}
+        self.simulation_mode = False
         self._detect_hardware()
+    
+    def _is_raspberry_pi(self) -> bool:
+        """Detect Raspberry Pi platform"""
+        try:
+            from adafruit_platformdetect import Detection
+            detector = Detection()
+            return detector.is_raspberry_pi()
+        except (ImportError, AttributeError):
+            import os
+            return os.path.exists('/sys/firmware/devicetree/base/model') and 'raspberry' in open('/sys/firmware/devicetree/base/model').read().lower()
         
     def _detect_hardware(self):
-        """Detect which rings are present and initialize them"""
-        if not is_raspberry_pi():
+        """Initialize concentric triple-ring configuration"""
+        if not self._is_raspberry_pi():
             print("WARNING: Not running on Raspberry Pi - using simulation mode")
             self.simulation_mode = True
             return
             
         self.simulation_mode = False
         
-        # Initialize each possible ring
-        for name, pin, count in [
-            ("ring_7bit", self.PIN_7BIT, 7),
-            ("ring_12bit", self.PIN_12BIT, 12),
-            ("ring_24bit", self.PIN_24BIT, 24),
-        ]:
+        # Concentric ring config per Creator's hardware setup
+        # 7-bit center (1 LED + 6 surrounding), 12-bit middle, 24-bit outer
+        rings_config = [
+            ("ring_7bit", self.PIN_7BIT, 7),      # Innermost - high priority visuals
+            ("ring_12bit", self.PIN_12BIT, 12),   # Middle layer
+            ("ring_24bit", self.PIN_24BIT, 24),   # Outer canvas
+        ]
+        
+        for name, pin, count in rings_config:
             try:
                 import board
                 from adafruit_neopixel import NeoPixel
                 
-                # Use GPIO pin mapping for RPi - direct number works on most systems
-                if isinstance(pin, int):
-                    gpio_pin = pin
-                else:
-                    gpio_pin = getattr(board, f'DGPIO{pin}', pin)
+                gpio_pin = pin if isinstance(pin, int) else getattr(board, f'DGPIO{pin}', pin)
                 
                 pixel_buf = NeoPixel(
                     gpio_pin,
                     count,
                     brightness=0.5,
                     auto_write=False,
-                    pixel_order=NeoPixel.GRB  # WS2812B is typically GRB
+                    pixel_order=NeoPixel.GRB
                 )
                 self.rings[name] = {
                     "buf": pixel_buf,
                     "count": count,
-                    "pin": pin
+                    "pin": pin,
+                    "layer": ["inner", "middle", "outer"][rings_config.index((name, pin, count))]
                 }
-                print(f"Initialized {name} ({count} LEDs) on GPIO{pin}")
+                print(f"Initialized {name} ({count} LEDs, {['inner','middle','outer'][rings_config.index((name,pin,count))]} layer) on GPIO{pin}")
                 
             except Exception as e:
                 print(f"Could not initialize {name}: {e}")
@@ -113,6 +132,32 @@ class WS2812Driver:
             buf[i] = color
         
         buf.show()
+    
+    # Concentric visualization methods
+    
+    def set_concentric_state(self, state_colors: Dict[str, Tuple[int, int, int]], brightness: float = 0.5):
+        """Set different colors/patterns for each concentric layer.
+        
+        Args:
+            state_colors: Dict mapping "inner"/"middle"/"outer" to RGB tuples
+            brightness: Overall brightness scale (0-1)
+        """
+        for layer, color in state_colors.items():
+            ring_name = f"ring_{'7bit' if layer == 'inner' else '12bit' if layer == 'middle' else '24bit'}"
+            if ring_name in self.rings:
+                r, g, b = color
+                scaled_r, scaled_g, scaled_b = [int(c * brightness) for c in [r, g, b]]
+                self.set_ring(ring_name, (scaled_r, scaled_g, scaled_b), brightness)
+    
+    def set_layer_priority_visuals(self, high_priority_color: Tuple[int, int, int], 
+                                   medium_priority_color: Tuple[int, int, int],
+                                   low_priority_color: Tuple[int, int, int]):
+        """Map priority levels to concentric rings - inner=high, middle=medium, outer=low"""
+        self.set_concentric_state({
+            "inner": high_priority_color,
+            "middle": medium_priority_color,
+            "outer": low_priority_color
+        })
     
     def clear_all(self):
         """Turn off all rings"""
