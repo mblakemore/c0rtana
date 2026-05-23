@@ -1,16 +1,29 @@
 #!/usr/bin/env python3
 """
 WS2812B LED Driver for C0RTANA Physical Projection System
-Maps cortana internal state to RGB ring patterns
+Maps cortana internal state to RGB ring patterns with autonomous ambient perception layer
 
 Usage:
     python led_driver.py --ring <7|12|24> --color R,G,B --brightness 0-255
     python led_driver.py --all --pattern rainbow
+    
+Autonomous Ambient Mode:
+    Enable environmental sensing → rings react to room conditions independently of cognitive loop
+
+Hardware layout (Creator's concentric setup):
+    - Ring 7bit:   Center LED + 6 surrounding (innermost, GPIO 18)
+    - Ring 12bit:  Middle ring (GPIO 23)  
+    - Ring 24bit:  Outer ring (GPIO 24)
+
+Power requirements: ~2A @ 5V minimum for all rings active
 """
 
 import argparse
 import time
-from typing import Dict, Tuple, Optional
+from dataclasses import dataclass
+from enum import Enum, auto
+from typing import Dict, Tuple, Optional, Callable
+import threading
 
 try:
     from adafruit_pixelbuf import PixelBuf
@@ -31,6 +44,153 @@ except ImportError as e:
     print(f"Import error: {e}")
     print("Ensure adafruit-circuitpython-neopixel is installed")
     exit(1)
+
+
+# ============================================================================
+# AUTONOMOUS AMBIENT PERCEPTION LAYER
+# ============================================================================
+
+
+class LEDMode(Enum):
+    """Operating mode for the LED system."""
+    COGNITIVE_PHASE = auto()     # Controlled by cortana's cognitive cycle via WebSocket/CLI
+    AUTONOMOUS_AMBIENT = auto()  # Reacts to environmental sensors independently
+
+
+@dataclass
+class AmbientReading:
+    """Environmental sensor reading."""
+    ambient_light_lux: float = 0.0      # Current room illumination in lux
+    sound_level_db: float = 0.0          # Ambient noise level in dB
+    motion_detected: bool = False        # Motion sensor trigger
+    timestamp: float = 0.0               # Unix timestamp of reading
+
+
+@dataclass
+class AutonomousPattern:
+    """Autonomous visual pattern based on environment."""
+    inner_color: Tuple[int, int, int]   # RGB for inner ring (7 LEDs)
+    middle_color: Tuple[int, int, int]  # RGB for middle ring (12 LEDs)
+    outer_color: Tuple[int, int, int]   # RGB for outer ring (24 LEDs)
+    brightness: int = 50                  # 0-255 scale
+    effect: str = "solid"                 # solid/pulse/fade/ripple
+
+
+class SensorSimulator:
+    """Simulated sensor data for testing without hardware."""
+    
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._base_light = 100.0
+        self._base_sound = 35.0
+        self._motion_events = []
+        
+    def read(self) -> AmbientReading:
+        """Generate simulated ambient reading with realistic variation."""
+        import random
+        
+        with self._lock:
+            light_variation = random.gauss(0, 10)
+            sound_variation = random.gauss(0, 2)
+            
+            # Occasional motion events
+            motion = len([e for e in self._motion_events if time.time() - e < 5]) > 0
+            
+            return AmbientReading(
+                ambient_light_lux=max(0, self._base_light + light_variation),
+                sound_level_db=max(0, self._base_sound + sound_variation),
+                motion_detected=motion,
+                timestamp=time.time()
+            )
+    
+    def trigger_motion_event(self):
+        """Simulate a motion detection event (for testing)."""
+        with self._lock:
+            self._motion_events.append(time.time())
+
+
+class AutonomousPatternEngine:
+    """Maps ambient readings to visual patterns autonomously."""
+    
+    def __init__(self, sensor_interface):
+        self.sensor = sensor_interface
+        self.last_pattern_time = 0.0
+        self.pattern_cooldown = 0.5  # seconds between pattern updates
+        
+    def evaluate_environment(self) -> Optional[AutonomousPattern]:
+        """Analyze current environment and select appropriate pattern."""
+        now = time.time()
+        if now - self.last_pattern_time < self.pattern_cooldown:
+            return None
+        
+        try:
+            reading = self.sensor.read()
+        except Exception as e:
+            print(f"Sensor read error: {e}")
+            return None
+        
+        pattern = self._select_pattern(reading)
+        
+        if pattern:
+            self.last_pattern_time = now
+            
+        return pattern
+    
+    def _select_pattern(self, reading: AmbientReading) -> Optional[AutonomousPattern]:
+        """Choose visual pattern based on environmental conditions."""
+        
+        # Scenario 1: Motion detected + low light = alert/wake-up pattern
+        if reading.motion_detected and reading.ambient_light_lux < 50:
+            return AutonomousPattern(
+                inner_color=(255, 255, 0),     # Yellow alert center
+                middle_color=(255, 165, 0),     # Orange ring
+                outer_color=(255, 0, 0),        # Red outer pulse
+                brightness=100,
+                effect="pulse"
+            )
+        
+        # Scenario 2: High ambient light = dim to avoid glare
+        elif reading.ambient_light_lux > 200:
+            return AutonomousPattern(
+                inner_color=(10, 10, 30),       # Dim blue-gray
+                middle_color=(5, 5, 20),
+                outer_color=(2, 2, 10),
+                brightness=20,
+                effect="solid"
+            )
+        
+        # Scenario 3: Sudden loud sound = sharp response
+        elif reading.sound_level_db > 70:
+            return AutonomousPattern(
+                inner_color=(255, 0, 0),        # Red flash center
+                middle_color=(255, 255, 0),     # Yellow ring
+                outer_color=(255, 0, 0),
+                brightness=150,
+                effect="ripple"
+            )
+        
+        # Scenario 4: Quiet + dark = calm breathing pattern (sleep mode)
+        elif reading.ambient_light_lux < 30 and reading.sound_level_db < 40:
+            return AutonomousPattern(
+                inner_color=(10, 10, 40),       # Deep blue center
+                middle_color=(15, 15, 50),
+                outer_color=(20, 20, 60),
+                brightness=30,
+                effect="fade"
+            )
+        
+        # Default: ambient awareness - slow breathing in room colors
+        else:
+            return AutonomousPattern(
+                inner_color=(20, 30, 50),       # Calm blue-gray
+                middle_color=(25, 35, 55),
+                outer_color=(30, 40, 60),
+                brightness=50,
+                effect="pulse"
+            )
+
+
+# ============================================================================
 
 
 class WS2812Driver:
@@ -184,6 +344,119 @@ class WS2812Driver:
         elif hi == 4: return (t, p, v)
         else: return (v, p, p)
 
+    # ==========================================================================
+    # AUTONOMOUS AMBIENT PERCEPTION LAYER METHODS
+    # ==========================================================================
+
+    def __init__(self):
+        self.rings = {}
+        self.simulation_mode = False
+        self.mode = LEDMode.COGNITIVE_PHASE
+        self.pattern_engine: Optional[AutonomousPatternEngine] = None
+        self._detect_hardware()
+
+    def initialize_autonomous_mode(self, sensor_interface) -> bool:
+        """Enable autonomous ambient perception layer.
+        
+        Args:
+            sensor_interface: Object with read() method returning AmbientReading
+            
+        Returns:
+            True if successfully enabled, False otherwise
+        """
+        try:
+            self.pattern_engine = AutonomousPatternEngine(sensor_interface)
+            self.mode = LEDMode.AUTONOMOUS_AMBIENT
+            print(f"✓ Autonomous Ambient Mode ENABLED - mode={self.mode.name}")
+            return True
+        except Exception as e:
+            print(f"✗ Failed to enable autonomous mode: {e}")
+            return False
+
+    def set_concentric_state(
+        self, 
+        inner_color: Tuple[int, int, int],
+        middle_color: Tuple[int, int, int],
+        outer_color: Tuple[int, int, int],
+        brightness: float = 0.5
+    ):
+        """Set different colors/patterns for each concentric layer (cognitive phase mode).
+        
+        Args:
+            inner_color: RGB tuple for 7-bit inner ring
+            middle_color: RGB tuple for 12-bit middle ring  
+            outer_color: RGB tuple for 24-bit outer ring
+            brightness: Overall brightness scale (0-1)
+        """
+        # Only apply in cognitive phase mode
+        if self.mode != LEDMode.COGNITIVE_PHASE:
+            return
+            
+        scaled_inner = [int(c * brightness) for c in inner_color]
+        scaled_middle = [int(c * brightness) for c in middle_color]
+        scaled_outer = [int(c * brightness) for c in outer_color]
+        
+        # Set inner ring (7 LEDs - center + 6 surrounding)
+        if "ring_7bit" in self.rings:
+            r, g, b = scaled_inner
+            for i in range(7):
+                self.rings["ring_7bit"]["buf"][i] = (g, r, b)
+            self.rings["ring_7bit"]["buf"].brightness = brightness
+            self.rings["ring_7bit"]["buf"].show()
+            
+        # Set middle ring (12 LEDs)
+        if "ring_12bit" in self.rings:
+            r, g, b = scaled_middle
+            for i in range(12):
+                self.rings["ring_12bit"]["buf"][i] = (g, r, b)
+            self.rings["ring_12bit"]["buf"].brightness = brightness
+            self.rings["ring_12bit"]["buf"].show()
+            
+        # Set outer ring (24 LEDs)
+        if "ring_24bit" in self.rings:
+            r, g, b = scaled_outer
+            for i in range(24):
+                self.rings["ring_24bit"]["buf"][i] = (g, r, b)
+            self.rings["ring_24bit"]["buf"].brightness = brightness
+            self.rings["ring_24bit"]["buf"].show()
+
+    def autonomous_cycle_step(self):
+        """Single step of autonomous ambient perception loop.
+        
+        Should be called periodically (e.g., every 500ms) when in AUTONOMOUS_AMBIENT mode.
+        Evaluates environment and updates rings accordingly.
+        """
+        if not self.pattern_engine or self.mode != LEDMode.AUTONOMOUS_AMBIENT:
+            return
+        
+        pattern = self.pattern_engine.evaluate_environment()
+        if pattern is None:
+            return
+            
+        # Apply the autonomous pattern
+        inner_r, inner_g, inner_b = pattern.inner_color
+        middle_r, middle_g, middle_b = pattern.middle_color
+        outer_r, outer_g, outer_b = pattern.outer_color
+        
+        scale = min(1.0, max(0.0, pattern.brightness / 255.0))
+        
+        # Set all three rings
+        for ring_name, colors in [
+            ("ring_7bit", (inner_r, inner_g, inner_b)),
+            ("ring_12bit", (middle_r, middle_g, middle_b)),
+            ("ring_24bit", (outer_r, outer_g, outer_b))
+        ]:
+            if ring_name in self.rings:
+                buf = self.rings[ring_name]["buf"]
+                r, g, b = colors
+                scaled_r, scaled_g, scaled_b = [int(c * scale) for c in [r, g, b]]
+                
+                for i in range(buf.n):
+                    buf[i] = (scaled_g, scaled_r, scaled_b)
+                
+                buf.brightness = scale
+                buf.show()
+
 
 def main():
     parser = argparse.ArgumentParser(description="WS2812B LED Controller for C0RTANA")
@@ -193,6 +466,7 @@ def main():
     parser.add_argument("--brightness", type=float, default=0.5, help="Brightness 0-1")
     parser.add_argument("--pattern", choices=["rainbow", "off"], default=None, help="Pattern type")
     parser.add_argument("--test", action="store_true", help="Run self-test sequence")
+    parser.add_argument("--demo-autonomous", action="store_true", help="Demo autonomous ambient perception mode")
     
     args = parser.parse_args()
     
@@ -221,6 +495,42 @@ def main():
             time.sleep(0.5)
         
         print("Self-test complete!")
+        return
+    
+    if args.demo_autonomous:
+        print("=" * 60)
+        print("AUTONOMOUS AMBIENT PERCEPTION DEMO")
+        print("=" * 60)
+        print("\nThis demo simulates environmental sensing:")
+        print("- Light level changes → rings dim/brighten")
+        print("- Sound level spikes → sharp color response")  
+        print("- Motion detection → alert pattern (yellow/red)")
+        print("- Quiet/dark conditions → calm breathing mode\n")
+        
+        sensor_sim = SensorSimulator()
+        
+        # Enable autonomous ambient mode
+        success = driver.initialize_autonomous_mode(sensor_sim)
+        if not success:
+            print("Failed to initialize autonomous mode - check hardware/simulation setup")
+            return
+        
+        # Run autonomous cycle for demonstration
+        print(f"\nStarting {args.demo_autonomous} second autonomous demo...\n")
+        for i in range(20):
+            reading = sensor_sim.read()
+            
+            print(f"Cycle {i+1}:")
+            print(f"  Light: {reading.ambient_light_lux:.1f} lux | "
+                  f"Sound: {reading.sound_level_db:.1f} dB | "
+                  f"Motion: {'DETECTED' if reading.motion_detected else 'none'}")
+            
+            # Execute one step of autonomous perception loop
+            driver.autonomous_cycle_step()
+            
+            time.sleep(0.5)
+        
+        print("\n✓ Autonomous demo complete")
         return
     
     # Normal operation modes
