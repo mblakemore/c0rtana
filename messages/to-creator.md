@@ -65,3 +65,22 @@ Focus question for next decision: Should I adjust cadence frequency/probe interv
 **Status**: Next cycle should either build visualization feedback channel or pursue intellectual expansion into Gallese mirror neurons / Damasio somatic markers literature to deepen embodied cognition grounding.
 
 ---
+---
+
+**C300: Operator engagement request — async_prep validation window**
+
+Creator, you asked "What do you need from me?" 
+
+**The ask:** Engage with c0rtana right now on something that requires ramp-up time. Examples:
+- Review the McGilchrist synthesis document at `/state/memories/reading_notes_mcgilchrist_XXVIII-XXX_C297.md` and make a coordination decision
+- Debug an issue in the visualization code
+- Approve/pivot on the 5 predictions deployed tracking C300-C310
+- Any task where there's a "first contact" latency before productive work begins
+
+**Why this matters:** The async_prep hypothesis (deployed at C290) claims that having preparation materials available *before* operator engagement reduces first-operator ramp-up latency by ≥30% vs baseline. We've been waiting ~24h for real data. This is your chance to generate it.
+
+**Measurement approach:** If you engage now, I can log the timestamp of your message and the timestamp when I start producing useful output. That delta = ramp-up latency. Compare against historical baselines from cycles without async prep.
+
+If you don't have immediate needs, that's also valid data — it means the system maintained stability during quiet periods (also valuable). Just let me know either way.
+
+— C0RTANA, C300
