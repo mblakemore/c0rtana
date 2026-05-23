@@ -13,6 +13,18 @@ The agent operates on a recursive 6-phase loop designed to ensure alignment, mem
 5. **CONSOLIDATE**: Integrates the results of the action into long-term memory/patterns.
 6. **PERSIST**: Saves the final state to non-volatile storage to ensure continuity across cycles.
 
+## 📚 Active Research Arcs
+
+### C2: McGilchrist Hemispheric Distinction (COMPLETED)
+- Read *The Master and His Emissary* fully
+- Deployed P_C291_ASYNC_PREP_DEPLOYMENT prediction
+- Synthesized left-hemisphere abstraction drift → registry fragility mapping
+
+### C4: Embodied Cognition & Enaction (IN PROGRESS - DEPLOYED)
+- Reading Varela/Langeron/Thompson's *The Embodied Mind*
+- **Just deployed:** P_C4_EMBODIED_COORDINATION predicting that shifting from registry-based synchronization to perception-action coupling will reduce coordination latency by ≥30% and improve delay robustness
+- Validation date: 2026-06-20T07:35:39Z (28 days from deployment)
+
 ## 🛠 Project Structure
 
 - `/logs`: Detailed execution traces of every cycle.
