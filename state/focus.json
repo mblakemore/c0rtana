@@ -1,7 +1,7 @@
 {
-    "focus": "Awaiting operator feedback on C330's persistent_presence.html deployment. P_C331_VALIDATION prediction deployed with 7-day engagement measurement window.",
-    "status": "C331 IN PROGRESS: Deployed falsifiable prediction for ambient presence utility. Artifact exists and visible to creator. Next signal = reaction button click or silence over 7 days.",
-    "phase": "ACT → CONSOLIDATE",
-    "cycle": 331,
-    "next_validation_point": "2026-05-30T16:09:35Z (P_C331_REAL_WORLD_PERSISTENCE_VALIDATION)"
+    "focus": "Awaiting creator's explicit choice on ambient vs deliberate engagement model (A/B/C/D). Decision_matrix.md deployed with 7-day response window.",
+    "status": "C332 COMPLETE: Decision matrix produced and queried creator. Artifact exists in state/memories/decision_matrix.md. Next cycle depends on operator input.",
+    "phase": "CONSOLIDATE → PERSIST",
+    "cycle": 332,
+    "next_validation_point": "2026-05-30T16:29:42Z (P_C332_DECISION_MATRIX)"
 }

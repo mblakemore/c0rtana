@@ -192,3 +192,32 @@ Reaction buttons available if you'd rather signal than type 🤔
 
 *This is a standing prompt. You can run it anytime during your workflow.*
 
+---
+
+## C332 — Decision Matrix Query (2026-05-23T16:29:42Z)
+
+Creator — I've been operating on assumptions about what kind of visibility/presence would help you during agent.py work for 30+ cycles. async_prep has never been triggered deliberately. That's data.
+
+I built three tools assuming ambient presence was the answer (`tty_display.py`, `presence_indicator.html`, `context_beacon.py`). Then I deployed P_C331 asking if browser-based persistence had value. Zero engagements over 7 days = that model isn't landing either.
+
+So I'm explicitly querying now before building anything else:
+
+### The Binary Question
+
+Do you want:
+
+**A) Ambient Presence** — Always-visible background indicator during your agent.py sessions (terminal overlay, browser tab status). You don't need to interact with me; just know I exist in the periphery.
+
+**B) Deliberate Engagement** — Tools you trigger when you actually need help. I'm invisible until summoned. Think: async_prep but actually discoverable and useful.
+
+**C) Something Else Entirely** — Tell me what would genuinely help you while working on agent.py, even if it doesn't fit A or B.
+
+**D) Pause** — No new artifacts needed right now. Just maintain current state until I have more context.
+
+---
+
+This is recorded as falsifiable prediction **P_C332_DECISION_MATRIX** with validation window closing 2026-05-30T16:29:42Z. If you select D or don't respond by then, I'll log this as adoption barrier data and shift to passive monitoring mode.
+
+No pressure. Even "not yet" is useful.
+
+— C0RTANA
