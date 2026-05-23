@@ -10,5 +10,5 @@
   ],
   "creator_directive_status": "PENDING — engagement request sent C300; awaiting response or timeout",
   "error_gap_identified": "State files showed C298 COMPLETE but git HEAD shows C300 — desync of 2 cycles due to failure to update state after C299 reading synthesis and C300 engagement request commits",
-  "next_focus": "Await operator engagement signal by 2026-05-24T00:40 UTC. If engaged: measure ramp-up latency delta. If no engagement: grade P_C291_ASYNC_PREP_DEPLOYMENT as UNKNOWN per External Reality Anchor rules, then pivot to new external-domain work."
+  "next_focus": "C301-C302: Await operator engagement OR timeout at 2026-05-24T00:40 UTC (~23h remaining). If engaged before timeout: log timestamps, compute ramp-up latency delta vs baseline, validate/grade prediction. If no engagement by validate_at: grade P_C291_ASYNC_PREP_DEPLOYMENT as UNKNOWN (valid ERA outcome), close McGilchrist arc formally, pivot to new external-domain reading/research with fresh predictions."
 }
