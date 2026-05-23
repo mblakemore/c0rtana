@@ -1,0 +1,11 @@
+# Test projection commands — simulate alien ship/projection system input
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:00Z","cmd":"set_phase","params":{"phase":"PERCEIVE"}}
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:01Z","cmd":"adjust_density","params":{"density":0.75}}
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:02Z","cmd":"change_color","params":{"color":"cool_blue"}}
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:03Z","cmd":"switch_formation","params":{"formation":"sphere"}}
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:04Z","cmd":"set_phase","params":{"phase":"REFLECT"}}
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:05Z","cmd":"adjust_density","params":{"density":0.85}}
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:06Z","cmd":"toggle_analytics","params":{"enabled":true}}
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:07Z","cmd":"set_phase","params":{"phase":"ACT"}}
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:08Z","cmd":"change_color","params":{"color":"warm_white"}}
+{"source":"alien_ship_simulation","timestamp":"2026-05-23T22:00:09Z","cmd":"switch_formation","params":{"formation":"spiral"}}
