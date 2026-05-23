@@ -30,8 +30,10 @@ except ImportError:
 
 # Configuration
 STATE_FILE = Path(__file__).parent.parent / "state" / "current-state.json"
+FOCUS_FILE = Path(__file__).parent.parent / "state" / "focus.json"
 POLL_INTERVAL = 5  # seconds
 UPDATE_THROTTLE = 2  # minimum seconds between screen updates (prevents flicker)
+FEEDBACK_LOG = Path(__file__).parent.parent / "logs" / "operator_feedback.jsonl"
 
 # Color pair IDs
 COLOR_NORMAL = 1   # dimmed baseline
@@ -56,6 +58,17 @@ def load_state():
         return None
 
 
+def load_focus():
+    """Load focus state from JSON file."""
+    try:
+        with open(FOCUS_FILE, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+    except json.JSONDecodeError:
+        return {}
+
+
 def get_phase_color(phase):
     """Return appropriate color pair for phase."""
     colors = {
@@ -78,6 +91,180 @@ def format_timestamp(ts_str):
         return dt.strftime("%Y-%m-%d %H:%M")
     except:
         return ts_str[:19] if len(ts_str) > 19 else ts_str
+
+
+def get_remaining_seconds(validate_at_str):
+    """Calculate seconds remaining until validation deadline."""
+    if not validate_at_str:
+        return None
+    try:
+        now = datetime.now(datetime.timezone.utc)
+        validate_dt = datetime.fromisoformat(validate_at_str.replace('Z', '+00:00'))
+        delta = validate_dt - now
+        return max(0, int(delta.total_seconds()))
+    except:
+        return None
+
+
+def format_time_remaining(seconds):
+    """Format seconds into human-readable countdown."""
+    if seconds is None:
+        return "--:--:--"
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    secs = seconds % 60
+    if hours > 0:
+        return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+    else:
+        return f"{minutes:02d}:{secs:02d}"
+
+
+def capture_operator_feedback(stdscr, state):
+    """Display reaction buttons and capture operator input."""
+    height, width = stdscr.getmaxyx()
+    
+    # Show feedback prompt
+    prompt = " [FEEDBACK] Press: ✅=good ⚠️=fractional 💡=insight 🔄=iteration | q=quit "
+    prompt = prompt.center(width - 4)
+    
+    try:
+        stdscr.addstr(height - 3, max(0, (width - len(prompt)) // 2), prompt[:width-4])
+        stdscr.refresh()
+        
+        # Wait for single-key input (non-blocking)
+        key = stdscr.getch()
+        feedback_types = {ord('c'): '✅', ord('w'): '⚠️', ord('i'): '💡', ord('r'): '🔄'}
+        
+        if key in feedback_types:
+            feedback_type = feedback_types[key]
+            
+            # Log the feedback
+            log_entry = {
+                "timestamp": datetime.now(datetime.timezone.utc).isoformat(),
+                "cycle": state.get('cycle', 'unknown'),
+                "phase": state.get('phase', 'unknown'),
+                "feedback_type": feedback_type,
+                "context": {
+                    "status": state.get('status', '')[:100],
+                    "pending_signals_count": len(state.get('pending_signals', [])),
+                    "predictions_deployed_count": len(state.get('falsifiable_predictions_deployed', []))
+                }
+            }
+            
+            FEEDBACK_LOG.parent.mkdir(parents=True, exist_ok=True)
+            with open(FEEDBACK_LOG, 'a') as f:
+                f.write(json.dumps(log_entry) + '\n')
+            
+            return feedback_type
+        
+    except curses.error:
+        pass
+    
+    return None
+
+
+def draw_quiet_window_panel(stdscr, focus, row):
+    """Draw quiet window countdown panel."""
+    height, width = stdscr.getmaxyx()
+    
+    # Check for quiet window indicator in focus.json
+    quiet_active = focus.get('quiet_window_active', False) if isinstance(focus, dict) else False
+    
+    if quiet_active:
+        # Look for validate_at timestamps to estimate time remaining
+        predictions = focus.get('falsifiable_predictions_deployed', [])
+        earliest_deadline = None
+        
+        for pred in predictions:
+            if 'validate_at' in str(pred).lower():
+                continue  # Skip entries without deadline
+            
+            # Try to extract validate_at from prediction strings like "P_C298_ASYNC_PREP_GRADING (grading pending 2026-05-24T05:43Z)"
+            try:
+                import re
+                match = re.search(r'(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?)', str(pred))
+                if match:
+                    ts = match.group(1) + 'Z'
+                    seconds_remaining = get_remaining_seconds(ts)
+                    if earliest_deadline is None or (seconds_remaining and seconds_remaining < earliest_deadline):
+                        earliest_deadline = seconds_remaining
+            except:
+                pass
+        
+        if earliest_deadline is not None:
+            countdown = format_time_remaining(earliest_deadline)
+            status = f"QUIET WINDOW: {countdown} remaining"
+            stdscr.attron(curses.color_pair(COLOR_PENDING_SIGNAL) | curses.A_BOLD)
+            stdscr.addstr(row, 2, status[:width-6])
+            stdscr.attroff(curses.color_pair(COLOR_PENDING_SIGNAL) | curses.A_BOLD)
+            return row + 1
+    
+    # If no quiet window active, show status
+    row += 1
+    return row
+
+
+def draw_predictions_panel(stdscr, state, focus, row):
+    """Draw falsifiable predictions tracker panel."""
+    height, width = stdscr.getmaxyx()
+    
+    # Get predictions from both current-state.json and focus.json
+    all_preds = []
+    
+    preds_from_state = state.get('falsifiable_predictions_deployed', [])
+    all_preds.extend(preds_from_state)
+    
+    preds_from_focus = focus.get('falsifiable_predictions_deployed', [])
+    all_preds.extend(preds_from_focus)
+    
+    if all_preds:
+        pred_count = len(set(str(p) for p in all_preds))  # Dedupe
+        stdscr.addstr(row, 2, f"PREDICTIONS ACTIVE: {pred_count}")
+        row += 1
+        
+        # Show first pending prediction with deadline
+        for pred in all_preds[:3]:
+            pred_str = str(pred)[:width - 10]
+            
+            # Highlight if has validation deadline
+            if 'pending' in pred_str.lower() or 'grading' in pred_str.lower():
+                stdscr.attron(curses.color_pair(COLOR_PENDING_SIGNAL))
+                stdscr.addstr(row, 4, f"⏳ {pred_str}")
+                stdscr.attroff(curses.color_pair(COLOR_PENDING_SIGNAL))
+            else:
+                stdscr.addstr(row, 4, f"• {pred_str}")
+            
+            row += 1
+        
+        return row
+    
+    row += 1
+    return row
+
+
+def draw_async_prep_panel(stdscr, state, row):
+    """Draw async_prep engagement status panel."""
+    height, width = stdscr.getmaxyx()
+    
+    # Check for async_prep-related pending signals
+    pending_signals = state.get('pending_signals', [])
+    async_prep_signals = [s for s in pending_signals if 'async_prep' in str(s).lower()]
+    
+    if async_prep_signals:
+        status = "ASYNC_PREP: DEPLOYED (awaiting operator engagement)"
+        stdscr.attron(curses.color_pair(COLOR_HIGH_CONFIDENCE))
+        stdscr.addstr(row, 2, status[:width-6])
+        stdscr.attroff(curses.color_pair(COLOR_HIGH_CONFIDENCE))
+        return row + 1
+    elif any('grading' in str(s).lower() for s in pending_signals):
+        status = "ASYNC_PREP: GRADING PENDING"
+        stdscr.attron(curses.color_pair(COLOR_NORMAL) | curses.A_DIM)
+        stdscr.addstr(row, 2, status[:width-6])
+        stdscr.attroff(curses.color_pair(COLOR_NORMAL) | curses.A_DIM)
+        return row + 1
+    
+    row += 1
+    return row
 
 
 def draw_status_screen(stdscr, state):
@@ -169,6 +356,18 @@ def draw_status_screen(stdscr, state):
                     stdscr.attroff(curses.color_pair(COLOR_PENDING_SIGNAL))
                     row += 1
                     break
+        
+        # Load focus.json for additional panels
+        focus = load_focus()
+        
+        # PANEL 1: Quiet window countdown
+        row = draw_quiet_window_panel(stdscr, focus, row)
+        
+        # PANEL 2: Falsifiable predictions tracker
+        row = draw_predictions_panel(stdscr, state, focus, row)
+        
+        # PANEL 3: Async_prep engagement status
+        row = draw_async_prep_panel(stdscr, state, row)
     
     # Footer with instructions (always visible but dimmed)
     footer = " Ctrl+C to exit | Polling every {}s ".format(POLL_INTERVAL)
@@ -233,6 +432,11 @@ def main(stdscr):
             # Throttle screen updates to avoid flicker
             if current_time - last_update_time >= UPDATE_THROTTLE:
                 state = load_state()
+                
+                # Capture operator feedback before drawing
+                focus = load_focus()
+                feedback = capture_operator_feedback(stdscr, {**state, 'focus': focus})
+                
                 draw_status_screen(stdscr, state)
                 last_update_time = current_time
             
