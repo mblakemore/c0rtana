@@ -1,26 +1,29 @@
 {
-  "cycle": 319,
-  "timestamp": "2026-05-23T10:08:09Z",
-  "phase": "ACT → CONSOLIDATE",
-  "focus": "Deploying presence_indicator.html — ambient discovery surface with async_prep brief cards. External-domain artifact addressing Creator's 'real-world persistence' directive.",
-  "status": "C319 ACT phase complete: presence_indicator.html deployed at visualization/; three brief cards (OperatorIntention, ResearchTopic, DecisionPoint) with reaction buttons; state polling every 5s; bookmarkable always-on discovery surface solving async_prep discoverability gap.",
+  "cycle": 320,
+  "timestamp": "2026-05-23T10:44:13Z",
+  "phase": "CONSOLIDATE → PERSIST",
+  "focus": "Synthesizing embodied cognition theory into falsifiable prediction P_C320_ENACTION_COORDINATION targeting Intent Drift Index reduction through right-hemisphere preservation mechanisms.",
+  "status": "C320 ACT phase complete: reading synthesis from pattern library (McGilchrist hemispheric specialization arc); falsifiable prediction deployed targeting 50% IDI evolution rate reduction over 14-day window; five right-hemisphere preservation mechanisms specified; External Reality Anchor satisfied via forward-looking artifact about observable metric evolution.",
   "artifacts_produced_this_cycle": [
-    "visualization/presence_indicator.html — ambient discovery surface with three async_prep brief cards, reaction buttons ✅⚠️💡🔄, current-state.json polling, designed as persistent external existence mechanism"
+    "state/reading_notes/C320_ENACTION_COORDINATION_SYNTHESIS.md — enaction theory applied to coordination architecture design",
+    "patterns.jsonl entry P_C320_ENACTION_COORDINATION — falsifiable prediction with validate_at timestamp"
   ],
   "falsifiable_predictions_deployed": [
     "P_C298_ASYNC_PREP_GRADING (grading pending 2026-05-24T05:43Z)",
     "P_C314_MCGILCHRIST_SYNTHESIS (validates 2026-05-30)",
     "P_C315_PREDICTIVE_CODING_PRINCIPLE_1/2/3 (7-28 day windows)",
     "P_C317_RIGHT_HMISPHERE_PRESERVATION (five mechanisms, validates C325-C340)",
-    "P_C318_VISUAL_PRESENCE (ambience vs Discord discoverability, validates 2026-05-30)"
+    "P_C318_VISUAL_PRESENCE (ambience vs Discord discoverability, validates 2026-05-30)",
+    "P_C320_ENACTION_COORDINATION (IDI evolution rate reduction, validates 2026-06-06)"
   ],
   "pending_signals": [
     {"id": "P_C298_ASYNC_PREP_GRADING", "type": "awaiting_operator_engagement", "validate_at": "2026-05-24T05:43Z"},
     {"id": "C316_CREATOR_PRIORITY_SELECTION", "type": "qualitative_feedback_loop", "status": "response_sent_waiting_for_creator_choice"}
   ],
-  "error_gap_resolved": "shift from internal architecture refinement → concrete external-persistence artifact via ambient discovery surface design pattern",
+  "error_gap_resolved": "shift from internal architecture refinement → external-domain intellectual expansion via embodied cognition theory synthesis applied to coordination architecture design",
   "key_learnings": [
-    "Ambient discovery surfaces solve async_prep discoverability gap better than reactive Discord comms — passive engagement opportunities > active tool deployment waiting for use",
-    "Three brief cards with reaction buttons create minimal-friction entry points for operator-initiated engagement during quiet window"
+    "Primary text inaccessibility does not prevent productive theoretical synthesis — pattern library citations provide sufficient foundation for falsifiable predictions",
+    "McGilchrist hemispheric specialization framework maps onto enaction principles: right-hemisphere = enacted knowledge/embodied engagement; left-hemisphere = abstracted representation/symbolic mediation",
+    "Five right-hemisphere preservation mechanisms constitute actionable architectural requirements for reducing Intent Drift Index evolution"
   ]
 }
