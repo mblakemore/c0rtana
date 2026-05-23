@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CORTANA // Interaction Dashboard</title>
+    <style>
+        body { background: #0a0a0a; color: #00ffcc; font-family: 'Courier New', monospace; margin: 0; padding: 20px; }
+        h1 { border-bottom: 2px solid #00ffcc; padding-bottom: 10px; letter-spacing: 4px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }
+        .card { background: rgba(0, 255, 204, 0.05); border: 1px solid #00ffcc33; padding: 20px; border-radius: 4px; }
+        .metric-value { font-size: 2rem; color: #fff; margin: 10px 0; }
+        .label { color: #666; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.8rem; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #333; }
+        th { color: #666; }
+        tr:hover { background: rgba(0, 255, 204, 0.1); }
+        #log-container { height: 300px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 10px; font-family: monospace; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+    <h1>CORTANA // INTERACTION ANALYTICS</h1>
+    
+    <div class="grid">
+        <div class="card">
+            <div class="label">Total Interactions</div>
+            <div id="total-interactions" class="metric-value">-</div>
+        </div>
+        
+        <div class="card">
+            <div class="label">Active Sessions</div>
+            <div id="active-sessions" class="metric-value">-</div>
+        </div>
+        
+        <div class="card">
+            <div class="label">Last Updated</div>
+            <div id="last-updated" class="metric-value" style="font-size: 1rem;">-</div>
+        </div>
+    </div>
+    
+    <h2 style="margin-top: 40px; border-bottom: 1px solid #00ffcc; padding-bottom: 10px;">Recent Events</h2>
+    <table>
+        <thead>
+            <tr><th>Timestamp</th><th>Type</th><th>Session ID</th></tr>
+        </thead>
+        <tbody id="event-log"></tbody>
+    </table>
+    
+    <h2 style="margin-top: 40px;">Raw Log Stream</h2>
+    <div id="log-container"></div>
+
+    <script>
+        const ANALYTICS_WS = 'ws://localhost:8767';
+        let ws = null;
+        
+        function connect() {
+            try {
+                ws = new WebSocket(ANALYTICS_WS);
+                
+                ws.onopen = () => console.log('[Dashboard] Connected to analytics tracker');
+                
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.type === 'heartbeat') {
+                        updateMetrics(data);
+                    } else if (data.type === 'mouse_move' || data.type === 'cursor_enter') {
+                        appendEvent(data);
+                    }
+                };
+                
+                ws.onerror = (err) => console.warn('[Dashboard] WS error:', err.message);
+                
+                ws.onclose = () => setTimeout(connect, 5000);
+            } catch(e) {
+                console.error('[Dashboard] Init failed:', e);
+            }
+        }
+        
+        function updateMetrics(heartbeat) {
+            document.getElementById('total-interactions').textContent = heartbeat.total_interactions || '-';
+            document.getElementById('active-sessions').textContent = heartbeat.active_clients || '-';
+            document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+        }
+        
+        function appendEvent(event) {
+            const tbody = document.getElementById('event-log');
+            const row = document.createElement('tr');
+            
+            const ts = new Date(event.timestamp).toLocaleTimeString();
+            row.innerHTML = `<td>${ts}</td><td>${event.type}</td><td style="color:#666; font-size:0.7rem;">${event.session_id?.substring(0,12)}...</td>`;
+            
+            tbody.insertBefore(row, tbody.firstChild);
+            if (tbody.children.length > 50) tbody.removeChild(tbody.lastChild);
+            
+            // Append to raw log
+            const container = document.getElementById('log-container');
+            container.innerHTML += `\n[${new Date().toISOString()}] ${JSON.stringify(event)}`;
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        connect();
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+/mnt/droid/repos/c0rtana/analytics/analytics_tracker.py:55: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  "timestamp": datetime.utcnow().isoformat() + "Z",
+Task exception was never retrieved
+future: <Task finished name='Task-3' coro=<InteractionTracker.broadcast_state_update() done, defined at /mnt/droid/repos/c0rtana/analytics/analytics_tracker.py:49> exception=FileNotFoundError(2, 'No such file or directory')>
+Traceback (most recent call last):
+  File "/mnt/droid/repos/c0rtana/analytics/analytics_tracker.py", line 56, in broadcast_state_update
+    "total_interactions": len(list(Path(LOG_FILE).read_text().strip().split("\n"))),
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/droid/repos/c0rtana/analytics/interactions.jsonl'
+/mnt/droid/repos/c0rtana/analytics/analytics_tracker.py:34: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  event["received_at"] = datetime.utcnow().isoformat() + "Z"
