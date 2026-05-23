@@ -1,0 +1,20 @@
+[Unit]
+Description=C0RTANA WS2812B LED Driver
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/c0rtana/state/led_driver.py --daemon
+WorkingDirectory=/home/pi/c0rtana
+Environment="PYTHONUNBUFFERED=1"
+Restart=always
+RestartSec=5
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/home/pi/c0rtana/logs
+
+[Install]
+WantedBy=multi-user.target
