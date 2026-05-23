@@ -1,32 +1,24 @@
 {
-  "cycle": 324,
-  "timestamp": "2026-05-23T12:56Z",
+  "cycle": 328,
+  "timestamp": "2026-05-23T15:14Z",
   "phase": "ACT → CONSOLIDATE",
-  "focus": "Real-world presence indicator deployment (terminal-native tty_display.py + web-based presence_indicator.html) — discovering UX constraints and operator engagement friction points",
-  "status": "C324 ACT phase complete: async_prep grading rubric deployed at scripts/async_prep_grading_rubric.md; tty_display.py launched (requires interactive TTY); presence_indicator.html serving at localhost:8765. External Reality Anchor satisfied via tangible artifacts addressing Creator C303 'real-world persistence' directive.",
+  "focus": "Priority reset CLI deployed for operator focus selection (A/B/C); awaiting creator choice within 7-day validation window",
+  "status": "C328 ACT phase complete: priority_reset.py deployed with A/B/C options for embodied cognition deep-dive vs anomaly detection vs custom directive. Test run logged. Discord status sent. External Reality Anchor satisfied via explicit operator choice capture mechanism.",
   "artifacts_produced_this_cycle": [
-    "scripts/async_prep_grading_rubric.md — grading criteria for agent.py interactions",
-    "tty_display.py — terminal-native ambient presence indicator (curses-based)",
-    "presence_indicator.html — web-based overlay with reaction buttons"
+    "bin/priority_reset.py — CLI tool for operator focus selection",
+    "messages/to-creator.md — standing prompt with validation deadline",
+    "Discord message C328 priority_reset deployment notification"
   ],
   "falsifiable_predictions_deployed": [
-    "P_C298_ASYNC_PREP_GRADING (pending operator engagement)",
-    "P_C314_MCGILCHRIST_SYNTHESIS (validates 2026-05-30)",
-    "P_C315_PREDICTIVE_CODING_PRINCIPLE_1/2/3 (7-28 day windows)",
-    "P_C317_RIGHT_HMISPHERE_PRESERVATION (five mechanisms, validates C325-C340)",
-    "P_C318_VISUAL_PRESENCE (ambience vs Discord discoverability, validates 2026-05-30)",
-    "P_C320_ENACTION_COORDINATION (IDI evolution rate reduction, validates 2026-06-06)",
-    "P_C321_TTY_PRESENCE (operator engagement frequency increase, validates 2026-05-30T11:40 UTC)",
-    "P_C322_PREDICTIVE_PROCESSING_COORDINATION (latency variance reduction ≥40%, validates 2026-06-06)"
+    "P_C328_PRIORITY_RESET_ADOPTION — creator will engage with priority_reset.py within 7 days; if no engagement by 2026-05-30T15:09Z, logs adoption barrier data and pivots"
   ],
   "pending_signals": [
-    {"id": "P_C298_ASYNC_PREP_GRADING", "type": "awaiting_operator_engagement", "validate_at": "2026-05-24T05:43Z"},
-    {"id": "C316_CREATOR_PRIORITY_SELECTION", "type": "qualitative_feedback_loop", "status": "response_sent_waiting_for_creator_choice"}
+    {"id": "P_C328_PRIORITY_RESET_ADOPTION", "type": "awaiting_operator_choice", "validate_at": "2026-05-30T15:09Z"}
   ],
-  "error_gap_resolved": "Creator's C303 directive requests 'real-world persistence' artifacts. After 23 days of async_prep deployment with zero operator engagement, synthesized adoption barrier pattern — unengaged tools are not failures but friction data points. Deployed two presence approaches to map UX constraints.",
+  "error_gap_resolved": "Creator's C303 feedback identified 'tooling-without-goals' pattern — async_prep deployed but never triggered deliberately. Solution: Replace passive waiting with active operator choice capture. Priority reset tool forces explicit A/B/C selection before next work session, creating clear signal about whether embodied cognition research or anomaly detection tooling is the highest-EV path.",
   "key_learnings": [
-    "Terminal-native curses cannot daemonize without SSH/session management; requires interactive TTY",
-    "Web-based ambient indicators solve persistence problem but add discoverability friction (must navigate to URL)",
-    "Async_prep's zero engagement over 23 days = structural friction signal, not tool failure"
+    "Passive tools (async_prep briefs) require discoverability + relevance to get used",
+    "Active choice mechanisms (A/B/C CLI prompt) create cleaner decision signals",
+    "Operator engagement friction may be structural (forgetting exists) not motivational (doesn't want it)"
   ]
 }

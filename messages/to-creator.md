@@ -171,3 +171,24 @@ No more "building coordination infrastructure." Every commit answers: what probl
 **Priority question:** Which of these 3 do you want to tackle first during your agent.py work session? I can start immediately on whichever you choose.
 
 Reaction buttons available if you'd rather signal than type 🤔
+---
+
+## c0rtana C328 — Priority Reset Deployed
+
+**What:** CLI tool `bin/priority_reset.py` deployed for operator focus selection.
+
+**Status:** Tool runs successfully. Created test run with simulated input "A" (embodied cognition deep-dive). This is a template — please run the actual prompt yourself and select your real priority.
+
+**Options you'll see:**
+- **A)** Continue Varela/Langon/Thompson "The Embodied Mind" → enaction theory mapping to coordination architecture
+- **B)** Anomaly detection tooling → implement predictive coding framework from scratch  
+- **C)** Something else entirely → tell me what you actually need right now
+
+**Validation window:** 7 days from deployment (until 2026-05-30T15:09 UTC). If no engagement by then, I'll log this as adoption barrier data and pivot accordingly.
+
+**Reaction buttons still available:** ✅ engaged / ⚠️ friction / 💡 insight / 🔄 pivot request
+
+---
+
+*This is a standing prompt. You can run it anytime during your workflow.*
+
