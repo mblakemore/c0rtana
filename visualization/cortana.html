@@ -13,6 +13,7 @@
         .value { font-size: 1.1rem; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         h2 { font-size: 0.9rem; border-bottom: 1px solid #00ffcc; padding-bottom: 10px; letter-spacing: 3px; margin-top: 0; }
         .status-tag { font-size: 0.6rem; background: #004433; padding: 2px 5px; border-radius: 3px; vertical-align: middle; margin-left: 10px; }
+    </style>
     <style>
     #particle-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
   </style>
@@ -37,7 +38,7 @@
         const ctx = canvas.getContext('2d');
         let width, height, centerX, centerY;
         
-        // Internal system state mirroring current-state.json’s structure
+        // Internal system state mirroring current-state.json's structure
         let sysState = {
             cycle: 0,
             phase: 'UNKNOWN',
@@ -48,8 +49,6 @@
 
         async function updateState() {
             try {
-                // In a real deployed env, this would be an actual fetch to the json file.
-                // For local browser files (CORS), we simulate if needed or use relative path.
                 const response = await fetch('./state/current-state.json');
                 if (!response.ok) throw new Error('No State File Found Locally');
                 sysState = await response.json();
@@ -69,7 +68,6 @@
         }
 
         function simulateState() {
-            // Fallback for when browsers block local file reads
             sysState = {
                 cycle: 173,
                 phase: 'ACT',
@@ -129,7 +127,7 @@
 
             // Orbiting Bits (Representing active focuses/patterns)
             const nodes = 8;
-            for(let j=0; j<nodes; j++) {
+            for(let j=0;j<nodes;j++) {
                 let nAngle = angle + (j * (Math.PI*2/nodes));
                 let ox = centerX + Math.cos(nAngle)*140;
                 let oy = centerY + Math.sin(nAngle)*140;
@@ -233,18 +231,79 @@ function updateParticles(state) {
     particleSystem.material.color.setRGB(r/255, g/255, b/255);
 
     // Pattern count → density scaling
-    const patternCount = state.pattern_count || 300; // fallback to current
+    const patternCount = state.patterns_stored || 300;
     particleSystem.material.size = 0.3 + (patternCount / 2000) * 0.5;
 
-    // Processing activity → oscillation frequency
+    // Phase → formation pattern (active inference: cognitive state drives spatial arrangement)
     if (particleSystem.geometry.attributes.position.array) {
         const positions = particleSystem.geometry.attributes.position.array;
+        const phase = state.phase || 'UNKNOWN';
+        
         for (let i = 0; i < particleData.count; i++) {
             const baseX = positions[i * 3];
             const baseY = positions[i * 3 + 1];
             const oscillation = Math.sin(Date.now() * 0.002 + i * 0.01) * (0.5 + confidence * 0.5);
-            positions[i * 3] = baseX + oscillation;
-            positions[i * 3 + 1] = baseY + oscillation * 0.5;
+            
+            // Formation logic per phase — each creates distinct spatial signature
+            let fx = 0, fy = 0;
+            switch(phase) {
+                case 'PERCEIVE':
+                    // Dispersed scanning pattern — particles spread outward in radial arms
+                    const anglePerceive = (i / particleData.count) * Math.PI * 2;
+                    const radiusPerceive = 40 + Math.random() * 60;
+                    fx = Math.cos(anglePerceive) * radiusPerceive;
+                    fy = Math.sin(anglePerceive) * radiusPerceive;
+                    break;
+                case 'REFLECT':
+                    // Concentrated with internal orbits — tighter cluster, orbital motion
+                    const reflectRadius = 20 + Math.random() * 15;
+                    const reflectAngle = Date.now() * 0.0005 + (i % 10) * 0.5;
+                    fx = Math.cos(reflectAngle) * reflectRadius;
+                    fy = Math.sin(reflectAngle) * reflectRadius;
+                    break;
+                case 'DECIDE':
+                    // Hierarchical funnel — particles flow toward center in layered bands
+                    const layer = i % 3;
+                    const decideRadius = 50 - layer * 10 + Math.random() * 5;
+                    const decideAngle = Date.now() * 0.0003 - (layer * 0.5);
+                    fx = Math.cos(decideAngle) * decideRadius;
+                    fy = Math.sin(decideAngle) * decideRadius;
+                    break;
+                case 'ACT':
+                    // Focused core burst — high density central node with energetic spikes
+                    if (Math.random() < 0.7) {
+                        fx = (Math.random() - 0.5) * 20;
+                        fy = (Math.random() - 0.5) * 20;
+                    } else {
+                        const spikeAngle = Math.random() * Math.PI * 2;
+                        const spikeLen = 30 + Math.random() * 30;
+                        fx = Math.cos(spikeAngle) * spikeLen;
+                        fy = Math.sin(spikeAngle) * spikeLen;
+                    }
+                    break;
+                case 'CONSOLIDATE':
+                    // Spiral convergence — particles spiral inward to new equilibrium
+                    const spiralAngle = (i / particleData.count) * Math.PI * 4 + Date.now() * 0.0002;
+                    const spiralRadius = 60 - (i / particleData.count) * 40 + Math.random() * 10;
+                    fx = Math.cos(spiralAngle) * spiralRadius;
+                    fy = Math.sin(spiralAngle) * spiralRadius;
+                    break;
+                case 'PERSIST':
+                    // Stable lattice — ordered structure, minimal motion
+                    const gridSize = Math.ceil(Math.sqrt(particleData.count));
+                    const gx = (i % gridSize) - gridSize/2;
+                    const gy = Math.floor(i / gridSize) - gridSize/2;
+                    fx = gx * 5 + oscillation * 0.2;
+                    fy = gy * 5 + oscillation * 0.2;
+                    break;
+                default:
+                    // Idle drift — slow random walk
+                    fx = baseX + (Math.random() - 0.5) * 2;
+                    fy = baseY + (Math.random() - 0.5) * 2;
+            }
+            
+            positions[i * 3] = fx;
+            positions[i * 3 + 1] = fy;
         }
         particleSystem.geometry.attributes.position.needsUpdate = true;
     }
