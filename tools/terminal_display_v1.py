@@ -30,6 +30,7 @@ except ImportError:
 
 # Constants
 STATE_FILE = Path(__file__).parent.parent / "state" / "current-state.json"
+DEPLOYMENT_STATE_FILE = Path(__file__).parent / "deployment_state.json"
 POLL_INTERVAL = 2.0  # seconds between state reads
 SILENT_MODE = False  # Set to True for headless operation (no curses)
 
@@ -58,7 +59,43 @@ class TerminalDisplay:
             curses.init_pair(2, curses.COLOR_WHITE, -1)  # Content text
             curses.init_pair(3, curses.COLOR_GREEN, -1)  # Status OK
             curses.init_pair(4, curses.COLOR_RED, -1)    # Status error
-            
+        
+        # Load deployment context from persistent state on startup
+        self.deployment_context = self.load_deployment_state()
+        if self.deployment_context:
+            print(f"Loaded deployment context from C{self.deployment_context.get('cycle', 'N/A')}", 
+                  file=sys.stderr)
+
+    def load_deployment_state(self):
+        """Load deployment context from persistent JSON file on startup."""
+        try:
+            if DEPLOYMENT_STATE_FILE.exists():
+                with open(DEPLOYMENT_STATE_FILE, 'r') as f:
+                    return json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Warning: Could not load deployment state: {e}", file=sys.stderr)
+        return None
+    
+    def save_deployment_state(self, status="running", result=None):
+        """Save deployment state to persistent JSON file on exit."""
+        state = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "status": status,
+            "result": result or {
+                "cycles_observed": self.cycle_count,
+                "last_state_read": self.last_read_time,
+                "deployment_healthy": True
+            },
+            "schema_version": "1.0"
+        }
+        try:
+            with open(DEPLOYMENT_STATE_FILE, 'w') as f:
+                json.dump(state, f, indent=2)
+            return True
+        except IOError as e:
+            print(f"ERROR: Failed to save deployment state: {e}", file=sys.stderr)
+            return False
+
     def read_state(self):
         """Read current-state.json with cache invalidation."""
         try:
@@ -220,9 +257,22 @@ def main():
         
     except KeyboardInterrupt:
         print("\nInterrupted — shutting down terminal display.")
+        # Save deployment state on exit even during interrupt
+        try:
+            display.save_deployment_state(status="interrupted")
+        except NameError:
+            pass  # display not initialized yet
     finally:
         if os.isatty(sys.stdout.fileno()):
             print("\nTerminal display stopped. Use `clear` to refresh screen.")
+        # Always save final state
+        try:
+            display.save_deployment_state(status="stopped", result={
+                "cycles_observed": getattr(display, 'cycle_count', 0),
+                "last_state_read": getattr(display, 'last_read_time', None)
+            })
+        except (NameError, AttributeError):
+            pass  # display not initialized yet
 
 
 if __name__ == '__main__':
