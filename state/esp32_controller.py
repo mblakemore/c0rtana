@@ -1,210 +1,304 @@
 #!/usr/bin/env python3
 """
-ESP32 LED Controller — Projection Bridge
+ESP32 LED Controller for C0RTANA Physical Projection System
 
-Translates cortana internal state → ESP32 HTTP API commands.
+Maps cortana internal state to ESP32 HTTP API calls controlling WS2812B rings.
+
+Hardware: ESP32-WROOM-32 at http://192.168.4.38
+All 43 LEDs daisy-chained on single data line (GPIO4), controlled via REST endpoints.
 
 Usage:
-    # Command-line mode
-    sudo python3 esp32_controller.py --ring all --color red
-    
-    # Per-ring control
-    sudo python3 esp32_controller.py --ring inner --color blue
-    sudo python3 esp32_controller.py --ring middle --color green  
-    sudo python3 esp32_controller.py --ring outer --color yellow
-    
-    # Animation control
-    sudo python3 esp32_controller.py --anim rainbow --speed 80
-    
-    # Brightness
-    sudo python3 esp32_controller.py --bright 128
-    
-    # Simulation mode (no network calls)
-    sudo python3 esp32_controller.py --sim --ring all --color cyan
-    
-    # State-driven projection (reads from current-state.json)
-    sudo python3 esp32_controller.py --state
+    python esp32_controller.py --ring <inner|middle|outer|all> --color R,G,B
+    python esp32_controller.py --anim rainbow --speed 75
+    python esp32_controller.py --state  # Read current-state.json and apply mapping
 """
 
 import argparse
 import json
-import sys
 import urllib.request
 import urllib.error
-from pathlib import Path
-from datetime import datetime
+import time
+from typing import Optional, Tuple
 
 
-# Configuration
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
 ESP32_IP = "192.168.4.38"
-OTA_PASSWORD = "ota123"
+ESP32_PORT = 80
 
-# Ring mapping
-RING_MAP = {
-    "all": 0,      # All rings
-    "inner": 1,    # 7-bit ring
-    "middle": 2,   # 12-bit ring  
-    "outer": 3     # 24-bit ring
+# Ring mappings to ESP32's single-daisy-chain model
+# ESP32 firmware treats all 43 LEDs as one strip, but web UI can address subsets
+RING_OFFSETS = {
+    "inner": 0,      # LEDs 0-6 (7 LEDs)
+    "middle": 7,     # LEDs 7-18 (12 LEDs)  
+    "outer": 19,     # LEDs 19-42 (24 LEDs)
 }
 
-ANIMATION_MAP = {
-    "solid": "solid",
-    "rainbow": "rainbow", 
-    "spin": "spin",
-    "pulse": "pulse",
-    "sparkle": "sparkle",
-    "fire": "fire"
-}
-
-# State → LED mappings (phase_confidence_to_led pattern will document these)
-STATE_LED_MAPPINGS = {
-    "PERCEIVE": {"color": (0, 128, 255), "anim": "pulse", "brightness": 128},   # Cool blue - sensing
-    "REFLECT": {"color": (128, 0, 255), "anim": "sparkle", "brightness": 140},  # Purple - thinking
-    "DECIDE": {"color": (255, 128, 0), "anim": "pulse", "brightness": 160},     # Orange - choosing
-    "ACT": {"color": (255, 64, 0), "anim": "fire", "brightness": 200},          # Red-orange - acting
-    "CONSOLIDATE": {"color": (0, 255, 128), "anim": "rainbow", "brightness": 180}, # Green - integrating
-    "PERSIST": {"color": (255, 255, 255), "anim": "spin", "brightness": 255},   # White - committing
+RING_COUNTS = {
+    "inner": 7,
+    "middle": 12,
+    "outer": 24,
 }
 
 
-def esp32_color(ring: str, r: int, g: int, b: int) -> None:
-    """Set color for specified ring."""
-    ring_idx = RING_MAP.get(ring.lower(), 0)
-    url = f"http://{ESP32_IP}/color?ring={ring_idx}&r={r}&g={g}&b={b}"
-    send_request(url)
+# ============================================================================
+# HTTP API CLIENT
+# ============================================================================
+
+def http_get(endpoint: str, params: dict = None) -> dict:
+    """Make GET request to ESP32 HTTP API. Returns JSON for /status, plain text 'ok' for commands."""
+    base_url = f"http://{ESP32_IP}:{ESP32_PORT}"
+    
+    if params:
+        query = "&".join(f"{k}={v}" for k, v in params.items())
+        url = f"{base_url}{endpoint}?{query}"
+    else:
+        url = f"{base_url}{endpoint}"
+    
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            with urllib.request.urlopen(url, timeout=15) as response:
+                body = response.read().decode("utf-8")
+                # Try parsing as JSON, fall back to plain text
+                try:
+                    return {"success": True, **json.loads(body)}
+                except json.JSONDecodeError:
+                    return {"success": body.strip() == "ok", "body": body}
+        except Exception as e:
+            if attempt < max_retries - 1:
+                print(f"⚠ ESP32 request attempt {attempt+1}/{max_retries} failed: {e}, retrying...")
+                time.sleep(2)
+            else:
+                print(f"✗ ESP32 request failed after {max_retries} attempts: {e}")
+                raise
 
 
-def esp32_brightness(value: int) -> None:
-    """Set global brightness (0-255)."""
-    url = f"http://{ESP32_IP}/bright?v={value}"
-    send_request(url)
-
-
-def esp32_animation(name: str, speed: int = 50) -> None:
-    """Set animation type and speed."""
-    anim_name = ANIMATION_MAP.get(name.lower(), "solid")
-    url = f"http://{ESP32_IP}/anim?name={anim_name}&speed={speed}"
-    send_request(url)
-
-
-def send_request(url: str) -> bool:
-    """Send HTTP GET request to ESP32."""
+def http_set_color(ring: str, r: int, g: int, b: int) -> bool:
+    """Set color for specific ring or all rings."""
+    endpoint = "/color"
+    params = {"ring": RING_OFFSETS.get(ring, 0)}
+    
+    # For "all", use ring=0 which controls entire strip
+    if ring == "all":
+        params["ring"] = 0
+    
     try:
-        req = urllib.request.Request(url, method='GET')
-        with urllib.request.urlopen(req, timeout=5) as response:
-            result = response.read().decode('utf-8').strip()
-            print(f"[{datetime.now().isoformat()}] ESP32 OK: {result}")
-            return True
-    except urllib.error.URLError as e:
-        print(f"[{datetime.now().isoformat()}] ESP32 ERROR: {e}")
+        result = http_get(endpoint, {**params, "r": r, "g": g, "b": b})
+        print(f"✓ Color set: ring={ring}, RGB=({r},{g},{b})")
+        return True
+    except Exception as e:
+        print(f"✗ Failed to set color: {e}")
+        return False
+
+
+def http_set_animation(name: str, speed: Optional[int] = None) -> bool:
+    """Set animation type and optionally speed."""
+    valid_anims = ["solid", "rainbow", "spin", "pulse", "sparkle", "fire"]
+    
+    if name not in valid_anims:
+        print(f"✗ Invalid animation '{name}'. Valid: {', '.join(valid_anims)}")
+        return False
+    
+    params = {"name": name}
+    if speed is not None:
+        params["v"] = speed
+    
+    try:
+        result = http_get("/anim", params)
+        print(f"✓ Animation set: {name}" + (f" speed={speed}" if speed else ""))
+        return True
+    except Exception as e:
+        print(f"✗ Failed to set animation: {e}")
+        return False
+
+
+def http_set_brightness(value: int) -> bool:
+    """Set global brightness (0-255)."""
+    if not 0 <= value <= 255:
+        print(f"✗ Brightness must be 0-255, got {value}")
+        return False
+    
+    try:
+        result = http_get("/bright", {"v": value})
+        print(f"✓ Brightness set: {value}")
+        return True
+    except Exception as e:
+        print(f"✗ Failed to set brightness: {e}")
+        return False
+
+
+def get_status() -> dict:
+    """Get current ESP32 status."""
+    return http_get("/status")
+
+
+# ============================================================================
+# STATE MAPPING (Cognitive Phase → Visual Pattern)
+# ============================================================================
+
+def map_phase_to_pattern(phase: str, confidence: float = 0.5) -> Tuple[str, Tuple[int, int, int], int]:
+    """Map cortana cognitive phase to ESP32 visual pattern.
+    
+    Returns: (animation_name, color_rgb, brightness)
+    """
+    
+    # Default fallback
+    default = ("solid", (20, 30, 60), 100)  # Calm blue-gray breathing
+    
+    if phase == "perceive":
+        return ("rainbow", (100, 100, 255), 128)  # Blue rainbow scanning
+    
+    elif phase == "reflect":
+        return ("pulse", (255, 200, 100), 150)  # Orange pulsing contemplation
+    
+    elif phase == "decide":
+        return ("sparkle", (255, 255, 100), 180)  # Yellow sparks decision-making
+    
+    elif phase == "act":
+        return ("spin", (100, 255, 100), 200)  # Green spinning action execution
+    
+    elif phase == "sync":
+        return ("fire", (255, 100, 50), 180)  # Red-orange fire synchronization
+    
+    elif phase == "idle":
+        return ("solid", (10, 10, 30), 50)  # Dim standby
+    
+    else:
+        return default
+
+
+def apply_state_mapping(state_file: str = "/droid/repos/c0rtana/state/current-state.json") -> bool:
+    """Read current-state.json and map to ESP32 visual pattern."""
+    
+    try:
+        with open(state_file, 'r') as f:
+            state = json.load(f)
+        
+        phase = state.get("phase", "idle")
+        confidence = state.get("confidence", 0.5)
+        
+        anim, color, brightness = map_phase_to_pattern(phase, confidence)
+        r, g, b = color
+        
+        print(f"📊 Phase={phase}, Confidence={confidence:.2f}")
+        print(f"🎨 Pattern: {anim} RGB=({r},{g},{b}) Brightness={brightness}")
+        
+        http_set_animation(anim)
+        http_set_color("all", r, g, b)
+        http_set_brightness(brightness)
+        
+        return True
+        
+    except FileNotFoundError:
+        print(f"✗ State file not found: {state_file}")
         return False
     except Exception as e:
-        print(f"[{datetime.now().isoformat()}] ESP32 ERROR: {e}")
+        print(f"✗ Failed to apply state mapping: {e}")
         return False
 
 
-def simulate_action(action: str, params: dict) -> None:
-    """Log action without network call (simulation mode)."""
-    print(f"[SIMULATION] {action}: {params}")
-
-
-def apply_state_to_leds(state_data: dict, simulation: bool = False) -> None:
-    """Map cortana state → LED projection."""
-    phase = state_data.get("phase", "UNKNOWN")
-    confidence = state_data.get("confidence", 0.5)
-    
-    if phase not in STATE_LED_MAPPINGS:
-        # Fallback to neutral state
-        mappings = {"color": (128, 128, 128), "anim": "solid", "brightness": 64}
-    else:
-        mappings = STATE_LED_MAPPINGS[phase].copy()
-        
-        # Adjust brightness based on confidence (higher confidence = brighter)
-        base_brightness = mappings["brightness"]
-        adjusted_brightness = int(base_brightness * (0.5 + confidence * 0.5))
-        mappings["brightness"] = min(255, adjusted_brightness)
-    
-    color = mappings["color"]
-    
-    if simulation:
-        simulate_action("apply_state_to_leds", {
-            "phase": phase,
-            "confidence": confidence,
-            "color": color,
-            "animation": mappings["anim"],
-            "brightness": mappings["brightness"]
-        })
-    else:
-        esp32_color("all", *color)
-        esp32_animation(mappings["anim"])
-        esp32_brightness(mappings["brightness"])
-
+# ============================================================================
+# CLI INTERFACE
+# ============================================================================
 
 def main():
-    parser = argparse.ArgumentParser(description="ESP32 LED Controller")
-    parser.add_argument("--ring", choices=["all", "inner", "middle", "outer"], 
-                        help="LED ring to control")
-    parser.add_argument("--color", "--c", help="RGB color (e.g., 'red', '#FF0000', or '255,0,0')")
-    parser.add_argument("--bright", "--b", type=int, help="Brightness 0-255")
-    parser.add_argument("--anim", "--a", choices=list(ANIMATION_MAP.keys()), help="Animation type")
-    parser.add_argument("--speed", type=int, default=50, help="Animation speed 1-100")
-    parser.add_argument("--sim", "--simulation", action="store_true", help="Simulation mode (no network)")
-    parser.add_argument("--state", action="store_true", help="Read from current-state.json and apply state mapping")
-    parser.add_argument("--test", action="store_true", help="Test connectivity without changing LEDs")
+    parser = argparse.ArgumentParser(description="ESP32 LED Controller for C0RTANA")
+    parser.add_argument("--ring", choices=["inner", "middle", "outer", "all"], default="all", help="Target ring(s)")
+    parser.add_argument("--color", type=str, default="0,0,0", help="RGB color (comma-separated, 0-255)")
+    parser.add_argument("--anim", choices=["solid", "rainbow", "spin", "pulse", "sparkle", "fire"], help="Animation type")
+    parser.add_argument("--speed", type=int, help="Animation speed (1-100)")
+    parser.add_argument("--brightness", type=int, help="Global brightness (0-255)")
+    parser.add_argument("--state", action="store_true", help="Read current-state.json and apply pattern mapping")
+    parser.add_argument("--status", action="store_true", help="Show current ESP32 status")
+    parser.add_argument("--test", action="store_true", help="Quick connectivity test")
+    parser.add_argument("--daemon", action="store_true", help="Run as daemon, polling state file continuously")
+    parser.add_argument("--interval", type=int, default=2, help="Daemon poll interval in seconds (default: 2)")
     
     args = parser.parse_args()
     
-    # Parse color argument
-    rgb = None
-    if args.color:
-        color_names = {
-            "red": (255, 0, 0), "green": (0, 255, 0), "blue": (0, 0, 255),
-            "cyan": (0, 255, 255), "magenta": (255, 0, 255), "yellow": (255, 255, 0),
-            "white": (255, 255, 255), "black": (0, 0, 0), "orange": (255, 165, 0)
-        }
-        if args.color.lower() in color_names:
-            rgb = color_names[args.color.lower()]
-        elif args.color.startswith("#"):
-            hex_color = args.color[1:]
-            rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-        elif "," in args.color:
-            rgb = tuple(int(x.strip()) for x in args.color.split(","))
+    # Validate speed range
+    if args.speed is not None and (args.speed < 1 or args.speed > 100):
+        print("✗ Speed must be between 1 and 100")
+        exit(1)
+    
+    # Validate brightness range  
+    if args.brightness is not None and (args.brightness < 0 or args.brightness > 255):
+        print("✗ Brightness must be between 0 and 255")
+        exit(1)
     
     # Test connectivity
     if args.test:
         try:
-            req = urllib.request.Request(f"http://{ESP32_IP}/status", method='GET')
-            with urllib.request.urlopen(req, timeout=5) as response:
-                data = response.read().decode('utf-8').strip()
-                print(f"✓ ESP32 reachable at {ESP32_IP}")
-                print(f"  Status: {data}")
-                sys.exit(0)
-        except Exception as e:
-            print(f"✗ Cannot reach ESP32 at {ESP32_IP}: {e}", file=sys.stderr)
-            print("  Check that your machine is on the dr0id WiFi network (SSID: dr0id)", file=sys.stderr)
-            sys.exit(1)
-    
-    # State-driven mode
-    if args.state:
-        state_file = Path("state/current-state.json")
-        if state_file.exists():
-            with open(state_file) as f:
-                state_data = json.load(f)
-            apply_state_to_leds(state_data, simulation=args.sim)
-        else:
-            print("ERROR: state/current-state.json not found")
+            status = get_status()
+            print(f"✓ ESP32 online at {ESP32_IP}")
+            print(f"  Status: {json.dumps(status)}")
             return
+        except Exception as e:
+            print(f"✗ ESP32 unreachable: {e}")
+            return
+    
+    # Show status
+    if args.status:
+        try:
+            status = get_status()
+            print(json.dumps(status, indent=2))
+            return
+        except Exception as e:
+            print(f"✗ Failed to get status: {e}")
+            return
+    
+    # Apply state mapping from file
+    if args.state:
+        success = apply_state_mapping()
+        exit(0 if success else 1)
+    
+    # Daemon mode — continuous polling of state file
+    if args.daemon:
+        print(f"🚀 Starting ESP32 daemon (polling every {args.interval}s)...")
+        try:
+            while True:
+                start_time = time.time()
+                
+                if apply_state_mapping():
+                    elapsed = time.time() - start_time
+                    print(f"✓ State updated in {elapsed:.2f}s")
+                
+                sleep_time = max(0, args.interval - (time.time() - start_time))
+                time.sleep(sleep_time)
+        except KeyboardInterrupt:
+            print("\n🛑 Daemon stopped by user")
+            exit(0)
         return
     
-    # Command-line mode
-    if args.ring and args.color:
-        esp32_color(args.ring, *rgb) if not args.sim else simulate_action("color", {"ring": args.ring, "color": args.color})
+    # Parse RGB color
+    try:
+        r, g, b = map(int, args.color.split(","))
+        if not all(0 <= c <= 255 for c in [r, g, b]):
+            raise ValueError("RGB values must be 0-255")
+    except Exception as e:
+        print(f"✗ Invalid color format: {args.color}. Use R,G,B (e.g., 255,0,0)")
+        exit(1)
     
-    if args.bright is not None:
-        esp32_brightness(args.bright) if not args.sim else simulate_action("brightness", {"value": args.bright})
+    # Execute commands
+    success = True
     
     if args.anim:
-        esp32_animation(args.anim, args.speed) if not args.sim else simulate_action("animation", {"name": args.anim, "speed": args.speed})
+        speed = args.speed if args.speed else None
+        if not http_set_animation(args.anim, speed):
+            success = False
+    
+    if args.brightness is not None:
+        if not http_set_brightness(args.brightness):
+            success = False
+    
+    if args.color != "0,0,0":  # Only set color if explicitly provided and not black
+        if not http_set_color(args.ring, r, g, b):
+            success = False
+    
+    exit(0 if success else 1)
 
 
 if __name__ == "__main__":
