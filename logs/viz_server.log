@@ -1,0 +1,13 @@
+/mnt/droid/repos/c0rtana/api/viz_server.py:102: DeprecationWarning: 
+        on_event is deprecated, use lifespan event handlers instead.
+
+        Read more about it in the
+        [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+        
+  @app.on_event("startup")
+INFO:     Started server process [470948]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0'[INFO] Cortana Visualization API v1.0 starting on port 8765
+INFO:     127.0.0.1:33088 - "GET /api/v1/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60250 - "GET /api/v1/metrics HTTP/1.1" 200 OK
