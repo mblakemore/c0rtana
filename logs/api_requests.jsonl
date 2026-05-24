@@ -5,3 +5,5 @@
 {"timestamp": "2026-05-24T19:08:57.269668+00:00", "endpoint": "/api/v1/state/dashboards", "query_params": {}, "response_time_ms": 0.12}
 {"timestamp": "2026-05-24T19:09:09.633470+00:00", "endpoint": "/api/v1/state", "query_params": {}, "response_time_ms": 0.51}
 {"timestamp": "2026-05-24T19:09:16.374356+00:00", "endpoint": "/api/v1/transition", "query_params": {}, "response_time_ms": 0.5}
+{"timestamp": "2026-05-24T20:05:42.714859+00:00", "endpoint": "/metrics", "query_params": {}, "response_time_ms": 0.12}
+{"timestamp": "2026-05-24T20:06:31.774452+00:00", "endpoint": "/api/v1/health", "query_params": {}, "response_time_ms": 0.16}

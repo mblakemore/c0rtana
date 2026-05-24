@@ -68,3 +68,6 @@
 [2026-05-24T19:07:16.370428] State changed: {"phase": "PERSIST", "confidence": 0.95}
 [2026-05-24T19:07:16.370489] Sensors: light_level=207, motion=False
 [2026-05-24T19:07:16.502129] ✓ Projection complete with sensor feedback
+[2026-05-24T20:16:56.631168] State changed: {"phase": "PERSIST", "confidence": 0.98}
+[2026-05-24T20:16:56.631241] Sensors: light_level=139, motion=False
+[2026-05-24T20:16:56.724808] ✓ Projection complete with sensor feedback

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cortana Analytics Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #e0e0e0; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: rgba(0, 255, 136, 0.2); border: 1px solid #00ff88; }
+        .error { background: rgba(255, 85, 85, 0.2); border: 1px solid #ff5555; }
+        button { background: #00ffcc; color: #000; border: none; padding: 10px 20px; cursor: pointer; margin: 5px; }
+        button:hover { background: #00ddaa; }
+        pre { background: #0d0d0d; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Cortana Analytics Event Test</h1>
+    <div id="status" class="status">Click "Test Event" to verify event recording works.</div>
+    
+    <button onclick="testEvent()">Test Single Event</button>
+    <button onclick="burstTest()">Burst Test (10 events)</button>
+    <button onclick="clearLog()">Clear Log Display</button>
+    
+    <h3>Recent Events from Server:</h3>
+    <pre id="log">Waiting for events...</pre>
+
+    <script>
+        const SERVER_URL = 'http://localhost:8767/events';
+        
+        async function testEvent() {
+            const statusDiv = document.getElementById('status');
+            try {
+                const response = await fetch(SERVER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'manual_test',
+                        source: 'test_page',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const result = await response.json();
+                
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = `✓ Event recorded successfully!<br/>Server response: ${JSON.stringify(result)}`;
+                
+                // Fetch latest events to show in log
+                await updateLog();
+            } catch (err) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `✗ Failed: ${err.message}`;
+            }
+        }
+        
+        async function burstTest() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = 'status';
+            statusDiv.innerHTML = 'Sending 10 events...';
+            
+            const promises = Array(10).fill(null).map(async (_, i) => {
+                await fetch(SERVER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'burst_event',
+                        index: i,
+                        source: 'test_page'
+                    })
+                });
+            });
+            
+            await Promise.all(promises);
+            
+            statusDiv.className = 'status success';
+            statusDiv.innerHTML = '✓ Burst test complete! 10 events sent.';
+            await updateLog();
+        }
+        
+        async function updateLog() {
+            try {
+                const response = await fetch('/analytics/interactions.jsonl');
+                if (!response.ok) throw new Error('Failed to fetch log');
+                const text = await response.text();
+                const lines = text.trim().split('\n').slice(-5); // Last 5 events
+                document.getElementById('log').textContent = lines.join('\n');
+            } catch (err) {
+                document.getElementById('log').textContent = `Error fetching log: ${err.message}`;
+            }
+        }
+        
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+    </script>
+</body>
+</html>

@@ -1,26 +1,4 @@
-node:events:497
-      throw er; // Unhandled 'error' event
-      ^
-
-Error: listen EADDRINUSE: address already in use :::8767
-    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
-    at listenInCluster (node:net:1997:12)
-    at Server.listen (node:net:2102:7)
-    at Object.<anonymous> (/mnt/droid/repos/c0rtana/analytics/event_server.js:57:8)
-    at Module._compile (node:internal/modules/cjs/loader:1705:14)
-    at Object..js (node:internal/modules/cjs/loader:1838:10)
-    at Module.load (node:internal/modules/cjs/loader:1441:32)
-    at Function._load (node:internal/modules/cjs/loader:1263:12)
-    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
-    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
-Emitted 'error' event on Server instance at:
-    at emitErrorNT (node:net:1976:8)
-    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
-  code: 'EADDRINUSE',
-  errno: -98,
-  syscall: 'listen',
-  address: '::',
-  port: 8767
-}
-
-Node.js v22.22.2
+[Analytics Server] Listening on port 8767
+[Analytics Server] Events will be written to: /mnt/droid/repos/c0rtana/analytics/interactions.jsonl
+[Analytics] Event recorded: test_interaction at 2026-05-24T20:10:28.062Z
+[Analytics] Event recorded: browser_test at 2026-05-24T20:11:12.873Z
