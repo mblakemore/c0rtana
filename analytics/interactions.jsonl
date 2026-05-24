@@ -1,1 +1,4 @@
 {"type": "test_event", "timestamp": "2026-05-23T21:47:00Z", "session_id": "sess_20260523_214718_0", "received_at": "2026-05-23T21:47:18.430926Z"}
+{"type":"test_interaction","source":"validation_test","received_at":"2026-05-24T20:10:28.062Z"}
+{"type":"browser_test","source":"cortana_html_validation","received_at":"2026-05-24T20:11:12.873Z"}
+{"type":"validation_test","source":"server_restart","received_at":"2026-05-24T20:15:58.971Z"}

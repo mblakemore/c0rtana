@@ -10,6 +10,7 @@ const path = require('path');
 
 const PORT = 8767;
 const EVENTS_FILE = path.join(__dirname, 'interactions.jsonl');
+const VIZ_DIR = path.join(__dirname, '..', 'visualization');
 
 // Ensure events file exists with header line if not present
 async function initEventsFile() {
@@ -48,9 +49,22 @@ const server = http.createServer(async (req, res) => {
                 res.end(JSON.stringify({ status: 'error', message: err.message }));
             }
         });
+    } else if (req.method === 'GET' && req.url.startsWith('/visualization/')) {
+        // Serve static files from visualization directory
+        const filePath = path.join(VIZ_DIR, req.url.replace('/visualization/', ''));
+        try {
+            const content = await fs.readFile(filePath);
+            const ext = path.extname(filePath).toLowerCase();
+            const typeMap = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css' };
+            res.writeHead(200, { 'Content-Type': typeMap[ext] || 'application/octet-stream' });
+            res.end(content);
+        } catch (err) {
+            res.writeHead(404);
+            res.end('File not found');
+        }
     } else {
         res.writeHead(404);
-        res.end('Not found');
+        res.end('Not found - use /events for POST or /visualization/<file> for GET');
     }
 });
 
