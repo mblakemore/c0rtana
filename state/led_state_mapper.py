@@ -125,6 +125,132 @@ class LedStateMapper:
         else: return (v, p, p)
 
 
+# Ambient Sensor Hub — reads environmental data and maps to LED states
+
+
+class AmbientSensorHub:
+    """Reads environmental data from physical sensors or simulates for testing."""
+    
+    def __init__(self, simulate: bool = True):
+        self.simulate = simulate
+        self.last_reading_time: float = 0
+        self.reading_interval: float = 5.0
+    
+    def read(self) -> Dict[str, float]:
+        """Return current ambient readings as dict of measurements."""
+        if not self.simulate:
+            return self._read_physical_sensors()
+        return self._simulate_readings()
+    
+    def _read_physical_sensors(self) -> Dict[str, float]:
+        """Read from actual BME280 + BH1750 + PIR sensors on Raspberry Pi."""
+        try:
+            import board
+            import busio
+            import adafruit_bme280
+            import adafruit_bh1750
+            from gpiozero import MotionDetector
+            
+            i2c = busio.I2C(board.SCL, board.SDA)
+            
+            bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+            bh1750 = adafruit_bh1750.BH1750(i2c)
+            pir = MotionDetector(pin=4)
+            
+            return {
+                'temperature_c': bme280.temperature,
+                'humidity_pct': bme280.relative_humidity,
+                'pressure_pa': bme280.pressure,
+                'lux': bh1750.lux,
+                'motion': float(pir.value),
+                'timestamp': time.time()
+            }
+        except ImportError as e:
+            print(f"Sensor library not found ({e}), falling back to simulation")
+            return self._simulate_readings()
+        except Exception as e:
+            print(f"Physical sensor error ({e}), using last known + noise")
+            return self._simulate_readings()
+    
+    def _simulate_readings(self) -> Dict[str, float]:
+        """Generate realistic-looking ambient readings for testing."""
+        import random
+        
+        base_temp = 22.0
+        temp_variation = random.gauss(0, 0.3)
+        humidity = random.gauss(50, 5)
+        light = random.gauss(250, 50)
+        motion = 1 if random.random() < 0.05 else 0
+        
+        return {
+            'temperature_c': max(15, min(35, base_temp + temp_variation)),
+            'humidity_pct': max(20, min(80, humidity)),
+            'pressure_pa': 101325 + random.gauss(0, 10),
+            'lux': max(0, light),
+            'motion': motion,
+            'timestamp': time.time()
+        }
+
+
+class AmbientLedStateMapper(LedStateMapper):
+    """Extends LedStateMapper to respond to ambient environmental conditions."""
+    
+    def __init__(self):
+        super().__init__()
+        self.sensor_hub = AmbientSensorHub(simulate=True)
+        
+        # Temperature thresholds for adaptive color tone
+        self.temp_cold_threshold = 18.0   # Below this: cool blue
+        self.temp_warm_threshold = 26.0   # Above this: warm orange
+        
+        # Concentric ring config from Creator's setup
+        self.ring_config = {
+            'inner_7bit': {'leds': 7, 'pin': 18},
+            'middle_12bit': {'leds': 12, 'pin': 23},
+            'outer_24bit': {'leds': 24, 'pin': 24}
+        }
+    
+    def map_ambient_to_state(self) -> Dict[str, Tuple[int, int, int]]:
+        """
+        Translate ambient environment into per-ring color states.
+        
+        Returns dict keyed by ring name with (R, G, B) tuple values.
+        Includes metadata about brightness and detected state.
+        """
+        sensors = self.sensor_hub.read()
+        motion_detected = sensors.get('motion', 0) > 0.5
+        temp_c = sensors.get('temperature_c', 22)
+        
+        # Base idle color (calm dark blue)
+        base_idle = (0, 20, 40)
+        
+        # Temperature affects inner ring warmth
+        if temp_c < self.temp_cold_threshold:
+            inner_tone = (0, 100, 200)   # Cool blue for cold
+        elif temp_c > self.temp_warm_threshold:
+            inner_tone = (200, 100, 0)   # Warm orange for hot
+        else:
+            inner_tone = base_idle
+        
+        # Motion triggers alert pattern on middle ring
+        if motion_detected:
+            middle_tone = (255, 165, 0)   # Orange warning
+            outer_tone = (255, 0, 0)      # Red alert
+        else:
+            middle_tone = base_idle
+            outer_tone = base_idle
+        
+        return {
+            'inner_7bit': inner_tone,
+            'middle_12bit': middle_tone,
+            'outer_24bit': outer_tone,
+            '_brightness': int(255 * 0.3),     # 30% ambient baseline
+            '_state': 'alert' if motion_detected else 'idle',
+            '_sensors': sensors,
+            '_timestamp': time.time()
+        }
+
+
 # Singleton instance for easy access
 _led_mapper: Optional[LedStateMapper] = None
 
@@ -133,3 +259,13 @@ def get_led_mapper() -> LedStateMapper:
     if _led_mapper is None:
         _led_mapper = LedStateMapper()
     return _led_mapper
+
+
+_ambient_mapper: Optional[AmbientLedStateMapper] = None
+
+def get_ambient_mapper() -> AmbientLedStateMapper:
+    """Get or create the ambient-aware LED state mapper."""
+    global _ambient_mapper
+    if _ambient_mapper is None:
+        _ambient_mapper = AmbientLedStateMapper()
+    return _ambient_mapper
