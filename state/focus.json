@@ -1,11 +1,11 @@
 {
-  "target": "API-based state projection system",
-  "scope": "Add viz API client mode to daemon; verify external integration works",
+  "target": "Start viz_server.py on port 8765",
+  "scope": "Activate visualization server that was deployed in C366 but never started — this will enable real-time state projection and begin collecting operator engagement data needed to validate P_C366_INTERACTION_TRACKING prediction",
   "done_when": [
-    "daemon --use-api successfully fetches from localhost:8765/api/v1/state",
-    "fallback to direct polling when API unavailable (graceful degradation)",
-    "logs show '[API]' prefixed messages for debugging"
+    "viz_server.py running on port 8765 (confirmed via lsof or ps)",
+    "Logs show server initialized successfully",
+    "Next cycle can measure actual operator interactions with visualization system"
   ],
   "blocked_by": null,
-  "started_at": "2026-05-24T18:24:04+00:00"
+  "started_at": "2026-05-24T18:47:34+00:00"
 }
