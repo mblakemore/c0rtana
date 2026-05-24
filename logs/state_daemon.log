@@ -1,2 +1,8 @@
 [2026-05-24T07:15:02.154306] Projecting state: phase=PERSIST, confidence=0.9
 [2026-05-24T07:15:02.218346] ✓ State projected successfully
+[2026-05-24T09:17:17.897414] State daemon started (PID: 3502282)
+[2026-05-24T09:17:17.897434] Monitoring /droid/repos/c0rtana/state/current-state.json every 5s
+[2026-05-24T09:17:17.897480] State changed: {"phase": "PERSIST", "confidence": 0.95}
+[2026-05-24T09:17:17.997211] ✓ Projection complete
+[2026-05-24T09:44:48.048718] State changed: {"phase": "PERSIST"}
+[2026-05-24T09:44:48.058117] Daemon shutdown complete

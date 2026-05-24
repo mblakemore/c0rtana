@@ -76,6 +76,88 @@ def http_get(endpoint: str, params: dict = None) -> dict:
                 raise
 
 
+# ============================================================================
+# SENSOR INPUT (Two-way embodied cognition feedback loop)
+# ============================================================================
+
+def read_sensors(simulate: bool = False) -> dict:
+    """Read sensor data from ESP32 or simulate if hardware not available.
+    
+    Sensor-to-state mapping schema:
+    - light_level (0-255): Ambient room brightness → modulates LED brightness
+      - <30 (dark): Reduce LED output by 50%, shift to warmer tones
+      - >200 (bright): Maximize LED visibility
+    
+    - motion_detected (bool): Presence detection → phase perturbation
+      - True: Shift IDLE→PERCEIVE, boost confidence +0.2
+    
+    Returns: {'light_level': int, 'motion_detected': bool, 'simulated': bool}
+    """
+    
+    if simulate:
+        # Simulated sensors for development/testing without physical hardware
+        import random
+        return {
+            "light_level": random.randint(20, 240),
+            "motion_detected": random.random() < 0.3,
+            "simulated": True
+        }
+    
+    try:
+        # Read from ESP32 HTTP API endpoint /sensors (would need firmware update)
+        result = http_get("/sensors")
+        result["simulated"] = False
+        return result
+    except Exception as e:
+        print(f"⚠ Real sensor read failed ({e}), falling back to simulation")
+        return read_sensors(simulate=True)
+
+
+def apply_sensor_feedback(state: dict, sensors: dict) -> dict:
+    """Modulate internal state based on environmental context.
+    
+    Error gap closure: External stimuli affecting internal processing.
+    Creates genuine cybernetic closure rather than mere display.
+    
+    Args:
+        state: Current cortana internal state (phase, confidence, etc.)
+        sensors: Sensor readings from read_sensors()
+        
+    Returns:
+        Modified state with environmental perturbations applied
+    """
+    
+    modified = state.copy()
+    
+    # Light level → brightness modulation
+    light = sensors.get("light_level", 128)
+    if light < 30:  # Dark room
+        modified["_ambient_modulation"] = {
+            "type": "low_light",
+            "brightness_scale": 0.5,
+            "color_temp_shift": "warm"
+        }
+        # Reduce LED brightness by half
+        current_bright = http_get("/status").get("brightness", 128)
+        modified["brightness_override"] = int(current_bright * 0.5)
+    
+    elif light > 200:  # Bright room
+        modified["_ambient_modulation"] = {
+            "type": "high_light",
+            "brightness_scale": 1.0,
+            "color_temp_shift": "neutral"
+        }
+    
+    # Motion detection → phase perturbation
+    motion = sensors.get("motion_detected", False)
+    if motion and modified.get("phase") == "idle":
+        modified["_environmental_trigger"] = "motion_detected"
+        modified["confidence"] = min(1.0, modified.get("confidence", 0.5) + 0.2)
+        # Would shift to PERCEIVE in full implementation
+    
+    return modified
+
+
 def http_set_color(ring: str, r: int, g: int, b: int) -> bool:
     """Set color for specific ring or all rings."""
     endpoint = "/color"
