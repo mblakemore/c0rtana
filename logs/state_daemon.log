@@ -80,3 +80,50 @@
 [2026-05-24T22:05:57.346106] State changed: {"phase": "COMPLETE", "confidence": 0.98}
 [2026-05-24T22:05:57.346198] Sensors: light_level=25, motion=False
 [2026-05-24T22:05:57.471559] ✓ Projection complete with sensor feedback
+[2026-05-24T23:25:07.630588] State changed: {"phase": "PERSIST", "confidence": 0.98}
+[2026-05-24T23:25:07.630656] Sensors: light_level=70, motion=False
+[2026-05-24T23:25:07.824934] ✓ Projection complete with sensor feedback
+[2026-05-24T23:25:37.825984] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:25:37.826045] State changed: {}
+[2026-05-24T23:25:37.826064] Sensors: light_level=89, motion=False
+[2026-05-24T23:25:37.826097] ✗ Projection failed
+[2026-05-24T23:25:42.826289] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:25:42.826349] State changed: {}
+[2026-05-24T23:25:42.826369] Sensors: light_level=200, motion=False
+[2026-05-24T23:25:42.826405] ✗ Projection failed
+[2026-05-24T23:25:47.826592] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:25:47.826651] State changed: {}
+[2026-05-24T23:25:47.835964] Sensors: light_level=90, motion=True
+[2026-05-24T23:25:47.836047] ✗ Projection failed
+[2026-05-24T23:25:52.836290] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:25:52.836356] State changed: {}
+[2026-05-24T23:25:52.836430] Sensors: light_level=82, motion=False
+[2026-05-24T23:25:52.836510] ✗ Projection failed
+[2026-05-24T23:25:57.836701] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:25:57.836765] State changed: {}
+[2026-05-24T23:25:57.846042] Sensors: light_level=39, motion=False
+[2026-05-24T23:25:57.846123] ✗ Projection failed
+[2026-05-24T23:26:02.846307] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:26:02.846396] State changed: {}
+[2026-05-24T23:26:02.848039] Sensors: light_level=78, motion=False
+[2026-05-24T23:26:02.848141] ✗ Projection failed
+[2026-05-24T23:26:07.848296] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:26:07.848356] State changed: {}
+[2026-05-24T23:26:07.857665] Sensors: light_level=162, motion=True
+[2026-05-24T23:26:07.857774] ✗ Projection failed
+[2026-05-24T23:26:12.857961] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:26:12.858037] State changed: {}
+[2026-05-24T23:26:12.867341] Sensors: light_level=169, motion=False
+[2026-05-24T23:26:12.867430] ✗ Projection failed
+[2026-05-24T23:26:17.867617] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:26:17.867682] State changed: {}
+[2026-05-24T23:26:17.869811] Sensors: light_level=47, motion=True
+[2026-05-24T23:26:17.869850] ✗ Projection failed
+[2026-05-24T23:26:22.870037] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:26:22.870103] State changed: {}
+[2026-05-24T23:26:22.872030] Sensors: light_level=105, motion=True
+[2026-05-24T23:26:22.872098] ✗ Projection failed
+[2026-05-24T23:26:27.872314] Invalid JSON in state file: Expecting property name enclosed in double quotes: line 34 column 1 (char 1617)
+[2026-05-24T23:26:27.872399] State changed: {}
+[2026-05-24T23:26:27.881706] Sensors: light_level=170, motion=True
+[2026-05-24T23:26:27.881794] ✗ Projection failed
