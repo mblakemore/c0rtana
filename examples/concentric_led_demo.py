@@ -66,33 +66,43 @@ def demo_priority_mapping(driver: WS2812Driver, simulate: bool = False):
     
     # Example: Decision system priorities mapped to rings
     scenarios = [
-        ("IDLE", 
-         high=(0, 0, 40),      # Dim inner
-         medium=(0, 0, 20),    # Even dimmer middle  
-         low=(0, 0, 10)),      # Almost off outer
-        
-        ("THINKING",
-         high=(0, 60, 120),    # Medium blue center
-         medium=(0, 40, 100),  # Slightly dimmer middle
-         low=(0, 20, 80)),     # Ambient outer
-        
-        ("SPEAKING",
-         high=(0, 255, 255),   # Bright cyan center (speaking color)
-         medium=(0, 180, 180), # Cyan glow middle
-         low=(0, 100, 100)),   # Soft outer halo
-        
-        ("SUCCESS",
-         high=(0, 200, 0),     # Green center
-         medium=(0, 150, 0),   # Green ring middle
-         low=(0, 100, 0)),     # Green ambient outer
-         
-        ("ERROR",
-         high=(200, 0, 0),     # Red center
-         medium=(150, 0, 0),   # Red middle
-         low=(100, 0, 0)),     # Dim red outer
+        {
+            "name": "IDLE", 
+            "high": (0, 0, 40),      # Dim inner
+            "medium": (0, 0, 20),    # Even dimmer middle  
+            "low": (0, 0, 10)        # Almost off outer
+        },
+        {
+            "name": "THINKING",
+            "high": (0, 60, 120),    # Medium blue center
+            "medium": (0, 40, 100),  # Slightly dimmer middle
+            "low": (0, 20, 80)       # Ambient outer
+        },
+        {
+            "name": "SPEAKING",
+            "high": (0, 255, 255),   # Bright cyan center (speaking color)
+            "medium": (0, 180, 180), # Cyan glow middle
+            "low": (0, 100, 100)     # Soft outer halo
+        },
+        {
+            "name": "SUCCESS",
+            "high": (0, 200, 0),     # Green center
+            "medium": (0, 150, 0),   # Green ring middle
+            "low": (0, 100, 0)       # Green ambient outer
+        },
+        {
+            "name": "ERROR",
+            "high": (200, 0, 0),     # Red center
+            "medium": (150, 0, 0),   # Red middle
+            "low": (100, 0, 0)       # Dim red outer
+        }
     ]
     
-    for state_name, high, medium, low in scenarios:
+    for scenario in scenarios:
+        state_name = scenario["name"]
+        high = scenario["high"]
+        medium = scenario["medium"]
+        low = scenario["low"]
         print(f"\nState: {state_name}")
         
         if simulate:

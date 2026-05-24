@@ -1,0 +1,173 @@
+{
+  "start_time": "2026-05-24T00:07:19.217551",
+  "duration_sec": 45,
+  "cycles_measured": 15,
+  "all_cycles_active": true,
+  "measurements": [
+    {
+      "cycle": 1,
+      "timestamp": "2026-05-24T00:06:34.217759",
+      "sensor": {
+        "lux": 97.98115238515044,
+        "db": 38.39394834888357,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 2,
+      "timestamp": "2026-05-24T00:06:37.217870",
+      "sensor": {
+        "lux": 95.2070826628818,
+        "db": 35.01121691992836,
+        "motion_detected": true
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 3,
+      "timestamp": "2026-05-24T00:06:40.218037",
+      "sensor": {
+        "lux": 84.47826110375438,
+        "db": 30.930474033714475,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 4,
+      "timestamp": "2026-05-24T00:06:43.218188",
+      "sensor": {
+        "lux": 106.76991380377382,
+        "db": 39.800387153958845,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 5,
+      "timestamp": "2026-05-24T00:06:46.218369",
+      "sensor": {
+        "lux": 114.77276193483547,
+        "db": 30.552319212430003,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 6,
+      "timestamp": "2026-05-24T00:06:49.218539",
+      "sensor": {
+        "lux": 87.72823516845271,
+        "db": 44.69377762922912,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 7,
+      "timestamp": "2026-05-24T00:06:52.218718",
+      "sensor": {
+        "lux": 83.42237637494932,
+        "db": 37.13800146563209,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 8,
+      "timestamp": "2026-05-24T00:06:55.218879",
+      "sensor": {
+        "lux": 83.66718819165327,
+        "db": 32.49666530105691,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 9,
+      "timestamp": "2026-05-24T00:06:58.219048",
+      "sensor": {
+        "lux": 94.05011607052332,
+        "db": 36.048030515362335,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 10,
+      "timestamp": "2026-05-24T00:07:01.219193",
+      "sensor": {
+        "lux": 83.41676878651927,
+        "db": 36.63997114564643,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 11,
+      "timestamp": "2026-05-24T00:07:04.219362",
+      "sensor": {
+        "lux": 92.42314656158301,
+        "db": 31.668901311177564,
+        "motion_detected": true
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 12,
+      "timestamp": "2026-05-24T00:07:07.219531",
+      "sensor": {
+        "lux": 118.20140230837892,
+        "db": 44.33994584039663,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 13,
+      "timestamp": "2026-05-24T00:07:10.219709",
+      "sensor": {
+        "lux": 106.24769052234996,
+        "db": 38.40260867557598,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 14,
+      "timestamp": "2026-05-24T00:07:13.219890",
+      "sensor": {
+        "lux": 96.58746059732115,
+        "db": 33.17598539956222,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    },
+    {
+      "cycle": 15,
+      "timestamp": "2026-05-24T00:07:16.220063",
+      "sensor": {
+        "lux": 115.09190478555755,
+        "db": 31.080266414500997,
+        "motion_detected": false
+      },
+      "status": "running",
+      "pattern_engine_active": true
+    }
+  ]
+}
