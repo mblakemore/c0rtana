@@ -15,7 +15,8 @@
   },
   "pending_predictions": [
     {"id": "P_C366_INTERACTION_TRACKING", "deadline": "2026-06-07", "status": "awaiting_data"},
-    {"id": "P_496_LED_ROTATION", "deadline": "2026-05-31", "status": "awaiting_validation"}
+    {"id": "P_496_LED_ROTATION", "deadline": "2026-05-31", "status": "awaiting_validation"},
+    {"id": "P_C499_QUANTUM_PREDICTIONS", "deadline": "ongoing", "status": "system_built"}
   ],
   "focus": {
     "primary": "Validate P_C366_INTERACTION_TRACKING by collecting operator engagement metrics",

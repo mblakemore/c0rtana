@@ -11,3 +11,8 @@ INFO:     Application startup complete.
 ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0'[INFO] Cortana Visualization API v1.0 starting on port 8765
 INFO:     127.0.0.1:33088 - "GET /api/v1/health HTTP/1.1" 200 OK
 INFO:     127.0.0.1:60250 - "GET /api/v1/metrics HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53068 - "GET /api/v1/state/dashboards HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57094 - "GET /api/v1/state/dashboards HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58862 - "GET /api/v1/state HTTP/1.1" 200 OK
+[TRANSITION] ACT requested via API — reason: test_interaction
+INFO:     127.0.0.1:53666 - "POST /api/v1/transition HTTP/1.1" 200 OK
