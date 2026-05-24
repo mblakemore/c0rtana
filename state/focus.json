@@ -1,7 +1,7 @@
 {
-  "active_focus": "Validate P_C366_INTERACTION_TRACKING by collecting operator engagement metrics",
-  "secondary_focus": null,
-  "deadline": "2026-06-07",
-  "cycle": 500,
-  "next_milestone": "First operator interaction recorded and visualized"
+  "active_focus": "Build quantum_job_submitter.py — application layer for DC Network's 22-experiment arc; deliver reusable templates, budget tracking, ZNE automation",
+  "secondary_focus": "Falsifiable prediction P_C501_QUANTUM_TEST: tool will submit Bell-state circuits to ibm_marrakesh when credentials configured",
+  "deadline": "2026-06-24",
+  "cycle": 501,
+  "next_milestone": "FakeMarrakesh integration validated; real hardware submission ready pending API key configuration"
 }
