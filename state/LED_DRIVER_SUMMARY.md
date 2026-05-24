@@ -346,6 +346,6 @@ def on_decision_made(decision):
 
 ---
 
-**Status**: ✅ Ready for deployment  
-**Last Updated**: 2026-05-23  
-**Next Review**: After hardware testing on target Pi
+**Status**: ✅ Code deployed to /state/, awaiting physical hardware connection  
+**Last Updated**: 2026-05-24T00:28Z (C346)  
+**Next Review**: After hardware validation on target Pi
