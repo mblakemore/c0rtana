@@ -28,6 +28,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+import requests
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -37,6 +38,10 @@ from state.esp32_controller import (
     read_sensors, 
     apply_sensor_feedback
 )
+
+# Viz API configuration
+VIZ_API_URL = "http://localhost:8080/api/v1/state"
+USE_VIZ_API = False  # Set True to use API instead of polling JSON directly
 
 
 # ============================================================================
@@ -93,6 +98,30 @@ def read_current_state() -> dict:
         return {}
 
 
+def fetch_state_via_api() -> dict | None:
+    """Fetch current state from viz API instead of reading JSON file directly."""
+    try:
+        response = requests.get(VIZ_API_URL, timeout=2)
+        if response.status_code == 200:
+            data = response.json()
+            # Extract canonical state fields from API response
+            return {
+                "cycle": data.get("cycle"),
+                "phase": data.get("phase"),
+                "confidence": data.get("confidence"),
+                "focus": data.get("focus"),
+                "next_focus": data.get("next_focus"),
+                "timestamp": data.get("timestamp"),
+                "_api_source": True  # Marker for debugging
+            }
+        else:
+            log(f"[API] HTTP {response.status_code} — falling back to direct polling")
+            return None
+    except Exception as e:
+        log(f"[API] Request failed ({e}) — falling back to direct polling")
+        return None
+
+
 def state_changed(old_state: dict, new_state: dict) -> bool:
     """Check if relevant state fields have changed."""
     if not old_state:
@@ -121,9 +150,15 @@ def remove_pid():
         pass
 
 
-def run_once(simulate_sensors: bool = True):
+def run_once(simulate_sensors: bool = True, use_api: bool = False):
     """One-shot projection with sensor feedback loop without looping."""
-    state = read_current_state()
+    if use_api:
+        state = fetch_state_via_api()
+        if not state:
+            log("[API] No state from viz API — falling back to direct polling")
+            state = read_current_state()
+    else:
+        state = read_current_state()
     
     if not state:
         log("No valid state to project")
@@ -148,21 +183,27 @@ def run_once(simulate_sensors: bool = True):
     return success
 
 
-def run_daemon(simulate_sensors: bool = True):
+def run_daemon(simulate_sensors: bool = True, use_api: bool = False):
     """Continuous monitoring loop with sensor feedback."""
     signal.signal(signal.SIGTERM, handle_signal)
     signal.signal(signal.SIGINT, handle_signal)
     
     write_pid()
     log("State daemon started (PID: {})".format(os.getpid()))
-    log(f"Monitoring {STATE_FILE} every {LOOP_INTERVAL}s")
+    if use_api:
+        log(f"Fetching state from viz API at {VIZ_API_URL} every {LOOP_INTERVAL}s")
+    else:
+        log(f"Monitoring {STATE_FILE} every {LOOP_INTERVAL}s")
     log(f"Sensor simulation mode: {simulate_sensors}")
     
     old_state = {}
     
     try:
         while True:
-            new_state = read_current_state()
+            if use_api:
+                new_state = fetch_state_via_api() or read_current_state()
+            else:
+                new_state = read_current_state()
             
             if state_changed(old_state, new_state):
                 log(f"State changed: {json.dumps({k: v for k, v in new_state.items() if k in ['phase', 'confidence']})}")
@@ -203,6 +244,7 @@ def main():
     parser.add_argument("--daemon", action="store_true", help="Run as background daemon service")
     parser.add_argument("--real-sensors", action="store_true", help="Use real ESP32 sensors instead of simulation")
     parser.add_argument("--simulate-sensors", action="store_true", default=True, help="Simulate sensors for testing (default: True)")
+    parser.add_argument("--use-api", action="store_true", help="Fetch state from viz API instead of polling JSON directly")
     
     args = parser.parse_args()
     
@@ -213,9 +255,9 @@ def main():
     os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
     
     if args.daemon or RUN_AS_DAEMON:
-        run_daemon(simulate_sensors=simulate_sensors)
+        run_daemon(simulate_sensors=simulate_sensors, use_api=args.use_api)
     elif args.once or not RUN_AS_DAEMON:
-        success = run_once(simulate_sensors=simulate_sensors)
+        success = run_once(simulate_sensors=simulate_sensors, use_api=args.use_api)
         sys.exit(0 if success else 1)
     else:
         parser.print_help()
