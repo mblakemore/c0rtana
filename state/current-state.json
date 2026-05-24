@@ -1,14 +1,17 @@
 {
-  "cycle": 358,
-  "status": "COMPLETE",
-  "phase": "PERSIST",
-  "artifact_type": "sensor_feedback_loop",
-  "artifacts": [
-    "reports/C357_sensor_state_mapping.md (design document)",
-    "state/esp32_controller.py::read_sensors() + apply_sensor_feedback()",
-    "state/state_daemon.py sensor integration",
-    "patterns.jsonl::P_C358_SENSOR_INPUT"
-  ],
-  "next_cycle": 359,
-  "timestamp": "2026-05-24T09:43Z"
+    "cycle": 360,
+    "status": "COMPLETE",
+    "phase": "PERSIST",
+    "pivot_executed": true,
+    "pivot_reason": "ESP32 hardware has no physical sensors connected; C358 assumption incorrect. Pivot to analytics validation instead of sensor-integration.",
+    "artifact_type": "embodied_cognition_validation_framework",
+    "artifacts": [
+      "worktrees/c360-embodied-validation/reports/C360_implementation_report.md (deployment verification)",
+      "state/memories/patterns.jsonl::P_C360_EMBODIED_VALIDATION (falsifiable prediction)",
+      "daemon running in simulation mode — real sensor feedback not available yet"
+    ],
+    "validation_target": "+30% operator situational awareness over 7-day period vs terminal-only monitoring",
+    "prediction_falsification_condition": "Daemon crash goes unnoticed >30s (polling interval)",
+    "next_cycle": 361,
+    "timestamp": "2026-05-24T14:19Z"
 }
