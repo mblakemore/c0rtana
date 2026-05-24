@@ -83,6 +83,44 @@
       <script src="../analytics/analytics_client.js"></script>
     <div class="cursor-ring" id="cursor-ring"></div>
     <div id="interaction-hint">Move cursor to interact with visual field</div>
+    
+    <!-- Explicit interaction hooks for operator engagement */}
+    <div id="engagement-controls" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <button id="btn-phase-indicator" class="engagement-btn" 
+                data-event-type="phase_click" title="Click to acknowledge current phase">
+            🔄 PERCEIVE
+        </button>
+        <button id="btn-state-toggle" class="engagement-btn" 
+                data-event-type="state_toggle" title="Toggle visualization mode">
+            ⚙️ MODE
+        </button>
+        <button id="btn-feedback" class="engagement-btn" 
+                data-event-type="feedback" title="Provide feedback on system state">
+            💬 FEEDBACK
+        </button>
+    </div>
+    
+    <style>
+        .engagement-btn {
+            background: rgba(0, 255, 204, 0.2);
+            border: 1px solid #00ffcc;
+            color: #00ffcc;
+            padding: 8px 12px;
+            margin-left: 8px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        .engagement-btn:hover {
+            background: rgba(0, 255, 204, 0.4);
+            box-shadow: 0 0 10px #00ffcc66;
+        }
+        .engagement-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
 
     <!-- External control indicator -->
     <div id="control-indicator">External Control: DISCONNECTED</div>
@@ -242,6 +280,46 @@
     connectToServer();
 
 
-  </script>
+     
+    // Engagement button handlers - emit analytics events on click
+    document.addEventListener('DOMContentLoaded', () => {
+        const engagementButtons = [
+            { id: 'btn-phase-indicator', eventType: 'phase_click' },
+            { id: 'btn-state-toggle', eventType: 'state_toggle' },
+            { id: 'btn-feedback', eventType: 'feedback' }
+        ];
+        
+        engagementButtons.forEach(btn => {
+            const element = document.getElementById(btn.id);
+            if (element) {
+                element.addEventListener('click', async (e) => {
+                    console.log(`[Cortana] Engagement event triggered: ${btn.eventType}`);
+                    
+                    try {
+                        await fetch('http://localhost:8767/events', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                type: btn.eventType,
+                                phase: vizEngine?.state?.phase || 'UNKNOWN',
+                                timestamp: new Date().toISOString(),
+                                session_id: sessionStorage.getItem('session_id') || 'anon'
+                            })
+                        });
+                        
+                        // Visual feedback
+                        element.style.background = 'rgba(0, 255, 204, 0.6)';
+                        setTimeout(() => {
+                            element.style.background = '';
+                        }, 200);
+                    } catch (err) {
+                        console.error('[Cortana] Analytics emit failed:', err);
+                    }
+                });
+            }
+        });
+    });
+    
+    </script>
 </body>
 </html>

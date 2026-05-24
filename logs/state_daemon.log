@@ -47,3 +47,6 @@
 [2026-05-24T17:02:29.865082] State changed: {"phase": "PERSIST"}
 [2026-05-24T17:02:29.865144] Sensors: light_level=141, motion=False
 [2026-05-24T17:02:29.986051] ✓ Projection complete with sensor feedback
+[2026-05-24T17:47:05.067002] State changed: {"phase": "PERCEIVE"}
+[2026-05-24T17:47:05.067062] Sensors: light_level=44, motion=False
+[2026-05-24T17:47:05.304482] ✓ Projection complete with sensor feedback
