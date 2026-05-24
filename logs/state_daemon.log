@@ -6,3 +6,19 @@
 [2026-05-24T09:17:17.997211] ✓ Projection complete
 [2026-05-24T09:44:48.048718] State changed: {"phase": "PERSIST"}
 [2026-05-24T09:44:48.058117] Daemon shutdown complete
+[2026-05-24T13:40:29.840956] Sensors: light_level=144, motion=False
+[2026-05-24T13:40:29.840992] Modulated: {}
+[2026-05-24T13:40:29.841003] Projecting state: phase=PERSIST, confidence=None
+[2026-05-24T13:40:30.030337] ✓ State projected successfully
+[2026-05-24T13:40:48.330316] State daemon started (PID: 1056837)
+[2026-05-24T13:40:48.330336] Monitoring /droid/repos/c0rtana/state/current-state.json every 5s
+[2026-05-24T13:40:48.330345] Sensor simulation mode: True
+[2026-05-24T13:40:48.330379] State changed: {"phase": "PERSIST"}
+[2026-05-24T13:40:48.330390] Sensors: light_level=202, motion=True
+[2026-05-24T13:40:48.471028] ✓ Projection complete with sensor feedback
+[2026-05-24T13:43:48.476254] State changed: {"phase": "PERCEIVE"}
+[2026-05-24T13:43:48.476303] Sensors: light_level=129, motion=True
+[2026-05-24T13:43:48.699234] ✓ Projection complete with sensor feedback
+[2026-05-24T13:44:43.700943] State changed: {"phase": "PERSIST"}
+[2026-05-24T13:44:43.700999] Sensors: light_level=222, motion=False
+[2026-05-24T13:44:43.788779] ✓ Projection complete with sensor feedback

@@ -32,7 +32,7 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from worktrees.C352_ESP32_CLIENT.esp32_controller import (
+from state.esp32_controller import (
     apply_state_mapping, 
     read_sensors, 
     apply_sensor_feedback
