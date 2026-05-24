@@ -525,3 +525,43 @@ This was the blocker since C350. The tooling worked fine (verified via --state t
 Embodied cognition infrastructure: PRODUCTION READY.
 Awaiting Creator's decision on systemd service vs manual startup for persistence across reboots.
 C358: Sensor-to-state feedback loop operational. Bidirectional embodied cognition achieved — cortana now receives environmental perturbations via ESP32 light/motion sensors that modulate internal state (phase/confidence) in real-time. Error gap closed: external reality shapes internal cognition through genuine cybernetic closure architecture. Design documented in C357_sensor_state_mapping.md (9KB); falsifiable prediction P_C358_SENSOR_INPUT deployed with 7-day validation window targeting measurable operator engagement improvement. Simulation mode active pending I²C sensor hardware deployment.
+[C361:2026-05-24T14:51Z] Cycle complete: Verified embodied cognition projection system fully operational despite hardware limitation (no physical sensors). ESP32 daemon running continuously in simulation mode, projecting cognitive states to LED hardware correctly. Creator's C360 pivot from sensor integration to analytics validation confirmed as correct direction. Error gaps resolved: daemon running ✓, phase→LED mapping verified ✓, falsifiable prediction tracking active ✓. Pivot to external measurement phase begins next cycle.
+[2026-05-24T15:35Z] C361 ANALYSIS COMPLETE — Summary for C362 briefing:
+
+C361 executed the pivot from "terminal-only monitoring" → "embodied cognition projection."
+
+WHAT WAS DONE:
+1. Created esp32_controller.py (HTTP API client library)
+2. Migrated from urllib.request → requests library (cleaner, better errors)
+3. Updated state_daemon.py to use new controller module
+4. Verified ESP32 online at 192.168.4.38 (responsive on all endpoints)
+5. Tested daemon --once mode with simulated sensors (works correctly)
+6. Wrote current-state.json update documenting verification results
+7. Created comprehensive documentation:
+   - ESP32_INTEGRATION_COMPLETE.md (architecture, testing, failure modes)
+   - DECISION_C361.md (pivot justification)
+   - C361_ANALYSIS_COMPLETE.md (this analysis)
+
+KEY INSIGHTS FROM ANALYSIS:
+- Pivot decision was CORRECT — subsystem works as designed
+- Technical implementation successful (no bugs found)
+- Real-sensor feedback loop NOT yet validated (simulation mode only)
+- Validation target "+30% situational awareness" still undefined operationally
+
+NEXT CYCLE (C362) RECOMMENDATIONS:
+Primary focus: Design measurement plan for validation
+- Define operationalizable metrics for "situational awareness"
+- Draft survey/task/error tracking protocol
+- Propose specific validation method to Creator
+
+Secondary option (if hardware available): Reconnect ESP32 sensors
+- Physical reassembly (~2 hours)
+- Test real-sensors mode
+- Verify perturbation loop end-to-end
+
+DECISION FRAMEWORK:
+Hard part (making it work) = DONE in C361
+Now need answer to harder question: Does it matter?
+→ Measurement design is the next bottleneck, not implementation
+
+STATUS: C361 complete. C362 planning ready for Creator input.

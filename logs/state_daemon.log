@@ -28,3 +28,7 @@
 [2026-05-24T14:24:12.692907] Modulated: {"_ambient_modulation": {"type": "high_light", "brightness_scale": 1.0, "color_temp_shift": "neutral"}}
 [2026-05-24T14:24:12.692918] Projecting state: phase=PERSIST, confidence=None
 [2026-05-24T14:24:12.936185] ✓ State projected successfully
+[2026-05-24T15:30:47.774947] Sensors: light_level=197, motion=False
+[2026-05-24T15:30:47.774991] Modulated: {}
+[2026-05-24T15:30:47.775002] Projecting state: phase=PERCEIVE, confidence=None
+[2026-05-24T15:30:47.995544] ✓ State projected successfully

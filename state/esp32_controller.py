@@ -15,8 +15,7 @@ Usage:
 
 import argparse
 import json
-import urllib.request
-import urllib.error
+import requests
 import time
 from typing import Optional, Tuple
 
@@ -52,25 +51,25 @@ def http_get(endpoint: str, params: dict = None) -> dict:
     base_url = f"http://{ESP32_IP}:{ESP32_PORT}"
     
     if params:
-        query = "&".join(f"{k}={v}" for k, v in params.items())
-        url = f"{base_url}{endpoint}?{query}"
+        url = f"{base_url}{endpoint}?{'&'.join(f'{k}={v}' for k, v in params.items())}"
     else:
         url = f"{base_url}{endpoint}"
     
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            with urllib.request.urlopen(url, timeout=15) as response:
-                body = response.read().decode("utf-8")
-                # Try parsing as JSON, fall back to plain text
-                try:
-                    return {"success": True, **json.loads(body)}
-                except json.JSONDecodeError:
-                    return {"success": body.strip() == "ok", "body": body}
+            r = requests.get(url, timeout=5)
+            r.raise_for_status()
+            
+            # Try parsing as JSON, fall back to plain text
+            try:
+                return {"success": True, **r.json()}
+            except json.JSONDecodeError:
+                return {"success": r.text.strip() == "ok", "body": r.text}
         except Exception as e:
             if attempt < max_retries - 1:
                 print(f"⚠ ESP32 request attempt {attempt+1}/{max_retries} failed: {e}, retrying...")
-                time.sleep(2)
+                time.sleep(1)
             else:
                 print(f"✗ ESP32 request failed after {max_retries} attempts: {e}")
                 raise
