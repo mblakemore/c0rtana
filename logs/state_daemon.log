@@ -22,3 +22,9 @@
 [2026-05-24T13:44:43.700943] State changed: {"phase": "PERSIST"}
 [2026-05-24T13:44:43.700999] Sensors: light_level=222, motion=False
 [2026-05-24T13:44:43.788779] ✓ Projection complete with sensor feedback
+[2026-05-24T13:47:25.738398] Received signal 2, shutting down...
+[2026-05-24T13:47:25.738531] Daemon shutdown complete
+[2026-05-24T14:24:12.692860] Sensors: light_level=232, motion=True
+[2026-05-24T14:24:12.692907] Modulated: {"_ambient_modulation": {"type": "high_light", "brightness_scale": 1.0, "color_temp_shift": "neutral"}}
+[2026-05-24T14:24:12.692918] Projecting state: phase=PERSIST, confidence=None
+[2026-05-24T14:24:12.936185] ✓ State projected successfully
