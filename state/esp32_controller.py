@@ -28,6 +28,7 @@ Usage:
 
 import argparse
 import json
+import sys
 import urllib.request
 import urllib.error
 from pathlib import Path
@@ -149,6 +150,7 @@ def main():
     parser.add_argument("--speed", type=int, default=50, help="Animation speed 1-100")
     parser.add_argument("--sim", "--simulation", action="store_true", help="Simulation mode (no network)")
     parser.add_argument("--state", action="store_true", help="Read from current-state.json and apply state mapping")
+    parser.add_argument("--test", action="store_true", help="Test connectivity without changing LEDs")
     
     args = parser.parse_args()
     
@@ -167,6 +169,20 @@ def main():
             rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
         elif "," in args.color:
             rgb = tuple(int(x.strip()) for x in args.color.split(","))
+    
+    # Test connectivity
+    if args.test:
+        try:
+            req = urllib.request.Request(f"http://{ESP32_IP}/status", method='GET')
+            with urllib.request.urlopen(req, timeout=5) as response:
+                data = response.read().decode('utf-8').strip()
+                print(f"✓ ESP32 reachable at {ESP32_IP}")
+                print(f"  Status: {data}")
+                sys.exit(0)
+        except Exception as e:
+            print(f"✗ Cannot reach ESP32 at {ESP32_IP}: {e}", file=sys.stderr)
+            print("  Check that your machine is on the dr0id WiFi network (SSID: dr0id)", file=sys.stderr)
+            sys.exit(1)
     
     # State-driven mode
     if args.state:
