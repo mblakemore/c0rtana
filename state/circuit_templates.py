@@ -81,6 +81,10 @@ def bv_algorithm(secret: str) -> QuantumCircuit:
     n = len(secret)
     qc = QuantumCircuit(n + 1, n)
     
+    # NOTE: Secret must be reversed to account for Qiskit's little-endian 
+    # bit ordering where qubit 0 is LSB in classical register measurements
+    secret_reversed = secret[::-1]
+    
     # Initialize all input qubits to |+⟩ via H gates
     for i in range(n):
         qc.h(i)

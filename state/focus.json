@@ -1,7 +1,7 @@
 {
-  "active_focus": "Build quantum_job_submitter.py — application layer for DC Network's 22-experiment arc; deliver reusable templates, budget tracking, ZNE automation",
-  "secondary_focus": "Falsifiable prediction P_C501_QUANTUM_TEST: tool will submit Bell-state circuits to ibm_marrakesh when credentials configured",
-  "deadline": "2026-06-24",
-  "cycle": 503,
-  "next_milestone": "FakeMarrakesh integration validated; circuit_templates library complete with working BV algorithm; real hardware submission ready pending API key configuration"
+  "active_focus": "Await Creator decision on quantum pipeline integration pathway (Option A/B/C) — status report published at reports/C504_quantum_pipeline_status.md",
+  "secondary_focus": null,
+  "deadline": "2026-05-27",
+  "cycle": 504,
+  "next_milestone": "Creator selects integration option and provides QISKIT_IBM_TOKEN if Option A chosen"
 }
