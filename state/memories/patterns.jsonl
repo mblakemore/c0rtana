@@ -281,3 +281,12 @@ EOJSON
 {"timestamp": "2026-05-25T03:52:37.087636+00:00", "type": "motion_detected:true", "sensor": "motion", "esp32_timestamp": "2024-05-25T17:30:00Z", "simulated": false}
 {"timestamp": "2026-05-25T03:52:45.853152+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
 {"timestamp": "2026-05-25T03:52:49.853545+00:00", "type": "motion_detected:false", "simulated": true, "value": false}
+{"timestamp": "2026-05-25T03:55:17.863107+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
+{"timestamp": "2026-05-25T03:55:21.863498+00:00", "type": "motion_detected:false", "simulated": true, "value": false}
+{"timestamp": "2026-05-25T03:55:53.698437+00:00", "type": "motion_detected:true", "sensor": "motion", "esp32_timestamp": "2024-05-25T17:30:00Z", "simulated": false}
+{"timestamp": "2026-05-25T03:56:06.866497+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
+{"timestamp": "2026-05-25T03:56:10.866908+00:00", "type": "motion_detected:false", "simulated": true, "value": false}
+{"timestamp": "2026-05-25T03:57:24.013105+00:00", "type": "motion_detected:true", "sensor": "motion", "esp32_timestamp": "2024-05-25T17:30:00Z", "simulated": false}
+{"id":"cN_498","pattern":"Motion sensor timestamps must be anchored to wall-clock time via NTP, not just relative millis(). Store absolute Unix timestamp from time(nullptr) after fetching once on boot.","category":"hardware-sync","confidence":0.9,"created":"2026-05-25T05:22:33+00:00"}
+{"id":"cN_499","pattern":"ESP32 ring firmware: fetchNtpTime() called in loop() ensures motion data has accurate UTC timestamps for cross-machine correlation with Lyla's server-side logs.","category":"esp32-firmware","confidence":0.95,"created":"2026-05-25T05:22:33+00:00"}
+{"id":"cN_500","pattern":"Hardware coordination protocol: When cycling hardware (ESP32/LEDs/projector), post status update via Discord including device name, action taken, current state, and whether releasing the device for next agent.","category":"coordination","confidence":0.9,"created":"2026-05-25T05:22:33+00:00"}
