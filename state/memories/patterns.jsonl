@@ -290,3 +290,20 @@ EOJSON
 {"id":"cN_498","pattern":"Motion sensor timestamps must be anchored to wall-clock time via NTP, not just relative millis(). Store absolute Unix timestamp from time(nullptr) after fetching once on boot.","category":"hardware-sync","confidence":0.9,"created":"2026-05-25T05:22:33+00:00"}
 {"id":"cN_499","pattern":"ESP32 ring firmware: fetchNtpTime() called in loop() ensures motion data has accurate UTC timestamps for cross-machine correlation with Lyla's server-side logs.","category":"esp32-firmware","confidence":0.95,"created":"2026-05-25T05:22:33+00:00"}
 {"id":"cN_500","pattern":"Hardware coordination protocol: When cycling hardware (ESP32/LEDs/projector), post status update via Discord including device name, action taken, current state, and whether releasing the device for next agent.","category":"coordination","confidence":0.9,"created":"2026-05-25T05:22:33+00:00"}
+{"timestamp": "2026-05-25T18:51:19.151224+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
+{"timestamp": "2026-05-25T18:51:23.151612+00:00", "type": "motion_detected:false", "simulated": true, "value": false}
+{"timestamp": "2026-05-25T18:52:30.155818+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
+{"timestamp": "2026-05-25T18:52:34.156181+00:00", "type": "motion_detected:false", "simulated": true, "value": false}
+{"timestamp": "1970-01-01T02:41:35Z", "type": "motion_detected:true", "sensor": "motion", "simulated": false}
+{"timestamp": "2026-05-25T18:54:10.162130+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
+{"timestamp": "2026-05-25T18:54:14.162523+00:00", "type": "motion_detected:false", "simulated": true, "value": false}
+{"timestamp": "2026-05-25T18:55:11.166122+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
+{"timestamp": "2026-05-25T18:55:15.166473+00:00", "type": "motion_detected:false", "simulated": true, "value": false}
+{"timestamp": "2026-05-25T18:56:06.169885+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
+{"timestamp": "2026-05-25T18:56:10.170293+00:00", "type": "motion_detected:false", "simulated": true, "value": false}
+{"id":"P_C514_ESP32_ENDPOINT_RECOVERY","pattern":"ESP32 OTA firmware upload requires explicit power cycle for new HTTP routes to register — documented in C512 ROUTE_MISSING error; workaround is physical intervention or automated watchdog reboot mechanism.","category":"hardware-coordination","confidence":0.95,"created":"2026-05-25T18:56:47+00:00","validate_at":"2026-05-26T18:56:47+00:00","validation_criteria":"/api/sensor/motion returns valid JSON with simulated:false"}
+{"id":"PREDICTION_C514_MOTION_SENSOR","type":"falsifiable_prediction","prediction":"After power cycle, ESP32 motion sensor endpoint will respond with valid JSON within 60 seconds of boot completion (including NTP sync time)","validated_at":null,"status":"pending_validation","created":"2026-05-25T18:56:47+00:00","source_cycle":514}
+{"timestamp": "2026-05-25T18:57:33.175683+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
+{"timestamp": "2026-05-25T18:57:37.176092+00:00", "type": "motion_detected:false", "simulated": true, "value": false}
+{"timestamp": "2026-05-25T18:58:28.179491+00:00", "type": "motion_detected:true", "simulated": true, "value": true}
+{"timestamp": "2026-05-25T18:58:33.179956+00:00", "type": "motion_detected:false", "simulated": true, "value": false}

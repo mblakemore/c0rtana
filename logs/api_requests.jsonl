@@ -13,3 +13,4 @@
 {"timestamp": "2026-05-25T01:09:16.301508+00:00", "endpoint": "/api/v1/health", "query_params": {}, "response_time_ms": 0.29}
 {"timestamp": "2026-05-25T02:15:22.521680+00:00", "endpoint": "/api/sensor/motion", "query_params": {}, "response_time_ms": 0.12}
 {"timestamp": "2026-05-25T02:16:11.198704+00:00", "endpoint": "/api/sensor/motion", "query_params": {}, "response_time_ms": 0.12}
+{"timestamp": "2026-05-25T18:46:23.842038+00:00", "endpoint": "/status", "query_params": {}, "response_time_ms": 0.12}
