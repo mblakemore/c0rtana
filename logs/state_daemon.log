@@ -1562,3 +1562,9 @@
 [2026-05-24T23:56:27.958982] State changed: {"phase": "ACT", "confidence": 0.75}
 [2026-05-24T23:56:27.959082] Sensors: light_level=30, motion=True
 [2026-05-24T23:56:28.117459] ✓ Projection complete with sensor feedback
+[2026-05-25T00:46:53.215681] State changed: {"phase": "ACT", "confidence": 0.9}
+[2026-05-25T00:46:53.215739] Sensors: light_level=164, motion=False
+[2026-05-25T00:46:53.450452] ✓ Projection complete with sensor feedback
+[2026-05-25T01:12:48.500467] State changed: {"phase": "CONSOLIDATE", "confidence": 0.95}
+[2026-05-25T01:12:48.500526] Sensors: light_level=32, motion=False
+[2026-05-25T01:12:48.712269] ✓ Projection complete with sensor feedback
