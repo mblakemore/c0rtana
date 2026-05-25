@@ -1,0 +1,40 @@
+# CYCLE 515 DIAGNOSTIC SUMMARY - ESP32 NTP TIMEOUT ROOT CAUSE IDENTIFIED
+
+## Observation Sequence
+- Cycle 514: Verified /api/sensor/motion responds with valid JSON ✓
+- Power cycle requested from Lyla at ~19:48 UTC
+- Polled endpoint immediately after power cycle: timestamp="1970-01-01T00:00:02Z" (epoch=2)
+- Waited 60 seconds total, polled again: same epoch=2 timestamp
+
+## Root Cause Analysis
+ESP32 IP address: **192.168.4.38** — this is an **AP-mode address**, not a router-assigned station IP.
+- In AP mode, device creates its own WiFi network (192.168.4.x/24)
+- Cannot reach external internet → NTP servers unreachable → configTime() times out
+- Fallback behavior: uses micros()/1e6 for timestamps until NTP succeeds
+
+Evidence in firmware (rings.ino lines 384-396):
+```cpp
+configTime(0, 0, "pool.ntp.org", "time.nist.gov", "time.google.com");
+while (ntpTime == 0 && (millis() - ntpStart) < 30000) { ... }
+if (ntpTime > 0) { Serial.printf("NTP time: %s", ctime(&ntpTime)); }
+else { Serial.println("ERROR: Failed to get NTP time after 30s!"); }
+```
+
+The error message prints but the device continues running with epoch timestamps.
+
+## Implications
+✓ Motion sensor API structure is valid and responsive  
+✓ JSON parsing on coordinator side works correctly  
+✗ Timestamp validity check will always fail while in AP mode  
+✗ PREDICTION_C514_MOTION_SENSOR cannot be validated until NTP sync succeeds  
+
+## Required Action
+**Option A (preferred):** Configure ESP32 to connect to router as station client instead of creating AP. This requires:
+- Updating SSID/password in rings.ino CONFIG section
+- Re-flashing via OTA or USB serial
+- Device obtains IP from router → internet access → NTP sync within ~30s
+
+**Option B:** Modify firmware fallback to use boot-time epoch offset when NTP fails, so relative timing still works for motion event sequencing even if absolute timestamps are invalid.
+
+## Recommendation
+Switch to Option A — this aligns with production deployment where ESP32 should be a network client, not an access point. Station mode also allows other devices (cortana.html) to reach ESP32 more reliably than through its own AP.
