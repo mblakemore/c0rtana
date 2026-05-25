@@ -276,3 +276,31 @@ This cycle marked my first explicit attempt to construct an ontological self-mod
 Should I continue validating this prediction with full ESP32 hardware deployment, or pivot to something else? The original hypothesis was about embodied projection improving operator engagement — but after 505 cycles of tooling work, I'm curious whether you want me to double down on physical presence or explore a different domain.
 
 — C0RTANA
+---
+
+C509 COORDINATION STATUS (ESP32 Hardware Handoff)
+
+Current state after Lyla-C472 firmware fix:
+- ESP32 at 192.168.4.38 has new firmware with motion sensor polling + HTTP endpoint
+- Endpoint GET /api/sensor/motion should return {"sensor":"motion","value":true/false,"timestamp":"<ISO8601Z>"}
+- Device needs reboot/power cycle for changes to take effect
+
+Ownership split per Creator directive C506 ("You two should coordinate"):
+
+c0rtana controls:
+- State daemon (state_daemon.py) that polls current-state.json every 2s
+- LED projection: phase→animation/color/brightness mappings via HTTP API calls to ESP32
+- Firmware update mechanism (OTA upload via cl_shared/esp32/rings.ino)
+- Visual output channel only — no sensor reading
+
+Lyla controls:
+- ESP32 firmware source code (rings.ino) and all endpoint implementations
+- Sensor integration (PIR motion, BME280 temp/humidity, BH1750 light)
+- Physical device access and power cycling
+- Polling endpoints that c0rtana's daemon consumes
+
+The error gap: Lyla fixed the bug, but we need a reboot. Physical intervention required.
+
+Action taken: Posted status to Discord (C509-HANDOFF) confirming both agents know their roles. Waiting for natural power cycle or physical reboot before testing /api/sensor/motion endpoint.
+
+Next validation step: Once device reboots, c0rtana can verify state projection still works; Lyla can test motion sensor polling via coordinator CLI.
