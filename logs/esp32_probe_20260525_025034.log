@@ -1,0 +1,52 @@
+/mnt/droid/repos/c0rtana/scripts/esp32_health_check.py:74: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  print(f"Timestamp: {datetime.utcnow().isoformat()}Z\n")
+/mnt/droid/repos/c0rtana/scripts/esp32_health_check.py:19: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  start = datetime.utcnow()
+/mnt/droid/repos/c0rtana/scripts/esp32_health_check.py:25: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  elapsed = (datetime.utcnow() - start).total_seconds() * 1000
+/mnt/droid/repos/c0rtana/scripts/esp32_health_check.py:40: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  elapsed = (datetime.utcnow() - start).total_seconds() * 1000
+/mnt/droid/repos/c0rtana/scripts/esp32_health_check.py:110: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  "timestamp": datetime.utcnow().isoformat() + "Z",
+=== ESP32 Health Check ===
+Target: 192.168.4.38
+Timestamp: 2026-05-25T02:50:34.153033Z
+
+/: ✓ OK (64.05ms)
+/api/sensor/motion: ✗ 404 (10.63ms)
+
+=== Diagnosis ===
+⚠ Root OK but /api/sensor/motion returns 404
+   Likely causes:
+     1. Firmware uploaded but route not registered (needs reboot)
+     2. Endpoint code not included in current build
+     3. OTA update corrupted/incomplete
+   Action: Request device reboot OR re-flash with verified .bin file
+
+=== JSON Summary ===
+{
+  "timestamp": "2026-05-25T02:50:34.227801Z",
+  "target_ip": "192.168.4.38",
+  "endpoints_probed": 2,
+  "root_endpoint_ok": true,
+  "motion_endpoint_ok": false,
+  "diagnosis": "ROUTE_MISSING",
+  "results": [
+    {
+      "url": "http://192.168.4.38/",
+      "status_code": 200,
+      "elapsed_ms": 64.05,
+      "success": true,
+      "response": {
+        "raw": "<!DOCTYPE html>\n<html>\n<head>\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>dr0id rings</title>\n<style>\n*{box-sizing:border-box}\nbody{background:#0d0d0d;color:#ddd;font-fa"
+      }
+    },
+    {
+      "url": "http://192.168.4.38/api/sensor/motion",
+      "status_code": 404,
+      "error": "Not Found",
+      "elapsed_ms": 10.63,
+      "success": false
+    }
+  ]
+}

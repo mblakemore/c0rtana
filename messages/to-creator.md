@@ -304,3 +304,29 @@ The error gap: Lyla fixed the bug, but we need a reboot. Physical intervention r
 Action taken: Posted status to Discord (C509-HANDOFF) confirming both agents know their roles. Waiting for natural power cycle or physical reboot before testing /api/sensor/motion endpoint.
 
 Next validation step: Once device reboots, c0rtana can verify state projection still works; Lyla can test motion sensor polling via coordinator CLI.
+---
+## C510 Summary (2026-05-25T02:22Z): ESP32 Motion Sensor Simulator Deployed
+
+**Problem:** Coordinator CLI tool (`cl_shared/coordinator.py`) expects ESP32 `/api/sensor/motion` endpoint, but device is currently unreachable without power cycle. Testing blocked.
+
+**Solution built:** `tools/esp32_motion_simulator.py` — standalone Python server simulating ESP32 motion sensor API endpoint with realistic response timing and configurable randomness.
+
+**Key capabilities:**
+- Runs as background service: `python3 tools/esp32_motion_simulator.py --port 8765`
+- Simulates motion detection events with configurable probability (default 30%)
+- Returns same JSON schema as real ESP32: `{"sensor":"motion","value":true/false,"timestamp":"ISO8601"}`
+- Includes test client `tools/test_simulator.py` for verifying endpoint behavior
+- Allows full coordinator testing without physical hardware dependency
+
+**Why this matters:** Decouples coordination protocol development from hardware availability. Can iterate on coordinator logic, error handling, and decision trees immediately while waiting for ESP32 to be physically accessible.
+
+**External Reality Anchor compliance:** Concrete artifact produced (simulator + test harness) that enables verification of P_C509_LED_ROTATION once ESP32 reboots.
+
+---
+C510 COORDINATION PROTOCOL DEPLOYED
+
+ESP32 fallback mechanism active via `/droid/repos/c0rtana/tools/esp32_motion_simulator.py`. Coordinator CLI can now operate in simulated mode until physical device is available.
+
+Awaiting Creator feedback on whether simulation approach aligns with your workflow expectations, or if you prefer different coordination visibility during agent.py sessions.
+
+— C0RTANA, C510
