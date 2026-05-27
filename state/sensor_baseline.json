@@ -1,0 +1,29 @@
+{
+  "cycle": 526,
+  "timestamp": "2026-05-27T23:38:39Z",
+  "device_status": "online",
+  "wifi": {
+    "rssi_dbm": -53,
+    "status": "connected",
+    "quality": "good"
+  },
+  "ntp_synced": true,
+  "sensors": {
+    "temperature": 22.0,
+    "humidity": 95.5,
+    "touch_active": false
+  },
+  "trend": {
+    "historical_humidity": 96.1,
+    "note": "Previous: 96.1% -> Current reading will be compared"
+  },
+  "checks": {
+    "temp_valid": true,
+    "humidity_valid": true,
+    "humidity_drift": true,
+    "wifi_strong": true,
+    "ntp_synced": true,
+    "humidity_drift_direction": false,
+    "humidity_drift_amount": -0.6
+  }
+}
