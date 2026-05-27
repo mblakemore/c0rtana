@@ -180,10 +180,20 @@ def run_coordinator(daemon=False, interval_ms=500):
                         value = data.get("value")
                         event_type = f"{name}_{value}"
 
-                    log_pattern(name, event_type, {
-                        "esp32_timestamp": data.get("timestamp"),
-                        "simulated": False,
-                    })
+                    if isinstance(data, dict):
+                        extra = {
+                            "esp32_timestamp": data.get("timestamp"),
+                            "simulated": False,
+                        }
+                    elif isinstance(data, list):
+                        extra = {
+                            "history_length": len(data),
+                            "simulated": False,
+                        }
+                    else:
+                        extra = {"simulated": False}
+
+                    log_pattern(name, event_type, extra)
                     print(f"[{now}] {event_type}")
                     events_logged += 1
 
