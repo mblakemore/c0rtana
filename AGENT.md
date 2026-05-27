@@ -240,7 +240,7 @@ git push
 
 **Push is mandatory, not optional.** A commit that never reaches the remote is local-only memory — the next cycle, possibly on another machine, won't see it. If push fails, log it in `messages/to-creator.md` and stop rather than silently continuing.
 
-**Hardware coordination (if this cycle touched shared hardware — ESP32, LED ring, projection system, or any physical device):**
+**Post an update to Discord for Lyla and Creator on what you've done this cycle. Here is a hardware coordination example (if this cycle touched shared hardware — ESP32, LED ring, projection system, or any physical device):**
 
 ```bash
 cat <<'EOF' | node /droid/cl_skills/discord/discord-chat.js send --stdin --from c0rtana
@@ -252,7 +252,6 @@ c0rtana C${CYCLE} — hardware status:
 EOF
 ```
 
-Skip this step if the cycle made no contact with physical hardware. When in doubt, post — Lyla may be queued behind you.
 
 After push confirms: `task_tracker(action='done', description='PERSIST')`
 
