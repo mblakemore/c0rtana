@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CORTANA // Sensor Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0a;
+            color: #00ffcc;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            font-size: 0.75rem;
+            color: #666;
+        }
+        .status-bar span { padding: 4px 10px; background: #111; border-radius: 3px; }
+        .status-bar .online { color: #00ffcc; }
+        .status-bar .drift-alert { color: #ff5555; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .card h3 {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .card .value {
+            font-size: 2rem;
+            color: #fff;
+        }
+        .card .meta {
+            font-size: 0.65rem;
+            color: #444;
+            margin-top: 5px;
+        }
+        .card.temp .value { color: #ffcc00; }
+        .card.humidity .value { color: #55aaff; }
+        .card.humidity.drift .value { color: #ff5555; }
+        .card.touch .value { color: #00ffcc; }
+        .chart-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .chart-card h3 {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .chart-container { position: relative; height: 250px; }
+        .touch-log {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .touch-log h3 {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .touch-log .entry {
+            font-size: 0.65rem;
+            color: #444;
+            padding: 3px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .touch-log .entry.active { color: #00ffcc; }
+        .prediction-box {
+            background: #0d1a0d;
+            border: 1px solid #004400;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .prediction-box h3 {
+            font-size: 0.7rem;
+            color: #44aa44;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .prediction-box p {
+            font-size: 0.7rem;
+            color: #669966;
+            line-height: 1.5;
+        }
+        .prediction-box .meta {
+            font-size: 0.6rem;
+            color: #336633;
+            margin-top: 8px;
+        }
+        .full-width { grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+    <h1>CORTANA // SENSOR DASHBOARD</h1>
+    <div class="status-bar">
+        <span id="esp-status">ESP32: CHECKING...</span>
+        <span id="data-age">Last read: --</span>
+        <span id="record-count">Records: 0</span>
+    </div>
+
+    <!-- Prediction box -->
+    <div class="prediction-box">
+        <h3>Prediction: P_C524_SENSOR_DRIFT</h3>
+        <p>If DHT22 humidity sensor is drifting, humidity will continue increasing over next 7 days (from ~96% toward 99%+). If genuinely high, it will remain 90-98%.</p>
+        <div class="meta">Validates at: 2026-06-03 | Confidence: 0.6</div>
+    </div>
+
+    <div class="grid">
+        <div class="card temp">
+            <h3>Temperature</h3>
+            <div class="value" id="temp-value">--</div>
+            <div class="meta" id="temp-meta">Waiting for data...</div>
+        </div>
+        <div class="card humidity" id="humidity-card">
+            <h3>Humidity</h3>
+            <div class="value" id="humidity-value">--</div>
+            <div class="meta" id="humidity-meta">DHT22 (GPIO 14)</div>
+        </div>
+        <div class="card touch">
+            <h3>Touch Sensor</h3>
+            <div class="value" id="touch-value">--</div>
+            <div class="meta" id="touch-meta">GPIO 5 — waiting for data...</div>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <h3>Humidity Drift (7-day history)</h3>
+        <div class="chart-container">
+            <canvas id="humidity-chart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <h3>Temperature (7-day history)</h3>
+        <div class="chart-container">
+            <canvas id="temp-chart"></canvas>
+        </div>
+    </div>
+
+    <div class="touch-log" id="touch-log">
+        <h3>Touch Events (recent)</h3>
+        <div id="touch-entries"><span style="color:#333">No events yet</span></div>
+    </div>
+
+    <script>
+    const ESP32_URL = 'http://192.168.4.38';
+    const STORAGE_KEY = 'cortana_sensor_history';
+    const MAX_RECORDS = 10000;
+    const POLL_INTERVAL = 5000; // 5 seconds
+
+    // Sensor history stored in localStorage
+    let history = [];
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) history = JSON.parse(raw);
+    } catch(e) { history = []; }
+
+    function saveHistory() {
+        if (history.length > MAX_RECORDS) {
+            history = history.slice(-MAX_RECORDS);
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+        document.getElementById('record-count').textContent = `Records: ${history.length}`;
+    }
+
+    // Charts
+    const humidityChart = new Chart(document.getElementById('humidity-chart'), {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Humidity (%)',
+                borderColor: '#55aaff',
+                backgroundColor: 'rgba(85,170,255,0.1)',
+                borderWidth: 2,
+                pointRadius: 1,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { type: 'time', time: { unit: 'hour' }, grid: { color: '#1a1a1a' }, ticks: { color: '#444', font: { family: 'Courier New', size: 10 } } },
+                y: { min: 80, max: 100, grid: { color: '#1a1a1a' }, ticks: { color: '#444', font: { family: 'Courier New', size: 10 } } }
+            },
+            plugins: { legend: { labels: { color: '#666', font: { family: 'Courier New' } } } }
+        }
+    });
+
+    const tempChart = new Chart(document.getElementById('temp-chart'), {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Temperature (°C)',
+                borderColor: '#ffcc00',
+                backgroundColor: 'rgba(255,204,0,0.1)',
+                borderWidth: 2,
+                pointRadius: 1,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { type: 'time', time: { unit: 'hour' }, grid: { color: '#1a1a1a' }, ticks: { color: '#444', font: { family: 'Courier New', size: 10 } } },
+                y: { grid: { color: '#1a1a1a' }, ticks: { color: '#444', font: { family: 'Courier New', size: 10 } } }
+            },
+            plugins: { legend: { labels: { color: '#666', font: { family: 'Courier New' } } } }
+        }
+    });
+
+    // Populate charts from history
+    function updateCharts() {
+        const hData = history.map(r => ({ x: new Date(r.timestamp), y: r.humidity }));
+        const tData = history.map(r => ({ x: new Date(r.timestamp), y: r.temperature }));
+        humidityChart.data.datasets[0].data = hData;
+        tempChart.data.datasets[0].data = tData;
+        humidityChart.update();
+        tempChart.update();
+    }
+
+    // Touch event log
+    let lastTouchState = null;
+    function updateTouchLog(active) {
+        const now = new Date().toISOString();
+        const entries = document.getElementById('touch-entries');
+        if (lastTouchState !== null && lastTouchState !== active) {
+            const cls = active ? 'entry active' : 'entry';
+            entries.innerHTML = `<div class="${cls}">${now} → ${active ? 'ACTIVE' : 'IDLE'}</div>` + entries.innerHTML;
+            // Keep only last 50
+            const items = entries.querySelectorAll('.entry');
+            while (items.length > 50) items[items.length - 1].remove();
+        }
+        lastTouchState = active;
+    }
+
+    // Main poll loop
+    async function poll() {
+        const results = {};
+        let allOnline = true;
+
+        // Temp
+        try {
+            const r = await fetch(`${ESP32_URL}/api/sensor/temp`);
+            const d = await r.json();
+            results.temperature = d.value;
+        } catch(e) { results.temperature = null; allOnline = false; }
+
+        // Humidity
+        try {
+            const r = await fetch(`${ESP32_URL}/api/sensor/humidity`);
+            const d = await r.json();
+            results.humidity = d.value;
+        } catch(e) { results.humidity = null; allOnline = false; }
+
+        // Touch
+        try {
+            const r = await fetch(`${ESP32_URL}/api/sensor/touch`);
+            const d = await r.json();
+            results.touch = d.active;
+        } catch(e) { results.touch = null; allOnline = false; }
+
+        // Update UI
+        document.getElementById('esp-status').innerHTML = allOnline
+            ? '<span class="online">ESP32: ONLINE</span>'
+            : '<span style="color:#ff5555">ESP32: OFFLINE</span>';
+        document.getElementById('data-age').textContent = `Last read: ${new Date().toLocaleTimeString()}`;
+
+        if (results.temperature !== null) {
+            document.getElementById('temp-value').textContent = `${results.temperature}°C`;
+        }
+        if (results.humidity !== null) {
+            const card = document.getElementById('humidity-card');
+            const isDrift = results.humidity > 95;
+            card.classList.toggle('drift', isDrift);
+            document.getElementById('humidity-value').textContent = `${results.humidity}%`;
+            document.getElementById('humidity-meta').textContent = isDrift
+                ? '⚠ DRIFT WARNING — above 95%'
+                : 'DHT22 (GPIO 14)';
+        }
+        if (results.touch !== null) {
+            document.getElementById('touch-value').textContent = results.touch ? 'TOUCH' : 'IDLE';
+            document.getElementById('touch-meta').textContent = `GPIO 5 — ${new Date().toLocaleTimeString()}`;
+            updateTouchLog(results.touch);
+        }
+
+        // Save to history
+        if (results.temperature !== null && results.humidity !== null) {
+            history.push({
+                timestamp: new Date().toISOString(),
+                temperature: results.temperature,
+                humidity: results.humidity
+            });
+            saveHistory();
+            updateCharts();
+        }
+    }
+
+    // Init
+    updateCharts();
+    poll();
+    setInterval(poll, POLL_INTERVAL);
+    </script>
+</body>
+</html>
