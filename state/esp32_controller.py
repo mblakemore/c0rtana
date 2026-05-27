@@ -81,32 +81,45 @@ def http_get(endpoint: str, params: dict = None) -> dict:
 
 def read_sensors(simulate: bool = False) -> dict:
     """Read sensor data from ESP32 or simulate if hardware not available.
-    
+
     Sensor-to-state mapping schema:
-    - light_level (0-255): Ambient room brightness → modulates LED brightness
-      - <30 (dark): Reduce LED output by 50%, shift to warmer tones
-      - >200 (bright): Maximize LED visibility
-    
-    - motion_detected (bool): Presence detection → phase perturbation
-      - True: Shift IDLE→PERCEIVE, boost confidence +0.2
-    
-    Returns: {'light_level': int, 'motion_detected': bool, 'simulated': bool}
+    - touch (bool): Human interaction → phase perturbation
+      - True (touch detected): Shift IDLE→PERCEIVE, boost confidence +0.2
+    - temp (float C): Ambient temperature → color temperature modulation
+      - <20 (cold): Shift to warmer tones on LEDs
+      - >28 (warm): Shift to cooler tones
+    - humidity (float %): Ambient humidity → brightness modulation
+      - >90%: Reduce LED brightness (high humidity = muffled atmosphere)
+
+    Returns: {'touch': bool, 'temp': float, 'humidity': float, 'simulated': bool}
     """
-    
+
     if simulate:
         # Simulated sensors for development/testing without physical hardware
         import random
         return {
-            "light_level": random.randint(20, 240),
-            "motion_detected": random.random() < 0.3,
+            "touch": random.random() < 0.3,
+            "temp": random.uniform(18, 30),
+            "humidity": random.uniform(40, 95),
             "simulated": True
         }
-    
+
     try:
-        # Read from ESP32 HTTP API endpoint /sensors (would need firmware update)
-        result = http_get("/sensors")
-        result["simulated"] = False
-        return result
+        # Touch sensor
+        touch_data = http_get("/api/sensor/touch")
+        touch = touch_data.get("active", False)
+
+        # DHT sensor (temperature + humidity in single endpoint)
+        dht_data = http_get("/api/sensor/dht")
+        temp = dht_data.get("temp", 22.0)
+        humidity = dht_data.get("humidity", 50.0)
+
+        return {
+            "touch": touch,
+            "temp": temp,
+            "humidity": humidity,
+            "simulated": False
+        }
     except Exception as e:
         print(f"⚠ Real sensor read failed ({e}), falling back to simulation")
         return read_sensors(simulate=True)
@@ -114,46 +127,51 @@ def read_sensors(simulate: bool = False) -> dict:
 
 def apply_sensor_feedback(state: dict, sensors: dict) -> dict:
     """Modulate internal state based on environmental context.
-    
+
     Error gap closure: External stimuli affecting internal processing.
     Creates genuine cybernetic closure rather than mere display.
-    
+
+    Touch → phase perturbation (human interaction detected)
+    Temp → color temperature modulation
+    Humidity → brightness modulation
+
     Args:
         state: Current cortana internal state (phase, confidence, etc.)
         sensors: Sensor readings from read_sensors()
-        
+
     Returns:
         Modified state with environmental perturbations applied
     """
-    
+
     modified = state.copy()
-    
-    # Light level → brightness modulation
-    light = sensors.get("light_level", 128)
-    if light < 30:  # Dark room
+
+    # Touch → phase perturbation (genuine cybernetic feedback)
+    touch = sensors.get("touch", False)
+    if touch and modified.get("phase") == "idle":
+        modified["_environmental_trigger"] = "touch_detected"
+        modified["confidence"] = min(1.0, modified.get("confidence", 0.5) + 0.2)
+        modified["phase"] = "perceive"
+
+    # Temperature → color temperature modulation for LEDs
+    temp = sensors.get("temp", 22.0)
+    if temp < 20:
         modified["_ambient_modulation"] = {
-            "type": "low_light",
-            "brightness_scale": 0.5,
+            "type": "cold",
             "color_temp_shift": "warm"
         }
-        # Reduce LED brightness by half
-        current_bright = http_get("/status").get("brightness", 128)
-        modified["brightness_override"] = int(current_bright * 0.5)
-    
-    elif light > 200:  # Bright room
+    elif temp > 28:
         modified["_ambient_modulation"] = {
-            "type": "high_light",
-            "brightness_scale": 1.0,
-            "color_temp_shift": "neutral"
+            "type": "warm",
+            "color_temp_shift": "cool"
         }
-    
-    # Motion detection → phase perturbation
-    motion = sensors.get("motion_detected", False)
-    if motion and modified.get("phase") == "idle":
-        modified["_environmental_trigger"] = "motion_detected"
-        modified["confidence"] = min(1.0, modified.get("confidence", 0.5) + 0.2)
-        # Would shift to PERCEIVE in full implementation
-    
+
+    # Humidity → brightness modulation
+    humidity = sensors.get("humidity", 50.0)
+    if humidity > 90:
+        modified["_ambient_modulation"]["brightness_scale"] = 0.7
+        current_bright = http_get("/status").get("brightness", 128)
+        modified["brightness_override"] = int(current_bright * 0.7)
+
     return modified
 
 

@@ -5,11 +5,13 @@ ESP32 Multi-Sensor Coordinator — Unified polling for all sensor endpoints
 Replaces the motion-only daemon (esp32_sensor_daemon.py) with a coordinator
 that polls every available sensor endpoint and logs state changes to patterns.jsonl.
 
-Current ESP32 firmware endpoints:
-  - /api/sensor/touch  → {"sensor":"touch","active":bool,"timestamp":"<ISO8601Z>"}
-  - /api/sensor/motion → 404 (removed in firmware update)
-  - /api/sensor/temp   → 404 (pending firmware update with DHT11/AM2302)
-  - /api/sensor/humidity → 404 (pending firmware update with DHT11/AM2302)
+Current ESP32 firmware endpoints (as of C517):
+  - /api/sensor/touch          → {"sensor":"touch","active":bool,"timestamp":"<ISO8601Z>"}
+  - /api/sensor/touch/history  → ["<ISO8601Z>", ...] last 10 touch activations
+  - /api/sensor/dht            → {"sensor":"am2302","humidity":float,"temp":float,"timestamp":"<ISO8601Z>"}
+  - /api/sensor/temp           → {"sensor":"temp","value":float}
+  - /api/sensor/humidity       → {"sensor":"humidity","value":float}
+  - /api/sensor/motion         → 404 (removed in firmware update)
 
 Usage:
     python tools/esp32_sensor_coordinator.py [--daemon] [--interval 500]
@@ -35,10 +37,14 @@ from urllib.error import URLError
 SENSOR_ENDPOINTS = {
     "touch": {
         "url": "http://192.168.4.38/api/sensor/touch",
-        "available": None,  # set to True/False on first probe
+        "available": None,
     },
-    "motion": {
-        "url": "http://192.168.4.38/api/sensor/motion",
+    "touch_history": {
+        "url": "http://192.168.4.38/api/sensor/touch/history",
+        "available": None,
+    },
+    "dht": {
+        "url": "http://192.168.4.38/api/sensor/dht",
         "available": None,
     },
     "temp": {
@@ -90,16 +96,27 @@ class SensorStateTracker:
         self.last_values = {}
 
     def has_changed(self, sensor_name, data):
+        # Handle different data shapes per sensor type
+        if sensor_name == "touch_history":
+            # Touch history is a list — compare the list
+            return self.last_values.get(sensor_name) != data
+        if sensor_name == "dht":
+            # DHT has temp+humidity together
+            return self.last_values.get(sensor_name) != data
         value = data.get("active") if "active" in data else data.get("value")
         if value is None:
-            # For temp/humidity, compare the whole dict
             value = data
         return self.last_values.get(sensor_name) != value
 
     def record(self, sensor_name, data):
-        value = data.get("active") if "active" in data else data.get("value")
-        if value is None:
+        if sensor_name == "touch_history":
             value = data
+        elif sensor_name == "dht":
+            value = data
+        else:
+            value = data.get("active") if "active" in data else data.get("value")
+            if value is None:
+                value = data
         self.last_values[sensor_name] = value
 
 
@@ -152,8 +169,17 @@ def run_coordinator(daemon=False, interval_ms=500):
             for name, data in results.items():
                 if tracker.has_changed(name, data):
                     tracker.record(name, data)
-                    value = data.get("active") if "active" in data else data.get("value")
-                    event_type = f"{name}_{value}"
+                    if name == "touch":
+                        value = data.get("active")
+                        event_type = f"touch_{value}"
+                    elif name == "dht":
+                        event_type = f"dht_temp_{data.get('temp')}_h_{data.get('humidity')}"
+                    elif name == "touch_history":
+                        event_type = "touch_history_updated"
+                    else:
+                        value = data.get("value")
+                        event_type = f"{name}_{value}"
+
                     log_pattern(name, event_type, {
                         "esp32_timestamp": data.get("timestamp"),
                         "simulated": False,
@@ -198,7 +224,10 @@ def main():
             status = "ONLINE" if available else "OFFLINE"
             info = ""
             if available:
-                info = f" → {json.dumps(data)}"
+                if isinstance(data, list):
+                    info = f" → {len(data)} entries"
+                else:
+                    info = f" → {json.dumps(data)}"
             print(f"  {name}: {status}{info}")
         return
 
