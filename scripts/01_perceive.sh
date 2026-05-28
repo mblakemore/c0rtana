@@ -48,4 +48,8 @@ else
 fi
 
 echo ""
+echo "--- PREDICTION DEADLINES ---"
+python3 scripts/prediction_deadline_checker.py 2>/dev/null || echo "(checker failed)"
+
+echo ""
 echo "=== END INTELLIGENCE ==="
