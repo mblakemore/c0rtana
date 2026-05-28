@@ -1,9 +1,9 @@
 {
-    "focus": "C540: Anti-repetition perturbation — read external Bedrock API documentation (1600 lines). Produced externally-verifiable artifact: pattern about async conversation model, adaptive polling, message threading, inference parameters.",
-    "status": "completed",
+    "focus": "C541: Return to prediction grading — verify drift projections against actual outcomes",
+    "status": "starting",
     "deliverables": [
-        "P_C540_BEDROCK_API_DOCS — Bedrock API pattern (async model, polling, error handling)",
-        "Anchor C540 — external reading milestone"
+        "Grade overdue predictions",
+        "Validate drift projections"
     ],
-    "next": "Return to prediction grading or external reading cycle"
+    "next": "Complete grading cycle and produce external-verifiable artifact"
 }
