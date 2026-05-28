@@ -10,6 +10,7 @@ export default class VisualizationEngine {
         this.cursorY = 0;
         this.esp32Url = options.esp32Url || 'http://192.168.4.38';
         this.sensorData = { temperature: 22, humidity: 60, touchActive: false };
+        this.precisionData = { temperature: { precision: 10, learned: null }, humidity: { precision: 2, learned: null } };
         this.sensorCallbacks = [];
         this.burstActive = false;
         this.burstTimer = 0;
@@ -79,6 +80,42 @@ export default class VisualizationEngine {
     startSensorPolling(intervalMs) {
         this.updateSensors();
         setInterval(() => this.updateSensors(), intervalMs);
+    }
+
+    setPrecisionData(channel, precision, learnedVariance) {
+        if (this.precisionData[channel]) {
+            this.precisionData[channel].precision = precision;
+            this.precisionData[channel].learned = learnedVariance;
+        }
+    }
+
+    getPrecisionForChannel(channel) {
+        const ch = this.precisionData[channel];
+        if (!ch) return 0.5;
+        // Use learned variance if available, otherwise initial precision
+        const effective = ch.learned ? (1.0 / ch.learned) : ch.precision;
+        // Normalize to 0-1 range (log scale since precision spans orders of magnitude)
+        return Math.min(1.0, Math.max(0.0, (Math.log10(effective) - 0.5) / 2));
+    }
+
+    drawPrecisionRings() {
+        const channels = [
+            { name: 'temperature', color: '255, 100, 50' },
+            { name: 'humidity', color: '50, 180, 255' },
+        ];
+
+        channels.forEach((ch, idx) => {
+            const precision = this.getPrecisionForChannel(ch.name);
+            const radius = 120 + idx * 25;
+            const lineWidth = 1 + precision * 3;
+            const alpha = 0.2 + precision * 0.5;
+
+            this.ctx.strokeStyle = `rgba(${ch.color}, ${alpha})`;
+            this.ctx.lineWidth = lineWidth;
+            this.ctx.beginPath();
+            this.ctx.arc(this.centerX, this.centerY, radius, 0, Math.PI * 2);
+            this.ctx.stroke();
+        });
     }
 
     resize() {
@@ -247,6 +284,9 @@ export default class VisualizationEngine {
     animate() {
         this.update();
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw precision rings
+        this.drawPrecisionRings();
 
         // Draw connections
         this.drawConnections();
