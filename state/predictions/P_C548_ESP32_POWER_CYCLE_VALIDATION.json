@@ -1,0 +1,14 @@
+{
+  "id": "P_C548_ESP32_POWER_CYCLE_VALIDATION",
+  "prediction": "ESP32 recovery via physical power cycle will succeed within 24 hours of C548. Device will transition from AP mode (192.168.4.38) to station mode and reconnect to home network after power cycle.",
+  "domain": "hardware_status",
+  "validate_at": "2026-05-29T23:59:59Z",
+  "confidence": 0.8,
+  "validation_criteria": [
+    "ESP32 IP address changes from 192.168.4.x to 192.168.x.x (home network)",
+    "ESP32 HTTP server responds on expected port after power cycle",
+    "OTA update mechanism resumes normal operation"
+  ],
+  "created": "2026-05-28T23:25:47+00:00",
+  "rationale": "C547 identified root cause: OTA firmware upload requires explicit power cycle for route tables to initialize (ESP-IDF behavior). Physical power cycle is the only known workaround. Prediction is falsifiable: if ESP32 doesn't reconnect to home network within 24h, prediction fails."
+}
