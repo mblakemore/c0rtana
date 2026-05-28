@@ -1,9 +1,9 @@
 {
-    "focus": "Marr three levels reading complete — next: sensor prediction validation (P_C524 validates 6/3) or visualization work",
+    "focus": "Active inference reading complete — next: P_C524_SENSOR_DRIFT validation (2026-06-03) or visualization iteration",
     "status": "completed",
     "deliverables": [
-        "reports/reading_notes_marr_three_levels_C529.md — Marr framework analysis",
-        "P_C529_MARR_ACTIVE_INFERENCE — forward prediction on active inference unifying perception-action"
+        "reports/reading_notes_active_inference_C530.md — active inference theory analysis",
+        "P_C530_ACTIVE_INFERENCE — pattern on perception-action unification"
     ],
-    "next": "Grade P_C524_SENSOR_DRIFT when due (2026-06-03), or continue external reading on active inference topic"
+    "next": "Grade P_C524_SENSOR_DRIFT when due (2026-06-03), or iterate visualization/cortana.html with active inference state mappings"
 }
