@@ -1,5 +1,5 @@
 export default class VisualizationEngine {
-    constructor() {
+    constructor(options = {}) {
         this.state = { phase: 'INIT', cycle: 0, internal_tension: 0.5 };
         this.canvas = document.getElementById('vizCanvas');
         if (!this.canvas) throw new Error('vizCanvas not found');
@@ -8,6 +8,11 @@ export default class VisualizationEngine {
         this.particleCount = 300;
         this.cursorX = 0;
         this.cursorY = 0;
+        this.esp32Url = options.esp32Url || 'http://192.168.4.38';
+        this.sensorData = { temperature: 22, humidity: 60, touchActive: false };
+        this.sensorCallbacks = [];
+        this.burstActive = false;
+        this.burstTimer = 0;
         this.phaseColors = {
             'PERCEIVE': { h: 180, s: 80, l: 60 },
             'REFLECT': { h: 220, s: 70, l: 55 },
@@ -25,6 +30,55 @@ export default class VisualizationEngine {
         });
         this.initParticles();
         this.animate();
+        if (options.enableSensors) {
+            this.startSensorPolling(options.sensorPollInterval || 5000);
+        }
+    }
+
+    onSensorUpdate(callback) {
+        this.sensorCallbacks.push(callback);
+    }
+
+    async pollSensor(endpoint, fallback) {
+        try {
+            const resp = await fetch(this.esp32Url + endpoint);
+            if (!resp.ok) return fallback;
+            return await resp.json();
+        } catch {
+            return fallback;
+        }
+    }
+
+    async updateSensors() {
+        const [tempData, humidityData, touchData] = await Promise.allSettled([
+            this.pollSensor('/api/sensor/temp', { value: this.sensorData.temperature }),
+            this.pollSensor('/api/sensor/humidity', { value: this.sensorData.humidity }),
+            this.pollSensor('/api/sensor/touch', { active: false }),
+        ]);
+
+        const prevTouch = this.sensorData.touchActive;
+        this.sensorData.temperature = tempData.value?.value ?? this.sensorData.temperature;
+        this.sensorData.humidity = humidityData.value?.value ?? this.sensorData.humidity;
+        this.sensorData.touchActive = touchData.value?.active ?? false;
+
+        // Trigger burst on touch rise
+        if (this.sensorData.touchActive && !prevTouch) {
+            this.burstActive = true;
+            this.burstTimer = 60;
+            this.particles.forEach(p => {
+                p.vx += (Math.random() - 0.5) * 8;
+                p.vy += (Math.random() - 0.5) * 8;
+            });
+        }
+        if (this.burstTimer > 0) this.burstTimer--;
+        if (this.burstTimer === 0) this.burstActive = false;
+
+        this.sensorCallbacks.forEach(cb => cb(this.sensorData));
+    }
+
+    startSensorPolling(intervalMs) {
+        this.updateSensors();
+        setInterval(() => this.updateSensors(), intervalMs);
     }
 
     resize() {
@@ -65,8 +119,12 @@ export default class VisualizationEngine {
         const phase = this.state.phase;
         const tension = this.state.internal_tension || 0.5;
 
-        // Update particle count based on pattern density
-        const targetCount = 200 + Math.floor(tension * 200);
+        // Temperature maps to velocity scale (18-26°C typical, scale linearly)
+        const tempScale = Math.max(0.5, Math.min(2.0, (this.sensorData.temperature - 18) / 8));
+
+        // Humidity maps to particle density (40-100% typical)
+        const humidityFactor = (this.sensorData.humidity - 40) / 60;
+        const targetCount = 200 + Math.floor(tension * 200) + Math.floor(humidityFactor * 100);
         while (this.particles.length < targetCount) {
             this.particles.push(this.createParticle());
         }
@@ -77,14 +135,15 @@ export default class VisualizationEngine {
         this.particles.forEach((p, i) => {
             const formation = this.getFormationTarget(p, i, phase, tension);
 
-            // Spiral formation behavior
-            p.orbitAngle += p.orbitSpeed * (1 + tension * 2);
+            // Spiral formation behavior — temperature modulates speed
+            p.orbitAngle += p.orbitSpeed * (1 + tension * 2) * tempScale;
             const targetX = formation.x;
             const targetY = formation.y;
 
-            // Lerp toward formation target
-            p.x += (targetX - p.x) * 0.02;
-            p.y += (targetY - p.y) * 0.02;
+            // Lerp toward formation target — humidity makes particles "heavier" (slower to respond)
+            const lerpFactor = 0.02 * (1 - humidityFactor * 0.5);
+            p.x += (targetX - p.x) * lerpFactor;
+            p.y += (targetY - p.y) * lerpFactor;
 
             // Cursor interaction - particles repel from cursor
             const dx = p.x - this.cursorX;
@@ -96,11 +155,12 @@ export default class VisualizationEngine {
                 p.vy += (dy / dist) * force * 2;
             }
 
-            // Damping
-            p.vx *= 0.95;
-            p.vy *= 0.95;
-            p.x += p.vx;
-            p.y += p.vy;
+            // Damping — temperature affects energy retention
+            const damping = 0.92 + (1 - tempScale) * 0.06;
+            p.vx *= damping;
+            p.vy *= damping;
+            p.x += p.vx * tempScale;
+            p.y += p.vy * tempScale;
 
             // Oscillation frequency based on tension
             p.life += 0.01 * (1 + tension * 3);

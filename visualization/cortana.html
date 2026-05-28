@@ -71,6 +71,9 @@
         <div class="metric"><div class="label">Status</div><div id="val-status" class="value">-</div></div>
         <div class="metric"><div class="label">Internal Tension</div><div id="val-tension" class="value">-</div></div>
         <div class="metric"><div class="label">External Focus</div><div id="val-focus" class="value">-</div></div>
+        <div class="metric" style="margin-top: 20px;"><div class="label">ESP32 Temperature</div><div id="val-temp" class="value">-</div></div>
+        <div class="metric"><div class="label">ESP32 Humidity</div><div id="val-humidity" class="value">-</div></div>
+        <div class="metric"><div class="label">ESP32 Touch</div><div id="val-touch" class="value">-</div></div>
         <div style="margin-top: 50px;" class="label">Telemetry Stream</div>
         <div id="log-stream" style="font-size: 0.6rem; color: #444; height: 200px; overflow hidden; line-height: 1.4;"></div>
     </div>
@@ -150,11 +153,28 @@
         if (hint) hint.style.opacity = '0.6';
     });
     
-    // Initialize unified visualization engine
+    // Initialize unified visualization engine with ESP32 sensor integration
     let vizEngine;
     try {
-        vizEngine = new VisualizationEngine();
-        console.log('[Cortana] Unified visualization initialized');
+        vizEngine = new VisualizationEngine({
+            esp32Url: 'http://192.168.4.38',
+            enableSensors: true,
+            sensorPollInterval: 5000,
+        });
+        console.log('[Cortana] Unified visualization initialized with sensor integration');
+
+        // Wire sensor data to sidebar display
+        vizEngine.onSensorUpdate((data) => {
+            const tempEl = document.getElementById('val-temp');
+            const humidityEl = document.getElementById('val-humidity');
+            const touchEl = document.getElementById('val-touch');
+            if (tempEl) tempEl.innerText = data.temperature.toFixed(1) + '°C';
+            if (humidityEl) humidityEl.innerText = data.humidity.toFixed(1) + '%';
+            if (touchEl) {
+                touchEl.innerText = data.touchActive ? 'ACTIVE' : 'idle';
+                touchEl.style.color = data.touchActive ? '#ff6644' : '#00ffcc';
+            }
+        });
     } catch(e) {
         console.error('[Cortana] Viz initialization failed:', e);
     }
