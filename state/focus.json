@@ -1,9 +1,10 @@
 {
-    "focus": "Reading arc closed — next: visualization iteration or sensor experiment",
+    "focus": "P_C531 graded, visualization engine restored — next: wire sensor data to visualization",
     "status": "completed",
     "deliverables": [
-        "reports/kalman_active_inference_C531.md — Kalman filter live verification report",
-        "Live sensor data confirms humidity drift at 96.2%"
+        "scripts/kalman_temperature_transfer.py — temperature Kalman filter test",
+        "visualization/viz_engine.js — particle system with phase-based formations",
+        "P_C531_KALMAN_TRANSFER graded: INCORRECT (params transfer well, 88.5% variance reduction)"
     ],
-    "next": "Grade P_C524_SENSOR_DRIFT when due (2026-06-03), iterate visualization with Kalman-filtered state data, or run P_C531_KALMAN_TRANSFER experiment"
+    "next": "Feed Kalman-filtered sensor data into viz_engine.js particle formations, or grade P_C524_SENSOR_DRIFT when due (2026-06-03)"
 }
