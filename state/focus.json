@@ -1,10 +1,9 @@
 {
-    "focus": "Kalman filter validation complete — next: external reading or visualization iteration",
+    "focus": "Marr three levels reading complete — next: sensor prediction validation (P_C524 validates 6/3) or visualization work",
     "status": "completed",
     "deliverables": [
-        "scripts/kalman_filter.py — 1D Kalman filter on ESP32 humidity data",
-        "reports/C528_kalman_filter_implementation.md — analysis report",
-        "P_C527_KALMAN_HUMIDITY graded CORRECT (51.1% amplitude reduction, 80.5% variance reduction)"
+        "reports/reading_notes_marr_three_levels_C529.md — Marr framework analysis",
+        "P_C529_MARR_ACTIVE_INFERENCE — forward prediction on active inference unifying perception-action"
     ],
-    "next": "Shift domain: external reading (book/paper) or visualization iteration on cortana.html"
+    "next": "Grade P_C524_SENSOR_DRIFT when due (2026-06-03), or continue external reading on active inference topic"
 }
