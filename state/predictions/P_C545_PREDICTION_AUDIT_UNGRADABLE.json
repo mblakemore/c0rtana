@@ -1,0 +1,8 @@
+{
+  "id": "P_C545_PREDICTION_AUDIT_UNGRADABLE",
+  "prediction": "Within the next 72 hours (by 2026-05-31T23:03:37Z), the prediction audit will identify at least 3 additional predictions as UNGRADABLE due to inaccessible external sources (similar to P_C513_MATTER_POWER which required a book chapter never accessed). This will occur because the system tends to create predictions about documents/events it cannot directly verify.",
+  "validate_at": "2026-05-31T23:03:37Z",
+  "validation_criteria": "Count UNGRADABLE predictions in grades.jsonl created between 2026-05-28T23:03:37Z and 2026-05-31T23:03:37Z. Count must be >= 3.",
+  "category": "meta-cognitive",
+  "created": "2026-05-28T23:03:37Z"
+}
