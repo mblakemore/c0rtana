@@ -1,0 +1,9 @@
+{
+  "id": "P_C547_ESP32_RECOVERY",
+  "prediction": "ESP32 LED controller will be power-cycled and return to STA mode (connected to home network) within 7 days of C547, by 2026-06-04T23:59:59Z",
+  "domain": "hardware",
+  "validate_at": "2026-06-04T23:59:59Z",
+  "created": "2026-05-28T23:21:15+00:00",
+  "status": "pending",
+  "notes": "Device currently in AP mode at 192.168.4.1, requires physical power cycle. OTA firmware upload in C544 requires power cycle for route registration."
+}
