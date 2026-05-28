@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C0RTANA — DHT22 Drift Monitor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+      background: #000;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #00d4ff;
+    }
+    .status {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .status-item {
+      padding: 8px 12px;
+      background: #111;
+      border-radius: 4px;
+    }
+    .status-item .label { color: #888; }
+    .status-item .value { color: #00d4ff; font-weight: bold; }
+    .status-item .value.warning { color: #ffaa00; }
+    .status-item .value.critical { color: #ff4444; }
+    .chart-container {
+      position: relative;
+      height: 400px;
+      margin: 20px 0;
+    }
+    .predictions {
+      margin-top: 30px;
+      padding: 15px;
+      background: #111;
+      border-radius: 4px;
+    }
+    .predictions h2 {
+      font-size: 16px;
+      color: #00d4ff;
+      margin-bottom: 10px;
+    }
+    .prediction-item {
+      padding: 10px;
+      margin: 5px 0;
+      background: #0a0a0a;
+      border-left: 3px solid #00d4ff;
+      font-size: 13px;
+    }
+    .prediction-item .id { color: #ffaa00; }
+    .prediction-item .status { float: right; font-size: 12px; }
+    .prediction-item .status.pending { color: #888; }
+    .prediction-item .status.verified { color: #00ff88; }
+    .prediction-item .status.falsified { color: #ff4444; }
+    .btn {
+      background: #00d4ff;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: bold;
+    }
+    .btn:hover { background: #00a8cc; }
+    .refresh-status {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>C0RTANA — DHT22 Drift Monitor</h1>
+    <div class="status">
+      <div class="status-item">
+        <span class="label">ESP32:</span>
+        <span class="value" id="esp32-status">Checking...</span>
+      </div>
+      <div class="status-item">
+        <span class="label">Humidity:</span>
+        <span class="value" id="humidity">--.--%</span>
+      </div>
+      <div class="status-item">
+        <span class="label">Temp:</span>
+        <span class="value" id="temp">--.--°C</span>
+      </div>
+      <div class="status-item">
+        <span class="label">Drift (24h):</span>
+        <span class="value" id="drift">--.--%</span>
+      </div>
+    </div>
+    <button class="btn" onclick="fetchSensorData()">Refresh</button>
+    <div class="refresh-status" id="last-update">Last update: never</div>
+    <div class="chart-container">
+      <canvas id="driftChart"></canvas>
+    </div>
+    <div class="predictions">
+      <h2>Pending Drift Predictions</h2>
+      <div class="prediction-item">
+        <span class="id">P_C524_SENSOR_DRIFT</span>
+        <span class="status pending">Pending</span>
+        <div>The DHT22 will drift from 96.1% toward 99%+ over 7 days due to sensor drift in stable-temperature environments.</div>
+      </div>
+      <div class="prediction-item">
+        <span class="id">P_C539_DRIFT_PROJECTION</span>
+        <span class="status pending">Pending</span>
+        <div>Either stabilize at 96-97% (C524 falsified) OR continue drifting to 99% (C524 confirmed). Validation: 2026-06-03.</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    let driftData = [];
+    let ctx = document.getElementById('driftChart').getContext('2d');
+    let chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Humidity (%)',
+          data: [],
+          borderColor: '#00d4ff',
+          backgroundColor: 'rgba(0, 212, 255, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }, {
+          label: 'Baseline (95.5%)',
+          data: [95.5, 95.5, 95.5, 95.5, 95.5],
+          borderColor: '#888',
+          borderWidth: 1,
+          borderDash: [5, 5],
+          pointRadius: 0,
+          fill: false
+        }, {
+          label: 'C524 Target (99%)',
+          data: [99, 99, 99, 99, 99],
+          borderColor: '#ffaa00',
+          borderWidth: 1,
+          borderDash: [5, 5],
+          pointRadius: 0,
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#e0e0e0' } }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            min: 80,
+            max: 100,
+            ticks: { color: '#888' },
+            grid: { color: '#222' }
+          },
+          x: {
+            ticks: { color: '#888' },
+            grid: { color: '#222' }
+          }
+        }
+      }
+    });
+
+    async function fetchSensorData() {
+      try {
+        const response = await fetch('http://192.168.2.213/api/sensor/dht22');
+        if (!response.ok) throw new Error('ESP32 offline');
+        const data = await response.json();
+        document.getElementById('esp32-status').textContent = 'Online';
+        document.getElementById('esp32-status').className = 'value';
+        document.getElementById('humidity').textContent = data.humidity.toFixed(2) + '%';
+        document.getElementById('temp').textContent = data.temperature.toFixed(2) + '°C';
+
+        const now = new Date();
+        driftData.push({ time: now, value: data.humidity });
+
+        // Keep last 50 readings
+        if (driftData.length > 50) driftData.shift();
+
+        // Update chart
+        chart.data.labels = driftData.map(d => d.time.toLocaleTimeString());
+        chart.data.datasets[0].data = driftData.map(d => d.value);
+        chart.update();
+
+        // Calculate 24h drift (simplified)
+        if (driftData.length > 1) {
+          const first = driftData[0].value;
+          const last = driftData[driftData.length - 1].value;
+          const drift = (last - first).toFixed(2);
+          const driftEl = document.getElementById('drift');
+          driftEl.textContent = drift + '%';
+          driftEl.className = 'value ' + (Math.abs(drift) > 1 ? 'critical' : 'warning');
+        }
+
+        document.getElementById('last-update').textContent = 'Last update: ' + now.toLocaleTimeString();
+      } catch (err) {
+        document.getElementById('esp32-status').textContent = 'Offline';
+        document.getElementById('esp32-status').className = 'value critical';
+        console.error('ESP32 error:', err);
+      }
+    }
+
+    // Auto-refresh every 30 seconds
+    fetchSensorData();
+    setInterval(fetchSensorData, 30000);
+  </script>
+</body>
+</html>
