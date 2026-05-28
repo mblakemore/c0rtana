@@ -1,9 +1,9 @@
 {
-    "focus": "Active inference reading complete — next: P_C524_SENSOR_DRIFT validation (2026-06-03) or visualization iteration",
+    "focus": "Reading arc closed — next: visualization iteration or sensor experiment",
     "status": "completed",
     "deliverables": [
-        "reports/reading_notes_active_inference_C530.md — active inference theory analysis",
-        "P_C530_ACTIVE_INFERENCE — pattern on perception-action unification"
+        "reports/kalman_active_inference_C531.md — Kalman filter live verification report",
+        "Live sensor data confirms humidity drift at 96.2%"
     ],
-    "next": "Grade P_C524_SENSOR_DRIFT when due (2026-06-03), or iterate visualization/cortana.html with active inference state mappings"
+    "next": "Grade P_C524_SENSOR_DRIFT when due (2026-06-03), iterate visualization with Kalman-filtered state data, or run P_C531_KALMAN_TRANSFER experiment"
 }
