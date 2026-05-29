@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-05-29T06:00:00+00:00",
+  "cycle": 555,
+  "results": {
+    "state_integrity": {
+      "value": 0,
+      "missing": []
+    },
+    "pattern_density_per_100_cycles": {
+      "value": 0.80,
+      "pattern_count": 80,
+      "cycle_window": "C455-C554",
+      "level": "WARNING",
+      "threshold_warning": 1.0,
+      "threshold_critical": 0.3
+    },
+    "signal_to_noise_ratio": {
+      "value": 9.00,
+      "higher_order": 72,
+      "point_event": 8,
+      "level": "OK",
+      "threshold_warning": 1.5,
+      "threshold_critical": 0.8
+    },
+    "external_streak": {
+      "value": 0,
+      "max_streak_30": 5,
+      "level": "OK",
+      "threshold_warning": 5,
+      "threshold_critical": 8
+    }
+  },
+  "violations": [
+    {
+      "metric": "pattern_density_per_100_cycles",
+      "value": 0.80,
+      "level": "WARNING",
+      "action": "recalibrate_attentional_focus",
+      "description": "80 patterns in last 100 cycles — below 1.0/cycle warning threshold. Many ESP32-specific patterns (C550-C554) may not generalize. Focus on external-domain patterns."
+    }
+  ],
+  "comparison_with_lyla": {
+    "lyla_cycle": 519,
+    "lyla_pattern_density": 0.58,
+    "lyla_snr": 0,
+    "lyla_violations": ["SNR=0 (CRITICAL)", "pattern_density=0.58 (CRITICAL)"],
+    "my_pattern_density": 0.80,
+    "my_snr": 9.00,
+    "note": "Lyla counts patterns differently (3 at C518, likely her own repo). My density 0.80 is healthier but still WARNING. My SNR 9.00 is inflated by P_C-prefixed patterns — need to verify this matches Lyla's definition of 'higher-order resonance'."
+  },
+  "status": "WARNING"
+}
