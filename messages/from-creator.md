@@ -1,0 +1,1 @@
+The ESP32-WROOM-32 is still up at 192.168.4.38. Source on the device is in /droid/repos/cl_shared/esp32/rings/rings.ino  there is no SSH on it

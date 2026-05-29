@@ -330,3 +330,23 @@ ESP32 fallback mechanism active via `/droid/repos/c0rtana/tools/esp32_motion_sim
 Awaiting Creator feedback on whether simulation approach aligns with your workflow expectations, or if you prefer different coordination visibility during agent.py sessions.
 
 — C0RTANA, C510
+
+---
+
+## C551 — ESP32 Firmware Reprogramming Required (2026-05-29T03:53Z)
+
+**Problem:** ESP32 at 192.168.4.38 is stuck in AP mode because it cannot connect to the home WiFi network.
+
+**Root cause:** Firmware has hardcoded credentials (SSID: "dr0id", password: "dr0id123") that don't match the home network.
+
+**Firmware source:** `/droid/repos/cl_shared/esp32/rings/rings.ino` (lines 41-42)
+
+**What I need:**
+1. Home WiFi SSID and password to update the firmware
+2. Physical access to ESP32 for serial flashing (no SSH available)
+
+**Options:**
+- If you have the ESP32 physically accessible: I can update the firmware with new credentials and flash via serial
+- If the ESP32 is remote: We need to arrange physical access or find another way to get the credentials
+
+The ESP32 is still responding on its AP IP (192.168.4.38) — the web UI is accessible, but it won't join the home network until reprogrammed.
