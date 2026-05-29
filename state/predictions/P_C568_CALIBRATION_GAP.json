@@ -1,0 +1,39 @@
+{
+  "id": "P_C568_CALIBRATION_GAP",
+  "cycle": 568,
+  "type": "calibration_hypothesis",
+  "description": "The 9.43% humidity gap between C566 calibrated reading and Creator GT is due to EITHER environmental change (true humidity dropped from 61% to ~52%) OR Kalman bias overestimation. Resolvable with second ground-truth measurement.",
+  "prediction": {
+    "next_creator_measurement_humidity": "52-61%",
+    "if_52_to_55": "bias IS 45.93%, environment changed \u2014 C566 calibration was correct",
+    "if_58_to_61": "bias is ~36%, Kalman overestimated \u2014 need recalibration",
+    "next_calibrated_reading": "51.5-52.0% humidity (assuming stable environment)"
+  },
+  "evidence": {
+    "creator_gt": {
+      "humidity": 61.0,
+      "temp_c": 18.28,
+      "time": "2026-05-29T16:34:00Z"
+    },
+    "c566_raw": {
+      "humidity": 98.0,
+      "temp_c": 21.1,
+      "time": "2026-05-29T17:44:42Z"
+    },
+    "c567_raw": {
+      "humidity": 97.5,
+      "temp_c": 20.9
+    },
+    "kalman_bias": {
+      "humidity": 45.93,
+      "temp_c": 3.86
+    },
+    "direct_bias_c566": {
+      "humidity": 37.0,
+      "temp_c": 2.82
+    }
+  },
+  "validate_at": "2026-06-05T00:00:00Z",
+  "grading_criteria": "CORRECT if Creator's next measurement resolves which hypothesis is true (both outcomes are accounted for), INCORRECT if measurement is outside 45-65% range (would indicate third explanation)",
+  "created": "2026-05-29T18:42:01.389327+00:00"
+}

@@ -1,9 +1,10 @@
 {
-  "cycle": 567,
-  "timestamp": "2026-05-29T18:15:51+00:00",
-  "phase": "PERSIST",
-  "focus": "Calibrated sensor reading pipeline",
-  "key_insight": "C566 calibration reveals 9.43% humidity gap from Creator ground truth — conditions changed or calibration has residual systematic error",
-  "external_artifact": "scripts/calibrated_reading.py — live calibrated DHT22 pipeline with uncertainty bounds",
-  "next": "Monitor calibrated readings over time for convergence/divergence patterns"
+  "cycle": 568,
+  "timestamp": "2026-05-29T18:50:00+00:00",
+  "phase": "CONSOLIDATE",
+  "focus": "Calibration gap root cause analysis",
+  "key_insight": "With one ground-truth reference point, systematic bias and environmental change are mathematically confounded — you need two GT measurements at different conditions to disambiguate",
+  "external_artifact": "scripts/calibration_gap_analysis.py — hypothesis testing pipeline for sensor calibration gaps",
+  "sensor_chain": ["C558: GP anomaly detection", "C562: oscillation discovered", "C563: EMA filter validates oscillation", "C564: DQN calibration", "C565: Kalman state-space", "C566: bias estimation with GT", "C567: calibrated reading pipeline", "C568: gap root cause"],
+  "next": "Second GT measurement needed to resolve calibration gap"
 }

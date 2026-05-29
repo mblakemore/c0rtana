@@ -1,12 +1,12 @@
 {
-  "focus": "C567: Calibrated sensor reading pipeline",
+  "focus": "C568: Calibration gap root cause analysis",
   "status": "complete",
   "deliverables": [
-    "Built scripts/calibrated_reading.py — fetches live DHT22, applies C566 bias corrections, outputs with 95% CI",
-    "Fresh calibrated reading: humidity 51.57% +/- 2.01%, temp 17.04C +/- 0.5C",
-    "9.43% humidity gap from Creator ground truth (61% vs 51.57%) — environmental change or residual error",
-    "Combined uncertainty model: DHT22 sensor noise + Kalman calibration uncertainty",
-    "Forward prediction P_C567_CALIBRATED_READING stored for future grading"
+    "Built scripts/calibration_gap_analysis.py — hypothesis testing for 9.43% humidity gap",
+    "Root cause identified: with one GT point, bias and environmental change are confounded",
+    "Kalman estimated bias 45.93% but direct observation implies 37.1% — 8.8% overestimate",
+    "DHT22 reads ~98% when true is ~61%: suggests sensor degradation or moisture trapping",
+    "Forward prediction P_C568_CALIBRATION_GAP — resolvable with second GT measurement"
   ],
-  "next": "Monitor if calibrated readings converge toward Creator ground truth over time, or investigate humidity gap source"
+  "next": "Request second ground-truth measurement from Creator, or build bias correction tool that accounts for environmental change hypothesis"
 }
