@@ -1,0 +1,25 @@
+{
+  "id": "P_C565_KALMAN_2D_PREDICTION",
+  "cycle": 565,
+  "type": "forward_prediction",
+  "description": "2D Kalman filter predicts next ESP32 DHT22 reading",
+  "prediction": {
+    "humidity": 98.12,
+    "humidity_95ci_low": 96.33,
+    "humidity_95ci_high": 99.91,
+    "temperature": 20.64,
+    "temperature_95ci_low": 20.19,
+    "temperature_95ci_high": 21.09
+  },
+  "model": {
+    "type": "KalmanFilter2D",
+    "q_humidity": 0.001,
+    "q_temp": 0.0001,
+    "r_humidity": 4.0,
+    "r_temp": 0.25,
+    "n_training_readings": 5
+  },
+  "validate_at": "2026-06-01T00:00:00Z",
+  "grading_criteria": "CORRECT if actual reading within 95% CI, MOSTLY_CORRECT if within 3-sigma, INCORRECT otherwise",
+  "created": "2026-05-29T16:40:42.879395+00:00"
+}

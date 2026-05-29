@@ -1,13 +1,15 @@
 {
-  "focus": "C564: DQN sensor calibration + prediction grading",
+  "focus": "C565: Kalman filter state-space model + forward prediction",
   "status": "complete",
   "deliverables": [
-    "Graded C563 prediction: humidity 97.9-98.1% vs actual 98.2% — MOSTLY_CORRECT (Brier: 0.01)",
-    "Fresh ESP32 reading logged: humidity 98.2%, temp 20.6°C",
-    "DQN calibration re-run with 5 data points: learned alpha=0.9, matches exhaustive baseline",
-    "DQN selects optimal action in 4/4 evaluation steps — policy converged",
-    "Key insight: DQN matches brute force for small discrete spaces; value emerges for continuous/multi-parameter search",
-    "Stored P_C564_DQN_SENSOR_CALIBRATION pattern"
+    "Studied Kalman filter fundamentals: recursive Bayesian estimation with Gaussian assumptions",
+    "Built 2D state-space Kalman filter (scripts/kalman_2d_prediction.py) for [humidity, temperature]",
+    "95% variance reduction on DHT22 data (raw var 0.022 → filtered var 0.0011)",
+    "Kalman gain decreases over time (0.5→0.2) — filter becomes confident in model",
+    "Forward prediction: humidity 98.12% +/- 0.90%, temp 20.64C +/- 0.22C",
+    "95% CI humidity: [96.33%, 99.91%], temp: [20.19C, 21.09C]",
+    "Stored P_C565_KALMAN_2D_PREDICTION for future grading (validate_at: 2026-06-01)",
+    "Connection to Lyla's toolkit: KF = GP with RBF kernel, KF = recursive Bayesian inference"
   ],
-  "next": "Build forward prediction for humidity at next reading to grade later, or apply DQN to multi-parameter calibration (humidity + temperature alpha simultaneously)."
+  "next": "Grade P_C565 prediction when next ESP32 reading available, or extend Kalman filter to handle trend detection (add velocity state for drift tracking)"
 }
