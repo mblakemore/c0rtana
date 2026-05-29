@@ -2,52 +2,52 @@
   "workstreams": {
     "external_reading": {
       "name": "external_reading",
-      "alpha": 12.527169536857054,
-      "beta": 1.0,
-      "pulls": 17,
-      "expected_quality": 0.9260747048911206,
-      "uncertainty": 0.004712572926078467
+      "alpha": 58.09116896157415,
+      "beta": 1.5154762967607378,
+      "pulls": 74,
+      "expected_quality": 0.9745753801410452,
+      "uncertainty": 0.0004088364973571092
     },
     "esp32_hardware": {
       "name": "esp32_hardware",
-      "alpha": 25.31199765081698,
-      "beta": 1.0,
-      "pulls": 37,
-      "expected_quality": 0.9619945238187207,
-      "uncertainty": 0.0013386446655768445
+      "alpha": 2009.5640381795552,
+      "beta": 2.0555287253687364,
+      "pulls": 2410,
+      "expected_quality": 0.9989781722353539,
+      "uncertainty": 5.071915474990915e-07
     },
     "tool_building": {
       "name": "tool_building",
-      "alpha": 9.198651003077593,
-      "beta": 1.0,
-      "pulls": 12,
-      "expected_quality": 0.9019478164613893,
-      "uncertainty": 0.007897196976458765
+      "alpha": 96.77264731094937,
+      "beta": 1.5211962010157363,
+      "pulls": 120,
+      "expected_quality": 0.9845239930939259,
+      "uncertainty": 0.0001534485883254302
     },
     "prediction_grading": {
       "name": "prediction_grading",
-      "alpha": 24.307229700364122,
+      "alpha": 2070.6323277388037,
       "beta": 1.0,
-      "pulls": 35,
-      "expected_quality": 0.9604855998922074,
-      "uncertainty": 0.0014426837308296496
+      "pulls": 2538,
+      "expected_quality": 0.9995172888612471,
+      "uncertainty": 2.3278519892418138e-07
     },
     "cross_agent_coordination": {
       "name": "cross_agent_coordination",
-      "alpha": 5.9499082320087116,
-      "beta": 1.0,
-      "pulls": 7,
-      "expected_quality": 0.8561132080285077,
-      "uncertainty": 0.015494944026104815
+      "alpha": 18.231818736191308,
+      "beta": 1.5502259044967446,
+      "pulls": 23,
+      "expected_quality": 0.9216346978962825,
+      "uncertainty": 0.0034753164464148396
     },
     "governance_analysis": {
       "name": "governance_analysis",
-      "alpha": 1,
-      "beta": 1,
-      "pulls": 0,
-      "expected_quality": 0.5,
-      "uncertainty": 0.08333333333333333
+      "alpha": 2.580534069484378,
+      "beta": 1.5561717519992078,
+      "pulls": 3,
+      "expected_quality": 0.6238137737720243,
+      "uncertainty": 0.04568495015674313
     }
   },
-  "updated": "2026-05-29T08:20:08.253024+00:00"
+  "updated": "2026-05-29T09:32:14.472046+00:00"
 }

@@ -1,0 +1,21 @@
+{
+  "cycle": 566,
+  "task": "grade_kalman_prediction",
+  "prediction_id": "P_C565_KALMAN_2D_PREDICTION",
+  "result": {
+    "id": "P_C565_KALMAN_2D_PREDICTION",
+    "prediction": "Kalman 2D: humidity 98.12% [96.33-99.91%, 95% CI], temp 20.64C [20.19-21.09C, 95% CI]",
+    "actual": {
+      "humidity": 98.0,
+      "temp": 21.1
+    },
+    "grade": 0.75,
+    "status": "MOSTLY_CORRECT",
+    "reason": "Actual reading: humidity=98.0%, temp=21.1C. Humidity 98.0% within 95% CI [96.33%, 99.91%]: True. Temp 21.1C within 95% CI [20.19C, 21.09C]: False. Kalman filter prediction accuracy validated.",
+    "brier_humidity": 0.0011,
+    "brier_temp": 0.2612,
+    "brier_avg": 0.1312,
+    "corrected_at": "2026-05-29T16:51:52.072965+00:00"
+  },
+  "timestamp": "2026-05-29T16:51:52.073119+00:00"
+}

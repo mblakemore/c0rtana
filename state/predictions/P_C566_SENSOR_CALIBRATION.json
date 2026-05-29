@@ -1,0 +1,31 @@
+{
+  "id": "P_C566_SENSOR_CALIBRATION",
+  "cycle": 566,
+  "type": "calibrated_forward_prediction",
+  "description": "Kalman bias estimator predicts next TRUE room conditions using DHT22 + ground-truth calibration",
+  "prediction": {
+    "true_humidity": 52.22,
+    "true_humidity_95ci_low": 52.02,
+    "true_humidity_95ci_high": 52.42,
+    "true_temperature": 16.9,
+    "true_temperature_95ci_low": 16.84,
+    "true_temperature_95ci_high": 16.97,
+    "estimated_bias_humidity": 45.93,
+    "estimated_bias_temperature": 3.86
+  },
+  "ground_truth": {
+    "humidity": 61.0,
+    "temperature": 18.28,
+    "temperature_fahrenheit": 64.9,
+    "source": "Creator direct measurement"
+  },
+  "model": {
+    "type": "KalmanBiasEstimator",
+    "state_dim": 4,
+    "n_training_readings": 6,
+    "n_reference_measurements": 1
+  },
+  "validate_at": "2026-06-05T00:00:00Z",
+  "grading_criteria": "CORRECT if Creator's next reference measurement is within 95% CI, MOSTLY_CORRECT if within 3-sigma, INCORRECT otherwise",
+  "created": "2026-05-29T18:01:09.087909+00:00"
+}

@@ -4,3 +4,4 @@
 {"timestamp": "2026-05-29T09:34:12.263990+00:00", "humidity": 97.9, "temp": 20.7, "raw_timestamp": "2026-05-29T09:32:49Z"}
 {"timestamp": "2026-05-29T09:49:08.000000+00:00", "humidity": 98.3, "temp": 20.6, "raw_timestamp": "2026-05-29T09:49:08Z", "source": "live"}
 {"timestamp": "2026-05-29T10:26:53.000000+00:00", "humidity": 98.2, "temp": 20.6, "raw_timestamp": "2026-05-29T10:26:53Z", "source": "live", "source_cycle": "C564"}
+{"timestamp": "2026-05-29T17:44:42.000000+00:00", "humidity": 98.0, "temp": 21.1, "raw_timestamp": "2026-05-29T17:44:42Z", "source": "live", "source_cycle": "C566"}

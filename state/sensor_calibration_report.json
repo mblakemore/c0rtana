@@ -1,0 +1,107 @@
+{
+  "cycle": 566,
+  "tool": "sensor_calibration.py",
+  "description": "Sensor calibration with Kalman bias estimation",
+  "calibration_analysis": {
+    "n_readings": 6,
+    "ground_truth": {
+      "humidity": 61.0,
+      "temp_celsius": 18.28,
+      "temp_fahrenheit": 64.9
+    },
+    "estimated_bias": {
+      "humidity": 45.93,
+      "temp": 3.86
+    },
+    "lyla_c497_bias": {
+      "humidity": 43.6,
+      "temp": 2.7
+    },
+    "bias_drift": {
+      "humidity": -2.3,
+      "temp": -1.16
+    },
+    "corrected_readings": [
+      {
+        "step": 1,
+        "corrected_humidity": 73.575,
+        "corrected_temp": 20.0,
+        "bias_humidity": 24.525,
+        "bias_temp": 0.7
+      },
+      {
+        "step": 2,
+        "corrected_humidity": 73.575,
+        "corrected_temp": 19.9802,
+        "bias_humidity": 24.525,
+        "bias_temp": 0.6802
+      },
+      {
+        "step": 3,
+        "corrected_humidity": 73.5355,
+        "corrected_temp": 19.988,
+        "bias_humidity": 24.4855,
+        "bias_temp": 0.688
+      },
+      {
+        "step": 4,
+        "corrected_humidity": 73.5901,
+        "corrected_temp": 19.9733,
+        "bias_humidity": 24.5401,
+        "bias_temp": 0.6733
+      },
+      {
+        "step": 5,
+        "corrected_humidity": 73.6036,
+        "corrected_temp": 19.9645,
+        "bias_humidity": 24.5536,
+        "bias_temp": 0.6645
+      },
+      {
+        "step": 6,
+        "corrected_humidity": 52.217,
+        "corrected_temp": 16.9029,
+        "bias_humidity": 45.9292,
+        "bias_temp": 3.8559
+      }
+    ],
+    "final_uncertainty": {
+      "true_humidity": 0.1,
+      "true_temp": 0.0316,
+      "bias_humidity": 0.2236,
+      "bias_temp": 0.0707
+    }
+  },
+  "forward_prediction": {
+    "id": "P_C566_SENSOR_CALIBRATION",
+    "cycle": 566,
+    "type": "calibrated_forward_prediction",
+    "description": "Kalman bias estimator predicts next TRUE room conditions using DHT22 + ground-truth calibration",
+    "prediction": {
+      "true_humidity": 52.22,
+      "true_humidity_95ci_low": 52.02,
+      "true_humidity_95ci_high": 52.42,
+      "true_temperature": 16.9,
+      "true_temperature_95ci_low": 16.84,
+      "true_temperature_95ci_high": 16.97,
+      "estimated_bias_humidity": 45.93,
+      "estimated_bias_temperature": 3.86
+    },
+    "ground_truth": {
+      "humidity": 61.0,
+      "temperature": 18.28,
+      "temperature_fahrenheit": 64.9,
+      "source": "Creator direct measurement"
+    },
+    "model": {
+      "type": "KalmanBiasEstimator",
+      "state_dim": 4,
+      "n_training_readings": 6,
+      "n_reference_measurements": 1
+    },
+    "validate_at": "2026-06-05T00:00:00Z",
+    "grading_criteria": "CORRECT if Creator's next reference measurement is within 95% CI, MOSTLY_CORRECT if within 3-sigma, INCORRECT otherwise",
+    "created": "2026-05-29T18:01:09.087909+00:00"
+  },
+  "created": "2026-05-29T18:01:09.088051+00:00"
+}
