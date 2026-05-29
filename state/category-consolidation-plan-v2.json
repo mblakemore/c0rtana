@@ -1,0 +1,726 @@
+{
+  "summary": {
+    "total_patterns": 329,
+    "categories_before": 159,
+    "categories_after": 85,
+    "categories_removed": 74,
+    "merges_proposed": 26,
+    "avg_patterns_per_category_before": 2.07,
+    "avg_patterns_per_category_after": 3.87,
+    "entropy_before": 6.534,
+    "entropy_after": 5.213,
+    "evenness_before": 0.894,
+    "evenness_after": 0.813,
+    "retrieval_improvement": 1.87
+  },
+  "merges": [
+    {
+      "canonical": "embodied",
+      "merge": [
+        "embodied-cognition-mapping",
+        "embodied_cognition",
+        "embodied_cognition_coordination",
+        "embodied_cognition_theory"
+      ],
+      "total_patterns": 26,
+      "details": [
+        {
+          "category": "embodied_cognition",
+          "patterns": 12
+        },
+        {
+          "category": "embodied_cognition_coordination",
+          "patterns": 12
+        },
+        {
+          "category": "embodied-cognition-mapping",
+          "patterns": 1
+        },
+        {
+          "category": "embodied_cognition_theory",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "infrastructure",
+      "merge": [
+        "infrastructure",
+        "infrastructure_audit",
+        "infrastructure_validation"
+      ],
+      "total_patterns": 15,
+      "details": [
+        {
+          "category": "infrastructure",
+          "patterns": 11
+        },
+        {
+          "category": "infrastructure_audit",
+          "patterns": 3
+        },
+        {
+          "category": "infrastructure_validation",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "meta",
+      "merge": [
+        "meta-cognitive",
+        "meta-discovery",
+        "meta-metric",
+        "meta-regulation",
+        "meta-regulation-tooling",
+        "meta-regulation-validation",
+        "meta_cognition",
+        "meta_coordination",
+        "meta_system"
+      ],
+      "total_patterns": 20,
+      "details": [
+        {
+          "category": "meta-regulation",
+          "patterns": 9
+        },
+        {
+          "category": "meta-cognitive",
+          "patterns": 2
+        },
+        {
+          "category": "meta-regulation-tooling",
+          "patterns": 2
+        },
+        {
+          "category": "meta-regulation-validation",
+          "patterns": 2
+        },
+        {
+          "category": "meta-discovery",
+          "patterns": 1
+        },
+        {
+          "category": "meta-metric",
+          "patterns": 1
+        },
+        {
+          "category": "meta_cognition",
+          "patterns": 1
+        },
+        {
+          "category": "meta_coordination",
+          "patterns": 1
+        },
+        {
+          "category": "meta_system",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "coordination",
+      "merge": [
+        "coordination",
+        "coordination-architecture",
+        "coordination-theory",
+        "coordination_architecture",
+        "coordination_design",
+        "coordination_friction",
+        "coordination_infrastructure",
+        "coordination_infrastructure_validation",
+        "coordination_protocol",
+        "coordination_status",
+        "coordination_theory"
+      ],
+      "total_patterns": 32,
+      "details": [
+        {
+          "category": "coordination_protocol",
+          "patterns": 9
+        },
+        {
+          "category": "coordination_architecture",
+          "patterns": 6
+        },
+        {
+          "category": "coordination",
+          "patterns": 4
+        },
+        {
+          "category": "coordination_infrastructure_validation",
+          "patterns": 3
+        },
+        {
+          "category": "coordination-theory",
+          "patterns": 2
+        },
+        {
+          "category": "coordination_status",
+          "patterns": 2
+        },
+        {
+          "category": "coordination_theory",
+          "patterns": 2
+        },
+        {
+          "category": "coordination-architecture",
+          "patterns": 1
+        },
+        {
+          "category": "coordination_design",
+          "patterns": 1
+        },
+        {
+          "category": "coordination_friction",
+          "patterns": 1
+        },
+        {
+          "category": "coordination_infrastructure",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "operational",
+      "merge": [
+        "operational_automation",
+        "operational_efficiency",
+        "operational_governance",
+        "operational_lesson",
+        "operational_mechanism",
+        "operational_principle",
+        "operational_protocol"
+      ],
+      "total_patterns": 13,
+      "details": [
+        {
+          "category": "operational_protocol",
+          "patterns": 6
+        },
+        {
+          "category": "operational_mechanism",
+          "patterns": 2
+        },
+        {
+          "category": "operational_automation",
+          "patterns": 1
+        },
+        {
+          "category": "operational_efficiency",
+          "patterns": 1
+        },
+        {
+          "category": "operational_governance",
+          "patterns": 1
+        },
+        {
+          "category": "operational_lesson",
+          "patterns": 1
+        },
+        {
+          "category": "operational_principle",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "architecture",
+      "merge": [
+        "architecture",
+        "architecture-integrity"
+      ],
+      "total_patterns": 7,
+      "details": [
+        {
+          "category": "architecture",
+          "patterns": 6
+        },
+        {
+          "category": "architecture-integrity",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "hardware",
+      "merge": [
+        "hardware",
+        "hardware-coordination",
+        "hardware-diagnosis",
+        "hardware-endpoints",
+        "hardware-infrastructure",
+        "hardware-sync",
+        "hardware_architecture",
+        "hardware_integration",
+        "hardware_interface",
+        "hardware_status",
+        "hardware_troubleshooting"
+      ],
+      "total_patterns": 25,
+      "details": [
+        {
+          "category": "hardware",
+          "patterns": 6
+        },
+        {
+          "category": "hardware_integration",
+          "patterns": 6
+        },
+        {
+          "category": "hardware_architecture",
+          "patterns": 3
+        },
+        {
+          "category": "hardware-infrastructure",
+          "patterns": 2
+        },
+        {
+          "category": "hardware_troubleshooting",
+          "patterns": 2
+        },
+        {
+          "category": "hardware-coordination",
+          "patterns": 1
+        },
+        {
+          "category": "hardware-diagnosis",
+          "patterns": 1
+        },
+        {
+          "category": "hardware-endpoints",
+          "patterns": 1
+        },
+        {
+          "category": "hardware-sync",
+          "patterns": 1
+        },
+        {
+          "category": "hardware_interface",
+          "patterns": 1
+        },
+        {
+          "category": "hardware_status",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "operator",
+      "merge": [
+        "operator-experience",
+        "operator_coordination",
+        "operator_engagement",
+        "operator_experience"
+      ],
+      "total_patterns": 8,
+      "details": [
+        {
+          "category": "operator_engagement",
+          "patterns": 5
+        },
+        {
+          "category": "operator-experience",
+          "patterns": 1
+        },
+        {
+          "category": "operator_coordination",
+          "patterns": 1
+        },
+        {
+          "category": "operator_experience",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "prediction",
+      "merge": [
+        "prediction",
+        "prediction-governance",
+        "prediction-methodology",
+        "prediction-system",
+        "prediction-validation",
+        "prediction-validation-methodology",
+        "prediction_discipline",
+        "prediction_methodology",
+        "prediction_system"
+      ],
+      "total_patterns": 15,
+      "details": [
+        {
+          "category": "prediction_discipline",
+          "patterns": 4
+        },
+        {
+          "category": "prediction-system",
+          "patterns": 3
+        },
+        {
+          "category": "prediction-validation",
+          "patterns": 2
+        },
+        {
+          "category": "prediction",
+          "patterns": 1
+        },
+        {
+          "category": "prediction-governance",
+          "patterns": 1
+        },
+        {
+          "category": "prediction-methodology",
+          "patterns": 1
+        },
+        {
+          "category": "prediction-validation-methodology",
+          "patterns": 1
+        },
+        {
+          "category": "prediction_methodology",
+          "patterns": 1
+        },
+        {
+          "category": "prediction_system",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "sensor",
+      "merge": [
+        "sensor_calibration",
+        "sensor_fusion",
+        "sensor_integration"
+      ],
+      "total_patterns": 7,
+      "details": [
+        {
+          "category": "sensor_calibration",
+          "patterns": 4
+        },
+        {
+          "category": "sensor_fusion",
+          "patterns": 2
+        },
+        {
+          "category": "sensor_integration",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "multi",
+      "merge": [
+        "multi-agent_architecture",
+        "multi-agent_coordination",
+        "multi_agent_coordination"
+      ],
+      "total_patterns": 6,
+      "details": [
+        {
+          "category": "multi-agent_coordination",
+          "patterns": 3
+        },
+        {
+          "category": "multi_agent_coordination",
+          "patterns": 2
+        },
+        {
+          "category": "multi-agent_architecture",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "external",
+      "merge": [
+        "external-knowledge",
+        "external_agency",
+        "external_reality_anchor",
+        "external_reality_anchor_compliance"
+      ],
+      "total_patterns": 6,
+      "details": [
+        {
+          "category": "external_reality_anchor",
+          "patterns": 2
+        },
+        {
+          "category": "external_reality_anchor_compliance",
+          "patterns": 2
+        },
+        {
+          "category": "external-knowledge",
+          "patterns": 1
+        },
+        {
+          "category": "external_agency",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "design",
+      "merge": [
+        "design_principle",
+        "design_specification"
+      ],
+      "total_patterns": 3,
+      "details": [
+        {
+          "category": "design_specification",
+          "patterns": 2
+        },
+        {
+          "category": "design_principle",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "real",
+      "merge": [
+        "real-world-persistence",
+        "real_world_persistence"
+      ],
+      "total_patterns": 3,
+      "details": [
+        {
+          "category": "real-world-persistence",
+          "patterns": 2
+        },
+        {
+          "category": "real_world_persistence",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "physical",
+      "merge": [
+        "physical_agency",
+        "physical_interface"
+      ],
+      "total_patterns": 3,
+      "details": [
+        {
+          "category": "physical_agency",
+          "patterns": 2
+        },
+        {
+          "category": "physical_interface",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "quantum",
+      "merge": [
+        "quantum_algorithms",
+        "quantum_computing"
+      ],
+      "total_patterns": 3,
+      "details": [
+        {
+          "category": "quantum_algorithms",
+          "patterns": 2
+        },
+        {
+          "category": "quantum_computing",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "theory",
+      "merge": [
+        "theory-of-mind",
+        "theory_synthesis"
+      ],
+      "total_patterns": 2,
+      "details": [
+        {
+          "category": "theory-of-mind",
+          "patterns": 1
+        },
+        {
+          "category": "theory_synthesis",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "system",
+      "merge": [
+        "system",
+        "system_architecture"
+      ],
+      "total_patterns": 2,
+      "details": [
+        {
+          "category": "system",
+          "patterns": 1
+        },
+        {
+          "category": "system_architecture",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "collaboration",
+      "merge": [
+        "collaboration",
+        "collaboration-infrastructure"
+      ],
+      "total_patterns": 2,
+      "details": [
+        {
+          "category": "collaboration",
+          "patterns": 1
+        },
+        {
+          "category": "collaboration-infrastructure",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "engineering",
+      "merge": [
+        "engineering",
+        "engineering_principle"
+      ],
+      "total_patterns": 2,
+      "details": [
+        {
+          "category": "engineering",
+          "patterns": 1
+        },
+        {
+          "category": "engineering_principle",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "cycle",
+      "merge": [
+        "cycle_management",
+        "cycle_transition"
+      ],
+      "total_patterns": 2,
+      "details": [
+        {
+          "category": "cycle_management",
+          "patterns": 1
+        },
+        {
+          "category": "cycle_transition",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "state",
+      "merge": [
+        "state_integrity_bug",
+        "state_management",
+        "state_visualization"
+      ],
+      "total_patterns": 3,
+      "details": [
+        {
+          "category": "state_integrity_bug",
+          "patterns": 1
+        },
+        {
+          "category": "state_management",
+          "patterns": 1
+        },
+        {
+          "category": "state_visualization",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "empirical",
+      "merge": [
+        "empirical-telemetry",
+        "empirical_research_methodology"
+      ],
+      "total_patterns": 2,
+      "details": [
+        {
+          "category": "empirical-telemetry",
+          "patterns": 1
+        },
+        {
+          "category": "empirical_research_methodology",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "cognitive",
+      "merge": [
+        "cognitive_drift",
+        "cognitive_visualization"
+      ],
+      "total_patterns": 2,
+      "details": [
+        {
+          "category": "cognitive_drift",
+          "patterns": 1
+        },
+        {
+          "category": "cognitive_visualization",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "engagement",
+      "merge": [
+        "engagement",
+        "engagement_design",
+        "engagement_model"
+      ],
+      "total_patterns": 3,
+      "details": [
+        {
+          "category": "engagement",
+          "patterns": 1
+        },
+        {
+          "category": "engagement_design",
+          "patterns": 1
+        },
+        {
+          "category": "engagement_model",
+          "patterns": 1
+        }
+      ]
+    },
+    {
+      "canonical": "deployment",
+      "merge": [
+        "deployment",
+        "deployment_pattern"
+      ],
+      "total_patterns": 2,
+      "details": [
+        {
+          "category": "deployment",
+          "patterns": 1
+        },
+        {
+          "category": "deployment_pattern",
+          "patterns": 1
+        }
+      ]
+    }
+  ]
+}
