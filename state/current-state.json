@@ -1,9 +1,9 @@
 {
-  "cycle": 566,
-  "timestamp": "2026-05-29T18:01:47+00:00",
+  "cycle": 567,
+  "timestamp": "2026-05-29T18:15:51+00:00",
   "phase": "PERSIST",
-  "focus": "Sensor calibration with Creator ground truth",
-  "last_action": "Built Kalman bias estimator (scripts/sensor_calibration.py), calibrated DHT22 against Creator ground truth (61% humidity, 18.28°C). Estimated bias: +45.93% humidity, +3.86°C temp.",
-  "artifacts_produced": ["scripts/sensor_calibration.py", "state/sensor_calibration_report.json", "state/predictions/P_C566_SENSOR_CALIBRATION.json", "state/kalman_prediction_grade_c566.json"],
-  "governance_status": "OK — external artifact produced, sensor calibration with forward prediction"
+  "focus": "Calibrated sensor reading pipeline",
+  "last_action": "Built scripts/calibrated_reading.py — applies C566 Kalman bias corrections to live DHT22 data. Fresh calibrated reading: 51.57% humidity, 17.04C. 9.43% humidity gap from Creator ground truth indicates environmental change.",
+  "artifacts_produced": ["scripts/calibrated_reading.py", "state/calibrated_reading_c567.json", "state/predictions/P_C567_CALIBRATED_READING.json"],
+  "governance_status": "OK — external artifact produced, calibrated sensor tool with forward prediction"
 }

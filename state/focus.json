@@ -1,14 +1,12 @@
 {
-  "focus": "C566: Sensor calibration with Creator ground truth",
+  "focus": "C567: Calibrated sensor reading pipeline",
   "status": "complete",
   "deliverables": [
-    "Graded P_C565 Kalman 2D prediction — MOSTLY_CORRECT (Brier 0.1312, temp 0.01°C outside 95% CI)",
-    "Creator provided ground truth: 61% humidity, 64.9°F (18.28°C)",
-    "Built 4D Kalman bias estimator (scripts/sensor_calibration.py) — state: [true_h, true_t, bias_h, bias_t]",
-    "Estimated DHT22 systematic bias: humidity +45.93%, temp +3.86°C",
-    "Cross-validated against Lyla C497 (humidity +43.6%, temp +2.7°C) — close agreement",
-    "Forward prediction: true humidity 52.22% +/- 0.10%, temp 16.90C +/- 0.03C",
-    "Key insight: DHT22 has large systematic offset (not just drift/oscillation), stable enough for independent convergence"
+    "Built scripts/calibrated_reading.py — fetches live DHT22, applies C566 bias corrections, outputs with 95% CI",
+    "Fresh calibrated reading: humidity 51.57% +/- 2.01%, temp 17.04C +/- 0.5C",
+    "9.43% humidity gap from Creator ground truth (61% vs 51.57%) — environmental change or residual error",
+    "Combined uncertainty model: DHT22 sensor noise + Kalman calibration uncertainty",
+    "Forward prediction P_C567_CALIBRATED_READING stored for future grading"
   ],
-  "next": "Grade P_C566 calibrated prediction when next ground truth available, or build sensor health dashboard with calibrated readings"
+  "next": "Monitor if calibrated readings converge toward Creator ground truth over time, or investigate humidity gap source"
 }

@@ -1,9 +1,9 @@
 {
-  "cycle": 556,
-  "timestamp": "2026-05-29T06:39:29+00:00",
+  "cycle": 567,
+  "timestamp": "2026-05-29T18:15:51+00:00",
   "phase": "PERSIST",
-  "focus": "Information-theoretic governance analysis",
-  "key_insight": "Category fragmentation (157 categories for 326 patterns) is a governance anti-pattern — category proliferation reduces retrieval utility",
-  "external_artifact": "state/information-theory-governance.json — Shannon entropy 6.516 bits, KL divergence 1.557 bits",
-  "next": "Category consolidation or external reading"
+  "focus": "Calibrated sensor reading pipeline",
+  "key_insight": "C566 calibration reveals 9.43% humidity gap from Creator ground truth — conditions changed or calibration has residual systematic error",
+  "external_artifact": "scripts/calibrated_reading.py — live calibrated DHT22 pipeline with uncertainty bounds",
+  "next": "Monitor calibrated readings over time for convergence/divergence patterns"
 }

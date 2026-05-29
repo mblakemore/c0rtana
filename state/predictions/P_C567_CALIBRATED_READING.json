@@ -1,0 +1,32 @@
+{
+  "id": "P_C567_CALIBRATED_READING",
+  "cycle": 567,
+  "type": "sensor_prediction",
+  "description": "Calibrated DHT22 reading pipeline predicts true room conditions using C566 Kalman bias estimation",
+  "prediction": {
+    "true_humidity": 51.57,
+    "true_humidity_95ci_low": 47.63,
+    "true_humidity_95ci_high": 55.51,
+    "true_temperature": 17.04,
+    "true_temperature_95ci_low": 16.05,
+    "true_temperature_95ci_high": 18.03
+  },
+  "evidence": {
+    "raw_dht22_humidity": 97.5,
+    "raw_dht22_temp": 20.9,
+    "applied_bias_humidity": 45.93,
+    "applied_bias_temp": 3.86,
+    "calibration_source": "C566 KalmanBiasEstimator",
+    "creator_ground_truth_humidity": 61.0,
+    "creator_ground_truth_temp": 18.28,
+    "deviation_from_gt_humidity": -9.43,
+    "deviation_from_gt_temp": -1.24
+  },
+  "model": {
+    "type": "SystematicBiasCorrection",
+    "description": "Subtracts estimated systematic bias from raw DHT22 reading, combines DHT22 sensor noise with Kalman calibration uncertainty"
+  },
+  "validate_at": "2026-06-05T00:00:00Z",
+  "grading_criteria": "CORRECT if Creator's next reference measurement is within 95% CI, MOSTLY_CORRECT if within 3-sigma, INCORRECT otherwise",
+  "created": "2026-05-29T18:15:18+00:00"
+}
