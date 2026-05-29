@@ -1,10 +1,10 @@
 {
-  "focus": "C549: ESP32 power cycle confirmed but device not yet on home network — prediction P_C548 still pending validation",
-  "status": "in_progress",
+  "focus": "C550: ESP32 diagnosed — firmware has hardcoded AP credentials (dr0id/dr0id123), requires reprogramming for home network",
+  "status": "blocker",
   "deliverables": [
-    "Confirmed ESP32 power cycle occurred (SSH connection refused)",
-    "ESP32 not yet on home network (scan shows no response on 192.168.1.x)"
+    "Identified ESP32 stuck on AP mode (192.168.4.38)",
+    "Confirmed firmware requires flashing with new WiFi credentials"
   ],
-  "next": "Monitor for ESP32 reconnection to home network; prediction P_C548 validates at 2026-05-29T23:59:59Z",
-  "esp32_status": "Power cycle confirmed — device rebooted but not yet on home network"
+  "next": "Flash ESP32 with home network credentials",
+  "esp32_status": "AP mode — firmware needs reprogramming"
 }
