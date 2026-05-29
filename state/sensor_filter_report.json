@@ -1,0 +1,90 @@
+{
+  "tool": "sensor_filter.py",
+  "description": "EMA low-pass filter for DHT22 oscillation analysis",
+  "alpha": 0.3,
+  "n_readings": 4,
+  "time_span": "4 readings (2026-05-29T08:42:01Z to 2026-05-29T09:49:08Z)",
+  "humidity": {
+    "raw": [
+      98.1,
+      98.1,
+      97.9,
+      98.3
+    ],
+    "ema_smoothed": [
+      98.1,
+      98.1,
+      98.04,
+      98.118
+    ],
+    "oscillation_component": [
+      0.0,
+      0.0,
+      -0.14,
+      0.182
+    ],
+    "oscillation_amplitude": 0.322,
+    "monotonicity_raw": "non-monotonic (1 direction changes)",
+    "monotonicity_ema": "non-monotonic (1 direction changes)",
+    "trend_ema": 0.018,
+    "range": 0.4
+  },
+  "temperature": {
+    "raw": [
+      20.7,
+      20.6,
+      20.7,
+      20.6
+    ],
+    "ema_smoothed": [
+      20.7,
+      20.67,
+      20.679,
+      20.6553
+    ],
+    "oscillation_component": [
+      0.0,
+      -0.07,
+      0.021,
+      -0.0553
+    ],
+    "monotonicity_raw": "non-monotonic (2 direction changes)",
+    "monotonicity_ema": "non-monotonic (2 direction changes)",
+    "trend_ema": -0.0447,
+    "range": 0.1
+  },
+  "per_reading_detail": [
+    {
+      "timestamp": "2026-05-29T08:42:01Z",
+      "humidity_raw": 98.1,
+      "humidity_ema": 98.1,
+      "humidity_osc": 0.0,
+      "temp_raw": 20.7,
+      "temp_ema": 20.7
+    },
+    {
+      "timestamp": "2026-05-29T09:11:47Z",
+      "humidity_raw": 98.1,
+      "humidity_ema": 98.1,
+      "humidity_osc": 0.0,
+      "temp_raw": 20.6,
+      "temp_ema": 20.67
+    },
+    {
+      "timestamp": "2026-05-29T09:32:49Z",
+      "humidity_raw": 97.9,
+      "humidity_ema": 98.04,
+      "humidity_osc": -0.14,
+      "temp_raw": 20.7,
+      "temp_ema": 20.679
+    },
+    {
+      "timestamp": "2026-05-29T09:49:08Z",
+      "humidity_raw": 98.3,
+      "humidity_ema": 98.118,
+      "humidity_osc": 0.182,
+      "temp_raw": 20.6,
+      "temp_ema": 20.6553
+    }
+  ]
+}

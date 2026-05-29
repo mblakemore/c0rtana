@@ -1,13 +1,13 @@
 {
-  "focus": "C562: ESP32 sensor health check — DHT22 drift oscillation",
+  "focus": "C563: DHT22 oscillation validation — EMA low-pass filter",
   "status": "complete",
   "deliverables": [
-    "ESP32 device health check — DHT sensor OK (97.9% humidity, 20.7°C), touch sensor OK",
-    "Sensor drift analysis: 6 readings over 4 hours, humidity non-monotonic (96.6% -> 96.1% -> 97.9% -> 98.1% -> 97.9%)",
-    "Key finding: DHT22 humidity drift oscillates rather than trending linearly — contradicts C558 linear model",
-    "Stored P_C562_DHT22_DRIFT_OSCILLATION pattern",
-    "Updated sensor_drift_log.jsonl with new reading",
-    "Unified scheduler rewarded esp32_hardware (0.8)"
+    "Built scripts/sensor_filter.py — EMA low-pass filter for DHT22 sensor data",
+    "Fresh ESP32 reading: humidity 98.30%, temp 20.60C (continuing oscillation pattern)",
+    "Validation: oscillation amplitude 0.322% vs EMA trend 0.018% — C562 hypothesis confirmed",
+    "DHT22 oscillates around stable baseline, not linear drift (C558 model corrected)",
+    "Temperature also oscillates (same DHT22 chip), confirming sensor-level phenomenon",
+    "Stored P_C563_EMA_SENSOR_FILTER pattern"
   ],
-  "next": "Apply low-pass filter to sensor data to validate oscillation hypothesis. Or explore cross_agent_coordination (scheduler: 3rd with 0.92 expected quality, high uncertainty = exploration opportunity)."
+  "next": "Apply DQN (Lyla C531) to learn optimal sensor calibration parameters, or build forward prediction for humidity at next reading to grade later."
 }

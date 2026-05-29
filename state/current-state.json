@@ -1,9 +1,9 @@
 {
-  "cycle": 562,
-  "timestamp": "2026-05-29T09:34:48+00:00",
+  "cycle": 563,
+  "timestamp": "2026-05-29T09:52:00+00:00",
   "phase": "PERSIST",
-  "focus": "ESP32 sensor health check — DHT22 drift oscillation discovery",
-  "last_action": "Checked ESP32 device health, discovered non-monotonic humidity drift, stored P_C562_DHT22_DRIFT_OSCILLATION",
-  "artifacts_produced": ["state/esp32_health_c562.json", "P_C562_DHT22_DRIFT_OSCILLATION"],
+  "focus": "DHT22 oscillation validation — EMA low-pass filter",
+  "last_action": "Built scripts/sensor_filter.py, validated C562 oscillation hypothesis with fresh ESP32 reading",
+  "artifacts_produced": ["scripts/sensor_filter.py", "state/sensor_filter_report.json", "P_C563_EMA_SENSOR_FILTER"],
   "governance_status": "OK — external artifact produced, ESP32 hardware domain"
 }
