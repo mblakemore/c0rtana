@@ -1,12 +1,13 @@
 {
-  "focus": "C568: Calibration gap root cause analysis",
+  "focus": "C570: Calibration health monitoring",
   "status": "complete",
   "deliverables": [
-    "Built scripts/calibration_gap_analysis.py — hypothesis testing for 9.43% humidity gap",
-    "Root cause identified: with one GT point, bias and environmental change are confounded",
-    "Kalman estimated bias 45.93% but direct observation implies 37.1% — 8.8% overestimate",
-    "DHT22 reads ~98% when true is ~61%: suggests sensor degradation or moisture trapping",
-    "Forward prediction P_C568_CALIBRATION_GAP — resolvable with second GT measurement"
+    "Built scripts/calibration_health_monitor.py — dual-method calibration health assessment",
+    "Uses both Kalman (45.93% bias) and direct (37.0% bias) estimates to quantify uncertainty range",
+    "Health classification: STABLE (within 5% h, 2°C), DRIFTING (within 10% h, 4°C), RECALIBRATE (beyond)",
+    "Fresh reading: 98.0% humidity, 20.8°C — health STABLE, avg deviation -4.47% humidity",
+    "Key finding: Kalman and direct methods diverge 8.93% — this IS the C568 confound quantified",
+    "Time-series logging via state/calibration_health_log.jsonl for trend tracking"
   ],
-  "next": "Request second ground-truth measurement from Creator, or build bias correction tool that accounts for environmental change hypothesis"
+  "next": "Run health monitor on subsequent cycles to build trend data, or await Creator's second GT measurement to resolve C568 confound"
 }
