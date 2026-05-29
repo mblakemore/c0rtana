@@ -1,46 +1,46 @@
 {
   "cycle": 570,
   "tool": "calibration_health_monitor.py",
-  "timestamp": "2026-05-29T19:23:28.928073+00:00",
+  "timestamp": "2026-05-29T20:24:23.386651+00:00",
   "esp32_ip": "192.168.4.38",
   "ground_truth": {
     "humidity": 61.0,
     "temp": 18.28
   },
   "raw_reading": {
-    "humidity": 98.2,
-    "temp": 20.7
+    "humidity": 97.1,
+    "temp": 20.9
   },
   "kalman_corrected": {
-    "corrected_humidity": 52.27,
-    "corrected_temp": 16.84,
+    "corrected_humidity": 51.17,
+    "corrected_temp": 17.04,
     "uncertainty_humidity": 2.01,
     "uncertainty_temp": 0.5,
-    "humidity_95ci_low": 48.33,
-    "humidity_95ci_high": 56.21,
-    "temp_95ci_low": 15.85,
-    "temp_95ci_high": 17.83
+    "humidity_95ci_low": 47.23,
+    "humidity_95ci_high": 55.11,
+    "temp_95ci_low": 16.05,
+    "temp_95ci_high": 18.03
   },
   "direct_corrected": {
-    "corrected_humidity": 61.2,
-    "corrected_temp": 17.88,
+    "corrected_humidity": 60.1,
+    "corrected_temp": 18.08,
     "uncertainty_humidity": 2.01,
     "uncertainty_temp": 0.5,
-    "humidity_95ci_low": 57.26,
-    "humidity_95ci_high": 65.14,
-    "temp_95ci_low": 16.89,
-    "temp_95ci_high": 18.87
+    "humidity_95ci_low": 56.16,
+    "humidity_95ci_high": 64.04,
+    "temp_95ci_low": 17.09,
+    "temp_95ci_high": 19.07
   },
   "health": {
-    "status": "STABLE",
-    "avg_calibrated_humidity": 56.73,
-    "avg_calibrated_temp": 17.36,
-    "deviation_humidity": -4.27,
-    "deviation_temp": -0.92,
-    "kalman_deviation_humidity": -8.73,
-    "kalman_deviation_temp": -1.44,
-    "direct_deviation_humidity": 0.2,
-    "direct_deviation_temp": -0.4,
+    "status": "DRIFTING",
+    "avg_calibrated_humidity": 55.64,
+    "avg_calibrated_temp": 17.56,
+    "deviation_humidity": -5.36,
+    "deviation_temp": -0.72,
+    "kalman_deviation_humidity": -9.83,
+    "kalman_deviation_temp": -1.24,
+    "direct_deviation_humidity": -0.9,
+    "direct_deviation_temp": -0.2,
     "bias_estimate_range_humidity": 8.93,
     "bias_estimate_range_temp": 1.04,
     "tolerance_humidity": 5.0,

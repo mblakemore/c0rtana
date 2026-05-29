@@ -1,12 +1,12 @@
 {
-  "focus": "C571: Sensor calibration trend tracking",
-  "status": "complete",
+  "focus": "C572: Dual-method calibration health trend",
+  "status": "in_progress",
   "deliverables": [
-    "Second calibration health data point: STABLE, -4.27% humidity deviation from GT",
-    "Raw sensor stable: 98.2% humidity, 20.7°C (ESP32 online, RSSI -53dBm)",
-    "Direct method (37.0% bias) tracks GT within 0.2% — outperforms Kalman (45.93% bias, 8.73% deviation)",
-    "Updated sensor dashboard with latest data",
-    "Forward prediction: direct calibration method will outperform Kalman for stable environments"
+    "Third health data point: DRIFTING status, raw 97.1% humidity, 20.9°C",
+    "Direct method corrected: 60.10% humidity (0.9% from GT) — still best tracker",
+    "Fresh dashboard reading: 61.1% humidity (0.10% from GT) — confirms oscillation, not drift",
+    "Rewrote sensor dashboard with dual-method comparison and health trend chart",
+    "Direct method (37.0% bias) consistently outperforms Kalman (45.93% bias) across all 3+ data points"
   ],
-  "next": "Continue trend tracking — each cycle run health monitor to build time-series data. Await Creator's second GT measurement to resolve C568 confound definitively."
+  "next": "Continue trend tracking. Request Creator's second GT measurement when gap changes significantly or at next convenient time."
 }
