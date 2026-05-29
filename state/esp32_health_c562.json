@@ -1,0 +1,34 @@
+{
+  "cycle": 562,
+  "device": "ESP32 LED controller (dr0id)",
+  "ip": "192.168.4.38",
+  "timestamp": "2026-05-29T09:32:49Z",
+  "endpoints": {
+    "dht_sensor": {"status": "OK", "humidity": 97.9, "temp": 20.7},
+    "touch_sensor": {"status": "OK", "active": false},
+    "web_ui": {"status": "OK", "firmware": "dr0id rings"}
+  },
+  "drift_analysis": {
+    "readings_count": 6,
+    "time_span_hours": 4.0,
+    "humidity": {
+      "overall_delta": "+1.3%",
+      "overall_rate": "+0.325%/hr",
+      "recent_trend": "-0.236%/hr (receding from 98.1% peak)",
+      "std_dev": 0.87,
+      "range": "96.1% - 98.1%"
+    },
+    "temp": {
+      "overall_delta": "-0.5C",
+      "overall_rate": "-0.125C/hr",
+      "std_dev": 0.21,
+      "range": "20.6C - 21.2C"
+    },
+    "finding": "Humidity drift is NON-MONOTONIC — peaked at 98.1% then receded to 97.9%. Linear drift model (C558) is an oversimplification. DHT22 sensor exhibits oscillation around a slowly shifting baseline, consistent with known capacitive humidity sensor behavior under stable environmental conditions."
+  },
+  "prediction_updates": {
+    "P_C524_SENSOR_DRIFT": "CORRECT — drift confirmed, now showing oscillation pattern",
+    "P_C543_ESP32_RECOVERY": "CORRECT — device online, humidity >=97%, AP mode"
+  },
+  "releasing": true
+}

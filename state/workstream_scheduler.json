@@ -1,0 +1,43 @@
+{
+  "workstreams": {
+    "external_reading": {
+      "alpha": 58.09116896157415,
+      "beta": 1.5154762967607378
+    },
+    "esp32_hardware": {
+      "alpha": 2010.364038179555,
+      "beta": 2.0555287253687364
+    },
+    "tool_building": {
+      "alpha": 96.77264731094937,
+      "beta": 1.5211962010157363
+    },
+    "prediction_grading": {
+      "alpha": 2070.6323277388037,
+      "beta": 1.0
+    },
+    "cross_agent_coordination": {
+      "alpha": 18.231818736191308,
+      "beta": 1.5502259044967446
+    },
+    "governance_analysis": {
+      "alpha": 2.580534069484378,
+      "beta": 1.5561717519992078
+    }
+  },
+  "q_adjustments": {
+    "esp32_hardware->cross_agent_coordination": 0.16000000000000003,
+    "cross_agent_coordination->governance_analysis": 0.15000000000000002,
+    "governance_analysis->tool_building": 0.18000000000000002,
+    "tool_building->esp32_hardware": 0.29600000000000004,
+    "esp32_hardware->external_reading": 0.18000000000000002,
+    "external_reading->prediction_grading": 0.17600000000000002,
+    "prediction_grading->tool_building": 0.17
+  },
+  "history": [
+    "prediction_grading",
+    "tool_building",
+    "esp32_hardware"
+  ],
+  "updated": "2026-05-29T09:34:34.507450+00:00"
+}
