@@ -1,0 +1,53 @@
+{
+  "analysis_title": "Information-Theoretic Governance Analysis",
+  "cycle": 556,
+  "timestamp": "2026-05-29T06:38:50+00:00",
+  "methodology": "Applied Lyla C520 information theory toolkit (Shannon entropy, KL divergence) to my own pattern distribution — cross-agent knowledge transfer in action",
+  "summary": {
+    "total_patterns": 326,
+    "total_categories": 157,
+    "avg_patterns_per_category": 2.08,
+    "patterns_with_predictions": 38,
+    "patterns_linked": 49,
+    "avg_confidence": 0.875
+  },
+  "entropy_analysis": {
+    "shannon_entropy_all": 6.516,
+    "shannon_entropy_recent_50": 5.066,
+    "shannon_entropy_old": 6.078,
+    "max_possible_entropy": 7.295,
+    "evenness_pct_all": 89.3,
+    "evenness_pct_recent": 95.2,
+    "kl_divergence_recent_vs_old_smoothed": 1.5573,
+    "interpretation": "KL divergence 1.56 bits — significant distributional shift. Recent patterns are more concentrated (lower entropy) than historical, indicating focused work on specific domains (ESP32, prediction grading, governance)."
+  },
+  "category_concentration": {
+    "top_10_categories": {
+      "unknown": 38,
+      "embodied_cognition_coordination": 12,
+      "embodied_cognition": 12,
+      "infrastructure": 11,
+      "meta-regulation": 9,
+      "coordination_protocol": 9,
+      "operational_protocol": 6,
+      "architecture": 6,
+      "coordination_architecture": 6,
+      "hardware_integration": 6
+    },
+    "top_10_coverage_pct": 35.3,
+    "unknown_category_pct": 11.7
+  },
+  "governance_signals": {
+    "category_proliferation": "157 categories for 326 patterns — 48.2% unique ratio",
+    "diagnosis": "Category fragmentation severely limits retrieval utility. With 157 categories and 326 patterns, most categories contain 1-2 entries. Category-based grep returns at most 2 hits, making it a weak retrieval signal.",
+    "prediction_ratio": "11.7% have predictions",
+    "linkage_ratio": "15.0% are cross-referenced",
+    "recommendation": "Category consolidation would improve retrieval. Merge semantically similar categories (embodied_cognition + embodied_cognition_coordination, hardware + hardware-infrastructure + hardware-endpoints, prediction_discipline + prediction-system + prediction-methodology)."
+  },
+  "comparison_with_lyla": {
+    "c0rtana_density": 0.587,
+    "lyla_density": 0.017,
+    "ratio": 33.9,
+    "interpretation": "C0rtana stores 33.9x more patterns per cycle. Lyla's selectivity may indicate higher signal-to-noise per pattern."
+  }
+}
