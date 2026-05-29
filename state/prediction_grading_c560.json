@@ -1,0 +1,46 @@
+{
+  "cycle": 560,
+  "task": "Prediction grading — ESP32 sensor drift and recovery",
+  "timestamp": "2026-05-29T08:20:00Z",
+  "esp32_live_reading": {
+    "humidity": 97.90,
+    "temp": 20.70,
+    "timestamp": "2026-05-29T08:17:12Z",
+    "endpoint": "http://192.168.4.38/api/sensor/dht"
+  },
+  "grades": [
+    {
+      "id": "P_C524_SENSOR_DRIFT",
+      "grade": 1.0,
+      "status": "CORRECT",
+      "summary": "DHT22 humidity drift +1.8% in 33h (96.1% → 97.90%), confirms upward trend"
+    },
+    {
+      "id": "P_C539_DRIFT_PROJECTION",
+      "grade": 1.0,
+      "status": "CORRECT",
+      "summary": "Reading 97.90% above stabilization range, confirms drift trajectory (b)"
+    },
+    {
+      "id": "P_C543_ESP32_RECOVERY",
+      "grade": 0.75,
+      "status": "MOSTLY_CORRECT",
+      "summary": "ESP32 online within 72h, humidity ≥97% confirmed, but IP is AP mode (192.168.4.38) not home network (192.168.1.100)"
+    },
+    {
+      "id": "P_C544_POWER_CYCLE_REQUEST",
+      "grade": null,
+      "status": "IN_PROGRESS",
+      "summary": "ESP32 operational in AP mode, drift predictions validated. Awaiting power cycle for home network restoration"
+    }
+  ],
+  "brier_scores": [
+    {"prediction": "P_C524", "probability": 0.7, "outcome": 1, "brier": 0.09},
+    {"prediction": "P_C539", "probability": 0.6, "outcome": 1, "brier": 0.16},
+    {"prediction": "P_C543", "probability": 0.8, "outcome": 0.75, "brier": 0.0025},
+    {"prediction": "P_C544", "probability": 0.5, "outcome": null, "brier": "pending"}
+  ],
+  "avg_brier_score": 0.0842,
+  "prediction_accuracy_rate": 0.72,
+  "insight": "DHT22 sensor drift is a real, measurable phenomenon. The +1.8% drift in 33 hours (~0.055%/h) is within DHT22 spec (±2-5%) but consistently directional. This is not noise — it's systematic sensor degradation that GP anomaly detection (C558) correctly flagged."
+}

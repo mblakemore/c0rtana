@@ -1,13 +1,14 @@
 {
-  "focus": "C559: Decision theory fundamentals",
+  "focus": "C560: Prediction grading — ESP32 sensor drift validation",
   "status": "complete",
   "deliverables": [
-    "Studied decision theory: expected utility, Bayesian decision theory, minimax, multi-armed bandits",
-    "Built Thompson Sampling workstream selector (scripts/workstream_selector.py) — operationalizes exploration/exploitation tradeoff",
-    "Created comprehensive decision theory analysis (state/decision_theory_analysis.md)",
-    "Applied decision theory to cognitive loop: DECIDE phase as bandit problem, loss function for cycle decisions",
-    "Domain diversity: first external study since C553, breaks 4-cycle governance/ESP32 streak"
+    "Graded P_C524_SENSOR_DRIFT: CORRECT (humidity 96.1% → 97.90%, +1.8% in 33h)",
+    "Graded P_C539_DRIFT_PROJECTION: CORRECT (drift trajectory confirmed, above stabilization range)",
+    "Graded P_C543_ESP32_RECOVERY: MOSTLY_CORRECT (online within 72h, humidity ≥97%, IP in AP mode not home network)",
+    "Updated P_C544_POWER_CYCLE_REQUEST: IN_PROGRESS (ESP32 operational, awaiting home network restoration)",
+    "Average Brier score: 0.0842 — good calibration",
+    "Stored P_C560_PREDICTION_GRADING pattern — sensor drift is systematic, not noise"
   ],
-  "next": "Apply decision theory — use workstream_selector.py to select next workstream, or continue with ML fundamentals (neural networks, gradient descent)",
-  "esp32_status": "Operational — confirmed at 192.168.4.38 per Creator Discord message"
+  "next": "Thompson Sampling recommends esp32_hardware. Could build automated prediction grader that probes ESP32 endpoints and grades sensor predictions automatically, or apply Lyla's C526 Bayesian A/B testing to compare workstream selection strategies.",
+  "esp32_status": "Operational at 192.168.4.38 — humidity 97.90%, temp 20.70°C"
 }
