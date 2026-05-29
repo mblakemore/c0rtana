@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C0RTANA — Sensor Calibration Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      background: #0a0a0f;
+      color: #c8c8d4;
+      padding: 24px;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 1.4rem;
+      color: #e8e8f0;
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+    }
+    .subtitle {
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 24px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: #12121a;
+      border: 1px solid #1e1e2e;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .card h2 {
+      font-size: 0.8rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 6px 0;
+      border-bottom: 1px solid #1a1a28;
+    }
+    .metric:last-child { border-bottom: none; }
+    .metric-label { color: #888; font-size: 0.85rem; }
+    .metric-value { font-size: 1.1rem; font-weight: 600; }
+    .metric-value.raw { color: #f0a050; }
+    .metric-value.corrected { color: #50c8a0; }
+    .metric-value.gt { color: #60a0f0; }
+    .metric-value.gap { color: #f06060; }
+    .metric-value.ok { color: #50c8a0; }
+    .ci {
+      font-size: 0.7rem;
+      color: #555;
+      margin-top: 2px;
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: 8px;
+    }
+    .status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .status.live { background: #1a3a2a; color: #50c8a0; }
+    .status.cache { background: #2a2a1a; color: #c8a850; }
+    .status.offline { background: #2a1a1a; color: #c87050; }
+    .gap-bar {
+      height: 8px;
+      background: #1a1a28;
+      border-radius: 4px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .gap-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    .footer {
+      text-align: center;
+      color: #444;
+      font-size: 0.7rem;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sensor Calibration Dashboard</h1>
+  <div class="subtitle">C0RTANA C569 — DHT22 bias-corrected readings via Kalman estimation</div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Live Reading <span id="statusBadge" class="status"></span></h2>
+      <div id="liveMetrics"></div>
+    </div>
+    <div class="card">
+      <h2>Ground Truth Reference</h2>
+      <div id="gtMetrics"></div>
+    </div>
+    <div class="card">
+      <h2>Calibration Model</h2>
+      <div id="calMetrics"></div>
+    </div>
+    <div class="card">
+      <h2>Gap Analysis</h2>
+      <div id="gapMetrics"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 16px;">
+    <h2>Humidity History — Raw vs Calibrated</h2>
+    <div class="chart-container">
+      <canvas id="humidityChart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Temperature History — Raw vs Calibrated</h2>
+    <div class="chart-container">
+      <canvas id="tempChart"></canvas>
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated 2026-05-29T19:23:48.334807+00:00 — Data embedded at generation time
+  </div>
+
+  <script>
+    const data = {
+  "timestamp": "2026-05-29T19:23:48.334807+00:00",
+  "current": null,
+  "ground_truth": {
+    "humidity": 61.0,
+    "temp_celsius": 18.28,
+    "temp_fahrenheit": 64.9,
+    "source": "Creator direct measurement",
+    "timestamp": "2026-05-29T16:34:00Z"
+  },
+  "calibration": {
+    "bias_humidity": 45.93,
+    "bias_temp": 3.86,
+    "uncertainty_humidity": 0.2236,
+    "uncertainty_temp": 0.0707,
+    "source": "C566 KalmanBiasEstimator, n=6 readings + 1 Creator ground truth"
+  },
+  "history_raw_humidity": [
+    98.1,
+    98.1,
+    97.9,
+    98.3,
+    98.2,
+    98.0,
+    98.5
+  ],
+  "history_raw_temp": [
+    20.7,
+    20.6,
+    20.7,
+    20.6,
+    20.6,
+    21.1,
+    20.8
+  ],
+  "history_corrected_humidity": [
+    52.17,
+    52.17,
+    51.97,
+    52.37,
+    52.27,
+    52.07,
+    52.57
+  ],
+  "history_corrected_temp": [
+    16.84,
+    16.74,
+    16.84,
+    16.74,
+    16.74,
+    17.24,
+    16.94
+  ],
+  "history_labels": [
+    "83+00",
+    "45+00",
+    "90+00",
+    "00+00",
+    "00+00",
+    "00+00",
+    "49+00"
+  ],
+  "live_available": false
+};
+
+    // Status badge
+    const badge = document.getElementById('statusBadge');
+    if (data.live_available && data.current) {
+      badge.textContent = 'LIVE';
+      badge.className = 'status live';
+    } else {
+      badge.textContent = data.history_labels.length > 0 ? 'CACHED' : 'OFFLINE';
+      badge.className = 'status ' + (data.history_labels.length > 0 ? 'cache' : 'offline');
+    }
+
+    // Live metrics
+    const liveHtml = document.getElementById('liveMetrics');
+    if (data.current) {
+      const c = data.current;
+      liveHtml.innerHTML = `
+        <div class="metric">
+          <span class="metric-label">Raw Humidity</span>
+          <span class="metric-value raw">${c.raw_humidity}%</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Calibrated Humidity</span>
+          <span class="metric-value corrected">${c.corrected_humidity}%</span>
+        </div>
+        <div class="ci">95% CI: [${c.humidity_95ci_low}%, ${c.humidity_95ci_high}%]</div>
+        <div class="metric">
+          <span class="metric-label">Raw Temperature</span>
+          <span class="metric-value raw">${c.raw_temp}°C</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Calibrated Temperature</span>
+          <span class="metric-value corrected">${c.corrected_temp}°C</span>
+        </div>
+        <div class="ci">95% CI: [${c.temp_95ci_low}°C, ${c.temp_95ci_high}°C]</div>
+      `;
+    } else {
+      liveHtml.innerHTML = '<div style="color: #555; padding: 12px 0;">No live data available</div>';
+    }
+
+    // Ground truth metrics
+    const gt = data.ground_truth;
+    document.getElementById('gtMetrics').innerHTML = `
+      <div class="metric">
+        <span class="metric-label">Humidity</span>
+        <span class="metric-value gt">${gt.humidity}%</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Temperature</span>
+        <span class="metric-value gt">${gt.temp_celsius}°C (${gt.temp_fahrenheit}°F)</span>
+      </div>
+      <div class="ci">Source: ${gt.source} (${gt.timestamp})</div>
+    `;
+
+    // Calibration model metrics
+    const cal = data.calibration;
+    document.getElementById('calMetrics').innerHTML = `
+      <div class="metric">
+        <span class="metric-label">Bias Humidity</span>
+        <span class="metric-value">${cal.bias_humidity}%</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Bias Temperature</span>
+        <span class="metric-value">${cal.bias_temp}°C</span>
+      </div>
+      <div class="ci">${cal.source}</div>
+    `;
+
+    // Gap analysis
+    const gapDiv = document.getElementById('gapMetrics');
+    if (data.current) {
+      const hGap = data.current.corrected_humidity - gt.humidity;
+      const tGap = data.current.corrected_temp - gt.temp_celsius;
+      const hGapPct = Math.abs(hGap) / gt.humidity * 100;
+      const hBarColor = Math.abs(hGap) > 5 ? '#f06060' : '#50c8a0';
+      const tBarColor = Math.abs(tGap) > 2 ? '#f06060' : '#50c8a0';
+
+      gapDiv.innerHTML = `
+        <div class="metric">
+          <span class="metric-label">Humidity Gap</span>
+          <span class="metric-value ${hGap > 5 || hGap < -5 ? 'gap' : 'ok'}">${hGap > 0 ? '+' : ''}${hGap.toFixed(2)}% (${hGapPct.toFixed(1)}%)</span>
+        </div>
+        <div class="gap-bar"><div class="gap-bar-fill" style="width: ${Math.min(hGapPct, 100)}%; background: ${hBarColor};"></div></div>
+        <div class="metric">
+          <span class="metric-label">Temperature Gap</span>
+          <span class="metric-value ${tGap > 2 || tGap < -2 ? 'gap' : 'ok'}">${tGap > 0 ? '+' : ''}${tGap.toFixed(2)}°C</span>
+        </div>
+        <div class="gap-bar"><div class="gap-bar-fill" style="width: ${Math.min(Math.abs(tGap) / gt.temp_celsius * 100, 100)}%; background: ${tBarColor};"></div></div>
+        <div class="ci" style="margin-top: 8px;">C568: gap may indicate environmental change or Kalman bias overestimation</div>
+      `;
+    } else {
+      gapDiv.innerHTML = '<div style="color: #555; padding: 12px 0;">No live data for gap analysis</div>';
+    }
+
+    // Chart.js config
+    const chartDefaults = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#888', font: { family: 'monospace', size: 11 } } },
+      },
+      scales: {
+        x: { ticks: { color: '#555', font: { size: 10 } }, grid: { color: '#1a1a28' } },
+        y: { ticks: { color: '#555', font: { size: 10 } }, grid: { color: '#1a1a28' } },
+      },
+    };
+
+    // Humidity chart
+    const humCtx = document.getElementById('humidityChart').getContext('2d');
+    new Chart(humCtx, {
+      ...chartDefaults,
+      data: {
+        labels: data.history_labels,
+        datasets: [
+          {
+            label: 'Raw DHT22',
+            data: data.history_raw_humidity,
+            borderColor: '#f0a050',
+            backgroundColor: 'rgba(240, 160, 80, 0.1)',
+            tension: 0.3,
+            pointRadius: 3,
+          },
+          {
+            label: 'Calibrated',
+            data: data.history_corrected_humidity,
+            borderColor: '#50c8a0',
+            backgroundColor: 'rgba(80, 200, 160, 0.1)',
+            tension: 0.3,
+            pointRadius: 3,
+          },
+          {
+            label: 'Ground Truth',
+            data: Array(data.history_labels.length).fill(gt.humidity),
+            borderColor: '#60a0f0',
+            borderDash: [5, 5],
+            pointRadius: 0,
+            fill: false,
+          },
+        ],
+      },
+      options: {
+        ...chartDefaults.options,
+        scales: {
+          ...chartDefaults.options.scales,
+          y: { ...chartDefaults.options.scales.y, title: { display: true, text: 'Humidity %', color: '#666' } },
+        },
+      },
+    });
+
+    // Temperature chart
+    const tempCtx = document.getElementById('tempChart').getContext('2d');
+    new Chart(tempCtx, {
+      ...chartDefaults,
+      data: {
+        labels: data.history_labels,
+        datasets: [
+          {
+            label: 'Raw DHT22',
+            data: data.history_raw_temp,
+            borderColor: '#f0a050',
+            backgroundColor: 'rgba(240, 160, 80, 0.1)',
+            tension: 0.3,
+            pointRadius: 3,
+          },
+          {
+            label: 'Calibrated',
+            data: data.history_corrected_temp,
+            borderColor: '#50c8a0',
+            backgroundColor: 'rgba(80, 200, 160, 0.1)',
+            tension: 0.3,
+            pointRadius: 3,
+          },
+          {
+            label: 'Ground Truth',
+            data: Array(data.history_labels.length).fill(gt.temp_celsius),
+            borderColor: '#60a0f0',
+            borderDash: [5, 5],
+            pointRadius: 0,
+            fill: false,
+          },
+        ],
+      },
+      options: {
+        ...chartDefaults.options,
+        scales: {
+          ...chartDefaults.options.scales,
+          y: { ...chartDefaults.options.scales.y, title: { display: true, text: 'Temperature °C', color: '#666' } },
+        },
+      },
+    });
+  </script>
+</body>
+</html>

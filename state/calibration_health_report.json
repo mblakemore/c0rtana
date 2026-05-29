@@ -1,46 +1,46 @@
 {
   "cycle": 570,
   "tool": "calibration_health_monitor.py",
-  "timestamp": "2026-05-29T19:10:48.756013+00:00",
+  "timestamp": "2026-05-29T19:23:28.928073+00:00",
   "esp32_ip": "192.168.4.38",
   "ground_truth": {
     "humidity": 61.0,
     "temp": 18.28
   },
   "raw_reading": {
-    "humidity": 98.0,
-    "temp": 20.8
+    "humidity": 98.2,
+    "temp": 20.7
   },
   "kalman_corrected": {
-    "corrected_humidity": 52.07,
-    "corrected_temp": 16.94,
+    "corrected_humidity": 52.27,
+    "corrected_temp": 16.84,
     "uncertainty_humidity": 2.01,
     "uncertainty_temp": 0.5,
-    "humidity_95ci_low": 48.13,
-    "humidity_95ci_high": 56.01,
-    "temp_95ci_low": 15.95,
-    "temp_95ci_high": 17.93
+    "humidity_95ci_low": 48.33,
+    "humidity_95ci_high": 56.21,
+    "temp_95ci_low": 15.85,
+    "temp_95ci_high": 17.83
   },
   "direct_corrected": {
-    "corrected_humidity": 61.0,
-    "corrected_temp": 17.98,
+    "corrected_humidity": 61.2,
+    "corrected_temp": 17.88,
     "uncertainty_humidity": 2.01,
     "uncertainty_temp": 0.5,
-    "humidity_95ci_low": 57.06,
-    "humidity_95ci_high": 64.94,
-    "temp_95ci_low": 16.99,
-    "temp_95ci_high": 18.97
+    "humidity_95ci_low": 57.26,
+    "humidity_95ci_high": 65.14,
+    "temp_95ci_low": 16.89,
+    "temp_95ci_high": 18.87
   },
   "health": {
     "status": "STABLE",
-    "avg_calibrated_humidity": 56.53,
-    "avg_calibrated_temp": 17.46,
-    "deviation_humidity": -4.47,
-    "deviation_temp": -0.82,
-    "kalman_deviation_humidity": -8.93,
-    "kalman_deviation_temp": -1.34,
-    "direct_deviation_humidity": 0.0,
-    "direct_deviation_temp": -0.3,
+    "avg_calibrated_humidity": 56.73,
+    "avg_calibrated_temp": 17.36,
+    "deviation_humidity": -4.27,
+    "deviation_temp": -0.92,
+    "kalman_deviation_humidity": -8.73,
+    "kalman_deviation_temp": -1.44,
+    "direct_deviation_humidity": 0.2,
+    "direct_deviation_temp": -0.4,
     "bias_estimate_range_humidity": 8.93,
     "bias_estimate_range_temp": 1.04,
     "tolerance_humidity": 5.0,

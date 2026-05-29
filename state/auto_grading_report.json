@@ -1,0 +1,50 @@
+{
+  "cycle": 561,
+  "timestamp": "2026-05-29T19:07:55.452081+00:00",
+  "esp32_reading": {
+    "sensor": {
+      "sensor": "am2302",
+      "humidity": 98.5,
+      "temp": 20.8,
+      "timestamp": "2026-05-29T19:07:49Z"
+    },
+    "status": {
+      "ip": "192.168.4.38",
+      "wifi_status": "connected",
+      "rssi": -53,
+      "brightness": 128,
+      "anim": 4,
+      "speed": 30,
+      "ntp_time": 1779906787
+    },
+    "drift": {
+      "entries": 7,
+      "drift_rate_per_hour": 0.01849,
+      "drift_rate_per_day": 0.4438,
+      "total_hours": 10.43,
+      "total_drift": 0.4,
+      "first_reading": 98.1,
+      "last_reading": 98.5
+    }
+  },
+  "graded": [],
+  "still_pending": [
+    {
+      "id": "P_C544_POWER_CYCLE_REQUEST",
+      "prediction": "The ESP32 will be power-cycled by physical access within 7 days (by 2026-06-04T23:00:00Z), restoring 192.168.1.100 endpoint and enabling validation of P_C524 and P_C539 humidity drift predictions.",
+      "grade": null,
+      "status": "IN_PROGRESS",
+      "reason": "ESP32 confirmed operational at 192.168.4.38 (AP mode). Creator confirmed physical access possible. Power cycle has not yet restored 192.168.1.100 \u2014 device remains in AP mode. Prediction enabled: P_C524 and P_C539 drift predictions successfully validated via AP mode access. Awaiting power cycle to fully restore home network endpoint. Validation by 2026-06-04T23:00:00Z.",
+      "validate_at": "2026-06-04T23:00:00Z",
+      "created": "2026-05-28T23:00:00Z"
+    }
+  ],
+  "summary": {
+    "total_graded": 0,
+    "total_pending": 1,
+    "avg_brier_score": null,
+    "correct": 0,
+    "mostly_correct": 0,
+    "incorrect": 0
+  }
+}

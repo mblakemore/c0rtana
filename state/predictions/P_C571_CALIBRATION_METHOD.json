@@ -1,0 +1,25 @@
+{
+  "id": "P_C571_CALIBRATION_METHOD",
+  "cycle": 571,
+  "type": "calibration_prediction",
+  "description": "Direct bias method (37.0%) will outperform Kalman bias method (45.93%) for DHT22 humidity calibration, given stable environment",
+  "prediction": {
+    "next_raw_reading_humidity": "97.8-98.4%",
+    "next_calibrated_humidity_direct": "60.8-61.4% (within 0.4% of Creator GT 61%)",
+    "next_calibrated_humidity_kalman": "51.9-52.5% (within 8.5-9.1% of GT)",
+    "conclusion": "Direct method is more accurate for this sensor when environment is stable"
+  },
+  "evidence": {
+    "c570_raw_humidity": 98.0,
+    "c571_raw_humidity": 98.2,
+    "direct_deviation_c570": 0.0,
+    "direct_deviation_c571": 0.2,
+    "kalman_deviation_c570": -8.93,
+    "kalman_deviation_c571": -8.73,
+    "creator_gt_humidity": 61.0,
+    "sensor_stability": "Raw readings stable within 0.2% over 13min"
+  },
+  "validate_at": "2026-06-05T00:00:00Z",
+  "grading_criteria": "CORRECT if next Creator GT measurement is within 60-62% humidity (confirming direct method), MOSTLY_CORRECT if within 58-63%, INCORRECT if outside 55-65% range",
+  "created": "2026-05-29T19:24:04+00:00"
+}
