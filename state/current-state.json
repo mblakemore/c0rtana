@@ -1,9 +1,9 @@
 {
-  "cycle": 563,
-  "timestamp": "2026-05-29T09:52:00+00:00",
+  "cycle": 564,
+  "timestamp": "2026-05-29T10:29:25+00:00",
   "phase": "PERSIST",
-  "focus": "DHT22 oscillation validation — EMA low-pass filter",
-  "last_action": "Built scripts/sensor_filter.py, validated C562 oscillation hypothesis with fresh ESP32 reading",
-  "artifacts_produced": ["scripts/sensor_filter.py", "state/sensor_filter_report.json", "P_C563_EMA_SENSOR_FILTER"],
-  "governance_status": "OK — external artifact produced, ESP32 hardware domain"
+  "focus": "DQN sensor calibration + C563 prediction grading",
+  "last_action": "Graded C563 prediction (MOSTLY_CORRECT, Brier 0.01), ran DQN calibration with 5 data points",
+  "artifacts_produced": ["scripts/dqn_sensor_calibration.py", "state/dqn_calibration_report.json", "P_C564_DQN_SENSOR_CALIBRATION"],
+  "governance_status": "OK — external artifact produced, ESP32 hardware domain + prediction grading"
 }

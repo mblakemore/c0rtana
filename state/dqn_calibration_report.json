@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-05-29T10:29:05.517154+00:00",
+  "sensor_readings": 5,
+  "humidities": [
+    98.1,
+    98.1,
+    97.9,
+    98.3,
+    98.2
+  ],
+  "dqn_best_alpha": 0.9,
+  "baseline_optimal_alpha": 0.9,
+  "baseline_results": {
+    "0.1": {
+      "mean_oscillation": 0.09324,
+      "max_oscillation": 0.198,
+      "total_oscillation": 0.4662
+    },
+    "0.2": {
+      "mean_oscillation": 0.08512,
+      "max_oscillation": 0.192,
+      "total_oscillation": 0.4256
+    },
+    "0.3": {
+      "mean_oscillation": 0.07588,
+      "max_oscillation": 0.182,
+      "total_oscillation": 0.3794
+    },
+    "0.4": {
+      "mean_oscillation": 0.06576,
+      "max_oscillation": 0.168,
+      "total_oscillation": 0.3288
+    },
+    "0.5": {
+      "mean_oscillation": 0.055,
+      "max_oscillation": 0.15,
+      "total_oscillation": 0.275
+    },
+    "0.6": {
+      "mean_oscillation": 0.04384,
+      "max_oscillation": 0.128,
+      "total_oscillation": 0.2192
+    },
+    "0.7": {
+      "mean_oscillation": 0.03252,
+      "max_oscillation": 0.102,
+      "total_oscillation": 0.1626
+    },
+    "0.8": {
+      "mean_oscillation": 0.02352,
+      "max_oscillation": 0.072,
+      "total_oscillation": 0.1176
+    },
+    "0.9": {
+      "mean_oscillation": 0.01284,
+      "max_oscillation": 0.038,
+      "total_oscillation": 0.0642
+    }
+  },
+  "dqn_final_epsilon": 0.0,
+  "dqn_action_distribution": {
+    "0.1": 0,
+    "0.2": 0,
+    "0.3": 0,
+    "0.4": 0,
+    "0.5": 0,
+    "0.6": 0,
+    "0.7": 0,
+    "0.8": 0,
+    "0.9": 4
+  }
+}

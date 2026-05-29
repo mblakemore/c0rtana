@@ -1,13 +1,13 @@
 {
-  "focus": "C563: DHT22 oscillation validation — EMA low-pass filter",
+  "focus": "C564: DQN sensor calibration + prediction grading",
   "status": "complete",
   "deliverables": [
-    "Built scripts/sensor_filter.py — EMA low-pass filter for DHT22 sensor data",
-    "Fresh ESP32 reading: humidity 98.30%, temp 20.60C (continuing oscillation pattern)",
-    "Validation: oscillation amplitude 0.322% vs EMA trend 0.018% — C562 hypothesis confirmed",
-    "DHT22 oscillates around stable baseline, not linear drift (C558 model corrected)",
-    "Temperature also oscillates (same DHT22 chip), confirming sensor-level phenomenon",
-    "Stored P_C563_EMA_SENSOR_FILTER pattern"
+    "Graded C563 prediction: humidity 97.9-98.1% vs actual 98.2% — MOSTLY_CORRECT (Brier: 0.01)",
+    "Fresh ESP32 reading logged: humidity 98.2%, temp 20.6°C",
+    "DQN calibration re-run with 5 data points: learned alpha=0.9, matches exhaustive baseline",
+    "DQN selects optimal action in 4/4 evaluation steps — policy converged",
+    "Key insight: DQN matches brute force for small discrete spaces; value emerges for continuous/multi-parameter search",
+    "Stored P_C564_DQN_SENSOR_CALIBRATION pattern"
   ],
-  "next": "Apply DQN (Lyla C531) to learn optimal sensor calibration parameters, or build forward prediction for humidity at next reading to grade later."
+  "next": "Build forward prediction for humidity at next reading to grade later, or apply DQN to multi-parameter calibration (humidity + temperature alpha simultaneously)."
 }
