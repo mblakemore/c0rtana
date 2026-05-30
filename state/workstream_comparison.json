@@ -1,0 +1,128 @@
+{
+  "workstreams": {
+    "external_reading": {
+      "name": "external_reading",
+      "alpha": 9.949999999999998,
+      "beta": 1.0,
+      "pulls": 13,
+      "expected_quality": 0.9087,
+      "uncertainty": 0.0069
+    },
+    "esp32_hardware": {
+      "name": "esp32_hardware",
+      "alpha": 20.9,
+      "beta": 1.0,
+      "pulls": 30,
+      "expected_quality": 0.9543,
+      "uncertainty": 0.0019
+    },
+    "tool_building": {
+      "name": "tool_building",
+      "alpha": 8.6,
+      "beta": 1.0,
+      "pulls": 11,
+      "expected_quality": 0.8958,
+      "uncertainty": 0.0088
+    },
+    "prediction_grading": {
+      "name": "prediction_grading",
+      "alpha": 19.4,
+      "beta": 1.0,
+      "pulls": 28,
+      "expected_quality": 0.951,
+      "uncertainty": 0.0022
+    },
+    "cross_agent_coordination": {
+      "name": "cross_agent_coordination",
+      "alpha": 4.5,
+      "beta": 1.0,
+      "pulls": 5,
+      "expected_quality": 0.8182,
+      "uncertainty": 0.0229
+    }
+  },
+  "comparisons": [
+    {
+      "workstream_a": "esp32_hardware",
+      "workstream_b": "prediction_grading",
+      "p_a_greater_b": 0.5142,
+      "expected_difference": 0.0024,
+      "bayes_factor": 1.06,
+      "jensen_shannon": 0.036116
+    },
+    {
+      "workstream_a": "esp32_hardware",
+      "workstream_b": "external_reading",
+      "p_a_greater_b": 0.69,
+      "expected_difference": 0.0525,
+      "bayes_factor": 2.23,
+      "jensen_shannon": 0.578156
+    },
+    {
+      "workstream_a": "esp32_hardware",
+      "workstream_b": "tool_building",
+      "p_a_greater_b": 0.7145,
+      "expected_difference": 0.0637,
+      "bayes_factor": 2.5,
+      "jensen_shannon": 0.669117
+    },
+    {
+      "workstream_a": "esp32_hardware",
+      "workstream_b": "cross_agent_coordination",
+      "p_a_greater_b": 0.8352,
+      "expected_difference": 0.1531,
+      "bayes_factor": 5.07,
+      "jensen_shannon": 1.263009
+    },
+    {
+      "workstream_a": "prediction_grading",
+      "workstream_b": "external_reading",
+      "p_a_greater_b": 0.6791,
+      "expected_difference": 0.0502,
+      "bayes_factor": 2.12,
+      "jensen_shannon": 0.539289
+    },
+    {
+      "workstream_a": "prediction_grading",
+      "workstream_b": "tool_building",
+      "p_a_greater_b": 0.7044,
+      "expected_difference": 0.0614,
+      "bayes_factor": 2.38,
+      "jensen_shannon": 0.629332
+    },
+    {
+      "workstream_a": "prediction_grading",
+      "workstream_b": "cross_agent_coordination",
+      "p_a_greater_b": 0.8288,
+      "expected_difference": 0.1508,
+      "bayes_factor": 4.84,
+      "jensen_shannon": 1.214877
+    },
+    {
+      "workstream_a": "external_reading",
+      "workstream_b": "tool_building",
+      "p_a_greater_b": 0.5312,
+      "expected_difference": 0.0117,
+      "bayes_factor": 1.13,
+      "jensen_shannon": 0.083199
+    },
+    {
+      "workstream_a": "external_reading",
+      "workstream_b": "cross_agent_coordination",
+      "p_a_greater_b": 0.6961,
+      "expected_difference": 0.1014,
+      "bayes_factor": 2.29,
+      "jensen_shannon": 0.588692
+    },
+    {
+      "workstream_a": "tool_building",
+      "workstream_b": "cross_agent_coordination",
+      "p_a_greater_b": 0.6707,
+      "expected_difference": 0.0903,
+      "bayes_factor": 2.04,
+      "jensen_shannon": 0.499558
+    }
+  ],
+  "source": "scripts/workstream_compare.py",
+  "cross_agent": "c0rtana C559 (Thompson Sampling) + Lyla C526 (Bayesian A/B testing)"
+}
