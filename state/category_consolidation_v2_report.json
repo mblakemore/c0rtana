@@ -1,0 +1,641 @@
+{
+  "id": "P_C574_CATEGORY_CONSOLIDATION_V2",
+  "timestamp": "2026-05-30T08:42:00.059911+00:00",
+  "before": {
+    "total_patterns": 346,
+    "num_categories": 91,
+    "avg_per_category": 3.802197802197802,
+    "categories": {
+      "interpretability-finding": 1,
+      "theory": 2,
+      "cybernetics": 2,
+      "applied-cybernetics": 1,
+      "meta": 20,
+      "stability-control": 1,
+      "agentics": 2,
+      "utility": 1,
+      "technical": 1,
+      "system": 2,
+      "collaboration": 2,
+      "engineering": 2,
+      "cycle": 2,
+      "state": 3,
+      "operational": 13,
+      "foundational": 38,
+      "collaborative_intelligence": 1,
+      "communication_protocol": 1,
+      "filesystem_topology": 1,
+      "visualization/hologram": 1,
+      "productivity_method": 1,
+      "tooling": 6,
+      "infrastructure": 15,
+      "architecture": 7,
+      "execution": 1,
+      "instrumentation": 1,
+      "coordination": 32,
+      "empirical": 2,
+      "methodology": 1,
+      "external": 6,
+      "theory/autonomy": 1,
+      "theory/autopoiesis": 1,
+      "theoretical_framework": 2,
+      "climate_anxiety_art_market_institutions": 1,
+      "prediction": 17,
+      "embodied": 26,
+      "multi": 6,
+      "operator": 8,
+      "cognitive": 2,
+      "protocol_design": 1,
+      "research_methodology": 1,
+      "engagement": 3,
+      "design": 3,
+      "robustness": 1,
+      "epistemological_coordination": 1,
+      "abstraction_design": 1,
+      "real": 3,
+      "discovery-pattern": 1,
+      "ux_design": 1,
+      "async_prep": 1,
+      "deployment": 2,
+      "creator_directive": 1,
+      "physical": 3,
+      "interface_design": 1,
+      "visualization/embodiment": 1,
+      "visualization": 3,
+      "ui_physics": 1,
+      "cybernetic_interface": 1,
+      "reality-anchor": 1,
+      "analytics": 1,
+      "hardware": 26,
+      "software_architecture": 1,
+      "agent-scaling": 1,
+      "development_methodology": 1,
+      "visual_language": 1,
+      "verification_methodology": 1,
+      "control_theory": 1,
+      "role_definition": 1,
+      "quantum": 3,
+      "qiskit_quirks": 1,
+      "firmware": 1,
+      "robotics_learning": 1,
+      "esp32-firmware": 1,
+      "neuroscience": 3,
+      "self_knowledge": 2,
+      "distributed_systems": 4,
+      "sensor": 8,
+      "shared_tooling": 1,
+      "computational_neuroscience": 3,
+      "active_inference": 1,
+      "predictive_processing": 2,
+      "data_quality": 1,
+      "api": 1,
+      "governance": 1,
+      "information-theory": 1,
+      "decision-theory": 1,
+      "decision_theory": 1,
+      "sensor-calibration": 5,
+      "external_reading": 1,
+      "sensor_calibration": 4,
+      "embedded-hardware": 1
+    }
+  },
+  "after": {
+    "total_patterns": 346,
+    "num_categories": 32,
+    "avg_per_category": 10.8125,
+    "categories": {
+      "self-knowledge": 3,
+      "theory": 6,
+      "cybernetics": 4,
+      "meta": 20,
+      "stability": 2,
+      "systems": 15,
+      "tooling": 10,
+      "engineering": 5,
+      "collaboration": 5,
+      "state-management": 5,
+      "operational": 22,
+      "foundational": 38,
+      "infrastructure": 16,
+      "visualization": 6,
+      "methodology": 5,
+      "design": 15,
+      "coordination": 32,
+      "discovery": 3,
+      "external": 8,
+      "prediction": 17,
+      "embodied": 26,
+      "cognitive": 11,
+      "engagement": 5,
+      "physical": 6,
+      "deployment": 3,
+      "ui_physics": 1,
+      "governance": 2,
+      "data": 3,
+      "hardware": 29,
+      "quantum": 4,
+      "sensor": 17,
+      "decision": 2
+    }
+  },
+  "stats": {
+    "patterns_merged": 109,
+    "categories_unmapped": 1,
+    "changes": {
+      "self-knowledge": [
+        [
+          "interpretability-finding",
+          "C163_DRIFT_REALITY_CHECK"
+        ],
+        [
+          "self_knowledge",
+          "P_C521_CLARED_STUBS"
+        ],
+        [
+          "self_knowledge",
+          "P_C522_PREDICTION_CORRECTION"
+        ]
+      ],
+      "cybernetics": [
+        [
+          "applied-cybernetics",
+          "C171_APPLIED_VARIETY"
+        ],
+        [
+          "cybernetic_interface",
+          "P_C339_STATE_MODULATION"
+        ]
+      ],
+      "stability": [
+        [
+          "stability-control",
+          "C175_EXTERNAL_ANCHOR"
+        ],
+        [
+          "robustness",
+          "cN_050"
+        ]
+      ],
+      "systems": [
+        [
+          "agentics",
+          "P_C176_OBSERVABILITY"
+        ],
+        [
+          "system",
+          "C184_STABLE_SUBSTRATE"
+        ],
+        [
+          "agentics",
+          "p_C188_HAND"
+        ],
+        [
+          "multi",
+          "P_C240_B_C_HYBRID_PARALLEL"
+        ],
+        [
+          "multi",
+          "P_C243_COORDINATION_APPROVAL"
+        ],
+        [
+          "multi",
+          "P_C243_WORKFLOW_VALIDATION"
+        ],
+        [
+          "multi",
+          "P_C287_CONCURRENT_DECISION"
+        ],
+        [
+          "multi",
+          "P_C290_DECISION_FRAMEWORK"
+        ],
+        [
+          "multi",
+          "P_C291_ASYNC_PREP_DEPLOYMENT_DECISION"
+        ],
+        [
+          "agent-scaling",
+          "P_C349_OBSERVABILITY_SCALING"
+        ],
+        [
+          "system",
+          "P_esp32_bridge"
+        ],
+        [
+          "distributed_systems",
+          "P_C522_CAP_THEOREM"
+        ],
+        [
+          "distributed_systems",
+          "P_C523_FLP_IMPOSSIBILITY"
+        ],
+        [
+          "distributed_systems",
+          "P_C523_BLACKBOARD_CAP"
+        ],
+        [
+          "distributed_systems",
+          "P_C523_PBFT_TRADEOFF"
+        ]
+      ],
+      "tooling": [
+        [
+          "utility",
+          "C178_VARA"
+        ],
+        [
+          "instrumentation",
+          "bb_performance_v3_pattern_002"
+        ],
+        [
+          "shared_tooling",
+          "P_C526_SHARED_HARDWARE_SERVICE"
+        ],
+        [
+          "api",
+          "P_C540_BEDROCK_API_DOCS"
+        ]
+      ],
+      "engineering": [
+        [
+          "technical",
+          "p_SENS_001"
+        ],
+        [
+          "control_theory",
+          "P_496_DECAY_COEFFICIENT"
+        ],
+        [
+          "robotics_learning",
+          "P_C514_SIM_TO_REAL_GAP"
+        ]
+      ],
+      "state-management": [
+        [
+          "cycle",
+          "P_cyc_207_RECOVERY_PROTOCOL"
+        ],
+        [
+          "state",
+          "P_207_CYC_INFLATION_GHOSTS"
+        ],
+        [
+          "state",
+          "C228_SYNC_STATE"
+        ],
+        [
+          "cycle",
+          "P_C289_READY_SIGNAL"
+        ],
+        [
+          "state",
+          "PHASE_COLOR_MAPPING_001"
+        ]
+      ],
+      "collaboration": [
+        [
+          "collaborative_intelligence",
+          "P208_ANSWERS_GENERATE_QUESTIONS"
+        ],
+        [
+          "communication_protocol",
+          "p_C209_discord_status"
+        ],
+        [
+          "epistemological_coordination",
+          "P_C314_MCGILCHRIST_TRUTH_KNOWLEDGE_ACTION"
+        ]
+      ],
+      "infrastructure": [
+        [
+          "filesystem_topology",
+          "p_C209_blackboard_location"
+        ]
+      ],
+      "visualization": [
+        [
+          "visualization/hologram",
+          "P_C209_vis_scaffold"
+        ],
+        [
+          "visualization/embodiment",
+          "P_C339_PHASE_DRIVEN_VISUALIZATION"
+        ],
+        [
+          "visual_language",
+          "P_C354_STATE_MAPPINGS"
+        ]
+      ],
+      "methodology": [
+        [
+          "productivity_method",
+          "a210_baseline_doc"
+        ],
+        [
+          "research_methodology",
+          "cN_301_003"
+        ],
+        [
+          "development_methodology",
+          "P_C354_SIMULATION_VALIDITY"
+        ],
+        [
+          "verification_methodology",
+          "P_C363_DIAGNOSIS_CORRECTION"
+        ]
+      ],
+      "design": [
+        [
+          "architecture",
+          "C214_HYBRID_B_AND_C_SOLUTION"
+        ],
+        [
+          "architecture",
+          "convergence_c217"
+        ],
+        [
+          "protocol_design",
+          "cN_301_001"
+        ],
+        [
+          "architecture",
+          "P_C304_CONTEXT_AUDIT_PROTOCOL"
+        ],
+        [
+          "abstraction_design",
+          "P_C315_PREDICTIVE_CODING_PRINCIPLE_3"
+        ],
+        [
+          "ux_design",
+          "P_C325_TERMINAL_PRESENCE_UX"
+        ],
+        [
+          "interface_design",
+          "C336_MINIMAL_VIABLE_PROTOCOL"
+        ],
+        [
+          "architecture",
+          "cN_174_002"
+        ],
+        [
+          "architecture",
+          "P_C341_PROJECTION_BRIDGE"
+        ],
+        [
+          "software_architecture",
+          "cN_343_bis"
+        ],
+        [
+          "architecture",
+          "C364_pattern"
+        ],
+        [
+          "architecture",
+          "P_496_API_STATE_PROJECTION"
+        ]
+      ],
+      "operational": [
+        [
+          "execution",
+          "C214_EXTERNAL_TOOLING_VERIFICATION"
+        ],
+        [
+          "operator",
+          "P_C300_OPERATOR_ENGAGEMENT_REQUEST"
+        ],
+        [
+          "operator",
+          "P_C310_DISCOVERABILITY_VS_INSTRUMENTATION"
+        ],
+        [
+          "operator",
+          "P_C313_QUANTITATIVE_PRESENCE"
+        ],
+        [
+          "operator",
+          "P_C318_VISUAL_PRESENCE"
+        ],
+        [
+          "operator",
+          "P_C328_PRIORITY_RESET_TOOL"
+        ],
+        [
+          "operator",
+          "P_C329_CONTEXT_VISIBILITY_QUERY"
+        ],
+        [
+          "operator",
+          "P_C331_REAL_WORLD_PERSISTENCE_VALIDATION"
+        ],
+        [
+          "operator",
+          "PRED_C366_INTERACTION_TRACKING"
+        ]
+      ],
+      "discovery": [
+        [
+          "empirical",
+          "C222_TENSION_SCORE"
+        ],
+        [
+          "empirical",
+          "C237_ESG_DATA_COLLECTION_BARRIERS"
+        ],
+        [
+          "discovery-pattern",
+          "P_C319_AMBIENT_DISCOVERY_SURFACE"
+        ]
+      ],
+      "theory": [
+        [
+          "theory/autonomy",
+          "cN_233"
+        ],
+        [
+          "theory/autopoiesis",
+          "cN_234"
+        ],
+        [
+          "theoretical_framework",
+          "p_009"
+        ],
+        [
+          "theoretical_framework",
+          "P_C331_PREDICTIVE_CODING_COORDINATION"
+        ]
+      ],
+      "external": [
+        [
+          "climate_anxiety_art_market_institutions",
+          "C235_HIRSCHHORN_CH4_SYNTHESIS"
+        ],
+        [
+          "external_reading",
+          "P_C565_KALMAN_STATE_SPACE"
+        ]
+      ],
+      "physical": [
+        [
+          "real",
+          "P_C319_REAL_WORLD_PRESENCE"
+        ],
+        [
+          "real",
+          "P_C321_TERMINAL_NATIVE_PERSISTENCE"
+        ],
+        [
+          "real",
+          "P_C324_REAL_WORLD_PERSISTENCE_PRIORITIES"
+        ]
+      ],
+      "deployment": [
+        [
+          "async_prep",
+          "P_C325_ASYNC_PREP_DEPLOYMENT_PATTERN"
+        ]
+      ],
+      "engagement": [
+        [
+          "creator_directive",
+          "P_C335_TECHNOLOGICAL_ADVANCEMENT_QUERY"
+        ],
+        [
+          "role_definition",
+          "P_C499_QUANTUM_ROLE_DIFFERENTIATION"
+        ]
+      ],
+      "governance": [
+        [
+          "reality-anchor",
+          "pN_349"
+        ]
+      ],
+      "data": [
+        [
+          "analytics",
+          "pN_350"
+        ],
+        [
+          "data_quality",
+          "P_C539_EMPTY_PREDICTION_BUG"
+        ],
+        [
+          "information-theory",
+          "P_C556_INFO_THEORY_GOVERNANCE"
+        ]
+      ],
+      "quantum": [
+        [
+          "qiskit_quirks",
+          "C503_QISKIT_BIT_ORDERING"
+        ]
+      ],
+      "hardware": [
+        [
+          "firmware",
+          "cN_232"
+        ],
+        [
+          "esp32-firmware",
+          "cN_499"
+        ],
+        [
+          "embedded-hardware",
+          "P_C573_TOUCH_INTERRUPT"
+        ]
+      ],
+      "cognitive": [
+        [
+          "neuroscience",
+          "P_C518_PREDICTIVE_PROCESSING"
+        ],
+        [
+          "neuroscience",
+          "P_C519_AARONSON_CRITIQUE"
+        ],
+        [
+          "neuroscience",
+          "P_C519_AARONSON_RESOLVE"
+        ],
+        [
+          "computational_neuroscience",
+          "P_C529_MARR_THREE_LEVELS"
+        ],
+        [
+          "computational_neuroscience",
+          "P_C529_MARR_ACTIVE_INFERENCE"
+        ],
+        [
+          "computational_neuroscience",
+          "P_C530_ACTIVE_INFERENCE"
+        ],
+        [
+          "active_inference",
+          "P_C531_KALMAN_ACTIVE_INFERENCE"
+        ],
+        [
+          "predictive_processing",
+          "P_C534_PRECISION_WEIGHTING"
+        ],
+        [
+          "predictive_processing",
+          "P_C534_PRECISION_ATTENTION_PREDICTION"
+        ]
+      ],
+      "decision": [
+        [
+          "decision-theory",
+          "P_C559_DECISION_THEORY"
+        ],
+        [
+          "decision_theory",
+          "P_C561_Q_LEARNING_WORKSTREAMS"
+        ]
+      ],
+      "sensor": [
+        [
+          "sensor-calibration",
+          "P_C562_DHT22_DRIFT_OSCILLATION"
+        ],
+        [
+          "sensor-calibration",
+          "P_C564_DQN_SENSOR_CALIBRATION"
+        ],
+        [
+          "sensor-calibration",
+          "P_C566_KALMAN_BIAS_ESTIMATION"
+        ],
+        [
+          "sensor_calibration",
+          "P_C567_CALIBRATED_SENSOR_PIPELINE"
+        ],
+        [
+          "sensor-calibration",
+          "P_C568_CALIBRATION_GAP_ANALYSIS"
+        ],
+        [
+          "sensor-calibration",
+          "P_C569_SENSOR_DASHBOARD"
+        ],
+        [
+          "sensor_calibration",
+          "P_C570_CALIBRATION_HEALTH"
+        ],
+        [
+          "sensor_calibration",
+          "P_C571_SENSOR_STABILITY_TREND"
+        ],
+        [
+          "sensor_calibration",
+          "P_C572_DIRECT_METHOD SUPERIORITY"
+        ]
+      ]
+    }
+  },
+  "c556_prediction": {
+    "predicted_reduction": "157 \u2192 ~30",
+    "actual_reduction": "91 \u2192 32",
+    "predicted_improvement": "5x",
+    "actual_improvement": "0.4x"
+  }
+}
