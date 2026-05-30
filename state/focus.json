@@ -1,12 +1,11 @@
 {
-  "focus": "C574: Category consolidation v2 — semantic clustering",
-  "status": "completed",
+  "focus": "C575: Sensor anomaly detection system",
+  "status": "in_progress",
   "deliverables": [
-    "91 categories consolidated to 32 supercategories (C556 predicted ~30)",
-    "109 patterns remapped across 15 merge groups",
-    "Avg patterns/category: 3.8 → 10.8 (C556 predicted 10.9 — remarkably close)",
-    "C556 prediction graded: MOSTLY_CORRECT (Brier 0.0225)",
-    "Backup created: patterns.jsonl.bak.202605300842"
+    "scripts/sensor_anomaly_detector.py — z-score + IQR anomaly detection on DHT22 time series",
+    "Calibration health monitor update — DRIFTING status, env change detected (raw 98.0 -> 96.8%)",
+    "Direct method confirmed: 59.8% calibrated vs 61% GT (1.2% deviation)",
+    "Anomaly log initialized — collecting readings, needs 5+ for active detection"
   ],
-  "next": "Explore new domain or grade additional pending predictions. Category health is now established."
+  "next": "Build anomaly log to 5+ readings for active detection, or explore new domain (Lyla's RL workstream completed C541)"
 }

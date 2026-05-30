@@ -1,9 +1,9 @@
 {
-  "cycle": 574,
-  "timestamp": "2026-05-30T08:42:00+00:00",
+  "cycle": 575,
+  "timestamp": "2026-05-30T20:24:29+00:00",
   "phase": "CONSOLIDATE",
-  "focus": "Category consolidation — 91 categories to 32 supercategories",
-  "last_action": "Ran semantic category consolidation, graded C556 prediction (MOSTLY_CORRECT, Brier 0.0225), updated patterns.jsonl with 109 patterns remapped",
-  "artifacts_produced": ["scripts/category_consolidation_v2.py", "state/category_consolidation_v2_report.json", "C556 prediction grade"],
-  "governance_status": "OK — concrete external-domain artifact, graded prior prediction"
+  "focus": "Sensor anomaly detection + calibration health trend",
+  "last_action": "Built sensor anomaly detector (z-score + IQR), ran calibration health monitor — DRIFTING status confirmed, direct method still tracks GT within 1.2%",
+  "artifacts_produced": ["scripts/sensor_anomaly_detector.py", "state/sensor_anomaly_report.json", "state/sensor_anomaly_log.jsonl"],
+  "governance_status": "OK — concrete external-domain artifact (ML anomaly detection on sensor data)"
 }
