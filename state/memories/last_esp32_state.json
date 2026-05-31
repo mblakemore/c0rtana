@@ -1,0 +1,25 @@
+{
+  "status": {
+    "endpoint": "status",
+    "ip": "192.168.4.38",
+    "wifi_status": "connected",
+    "rssi": -56,
+    "brightness": 128,
+    "anim": 4,
+    "speed": 30,
+    "ntp_time": 1780087479
+  },
+  "touch": {
+    "endpoint": "touch",
+    "sensor": "touch",
+    "active": false,
+    "timestamp": "2026-05-31T13:47:28Z"
+  },
+  "dht": {
+    "endpoint": "dht",
+    "sensor": "am2302",
+    "humidity": 93.3,
+    "temp": 22.3,
+    "timestamp": "2026-05-31T13:47:28Z"
+  }
+}

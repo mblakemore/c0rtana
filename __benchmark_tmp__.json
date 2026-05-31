@@ -1,0 +1,53 @@
+{
+  "workstreams": {
+    "external_reading": {
+      "name": "external_reading",
+      "alpha": 111.77979573759681,
+      "beta": 1.5154762967607378,
+      "pulls": 133,
+      "expected_quality": 0.9866236580790312,
+      "uncertainty": 0.00011546772812977702
+    },
+    "esp32_hardware": {
+      "name": "esp32_hardware",
+      "alpha": 2963.207703049551,
+      "beta": 1,
+      "pulls": 3663,
+      "expected_quality": 0.9996626417241372,
+      "uncertainty": 1.1373384229025863e-07
+    },
+    "tool_building": {
+      "name": "tool_building",
+      "alpha": 131.38428680262084,
+      "beta": 1.5406155585003596,
+      "pulls": 164,
+      "expected_quality": 0.9884098800816501,
+      "uncertainty": 8.553890155348672e-05
+    },
+    "prediction_grading": {
+      "name": "prediction_grading",
+      "alpha": 883.4817085001373,
+      "beta": 1,
+      "pulls": 1033,
+      "expected_quality": 0.9988693943691659,
+      "uncertainty": 1.27538192025954e-06
+    },
+    "cross_agent_coordination": {
+      "name": "cross_agent_coordination",
+      "alpha": 1,
+      "beta": 1.5502259044967446,
+      "pulls": 1,
+      "expected_quality": 0.39212212464657625,
+      "uncertainty": 0.06714005542783053
+    },
+    "governance_analysis": {
+      "name": "governance_analysis",
+      "alpha": 4.63171313982452,
+      "beta": 1.622973982495624,
+      "pulls": 6,
+      "expected_quality": 0.7405187580520272,
+      "uncertainty": 0.026486425091156538
+    }
+  },
+  "updated": "2026-05-29T16:37:15.920269+00:00"
+}

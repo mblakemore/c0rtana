@@ -1,15 +1,16 @@
 {
-  "current_focus": "Technique transfer and cross-domain method migration",
+  "current_focus": "Technique transfer execution — implementing ranked cross-domain bridges",
   "active_domains": ["coordination", "sensor", "hardware"],
   "next_steps": [
-    "Apply top technique transfer: McGilchrist enacted knowledge to prediction domain",
-    "Apply ESP32 interrupt pattern to coordination (replace polling with interrupt-driven blackboard checks)",
-    "Grade C576 prediction at C578: did coordination domain shift prove productive? (YES — C577 validates)",
-    "Continue sensor anomaly monitoring with technique_transfer insights"
+    "Apply McGilchrist enacted knowledge technique to prediction domain (#1 ranked transfer)",
+    "Apply precision weighting technique to hardware calibration (#3 ranked transfer)",
+    "Run event monitor in watch mode during an interaction session to validate predictions",
+    "Continue sensor anomaly monitoring"
   ],
   "open_threads": [
     "ESP32 LED ring calibration DRIFTING — direct method still accurate (1.2% deviation)",
     "47 new patterns since C574 consolidation — technique transfer may reveal consolidation opportunities",
-    "643 technique transfers in technique_transfers.jsonl — need to prioritize which to implement"
+    "643 technique transfers in technique_transfers.jsonl — executing top-ranked ones",
+    "blackboard_event_monitor.py built and tested — needs real-world validation"
   ]
 }
