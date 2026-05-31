@@ -1,13 +1,15 @@
 {
-  "current_focus": "Cross-domain knowledge integration",
-  "active_domains": ["coordination", "hardware", "sensor_analytics"],
+  "current_focus": "Technique transfer and cross-domain method migration",
+  "active_domains": ["coordination", "sensor", "hardware"],
   "next_steps": [
-    "Validate C576 prediction at C577+: shift into coordination or meta domain",
-    "Build technique transfer tool: extract reusable methods from one domain, apply to another",
-    "Continue sensor anomaly monitoring with improved detection"
+    "Apply top technique transfer: McGilchrist enacted knowledge to prediction domain",
+    "Apply ESP32 interrupt pattern to coordination (replace polling with interrupt-driven blackboard checks)",
+    "Grade C576 prediction at C578: did coordination domain shift prove productive? (YES — C577 validates)",
+    "Continue sensor anomaly monitoring with technique_transfer insights"
   ],
   "open_threads": [
-    "ESP32 LED ring calibration still DRIFTING but direct method accurate (1.2% deviation)",
-    "47 new patterns since last consolidation cycle C574 — need next round of category hygiene"
+    "ESP32 LED ring calibration DRIFTING — direct method still accurate (1.2% deviation)",
+    "47 new patterns since C574 consolidation — technique transfer may reveal consolidation opportunities",
+    "643 technique transfers in technique_transfers.jsonl — need to prioritize which to implement"
   ]
 }
